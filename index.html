@@ -62,13 +62,11 @@
         .estado-pagado { background: #cff4fc; color: #055160; }
         .flex-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
         .talla-info { font-size: 14px; margin-top: 4px; color: #6c757d; }
-        .rol-selector { display: flex; gap: 15px; justify-content: center; margin-bottom: 20px; }
-        .rol-btn { background: white; color: #2c7da0; border: 2px solid #2c7da0; }
-        .rol-btn.active { background: #2c7da0; color: white; }
-        .login-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-        .login-card { background: white; border-radius: 32px; padding: 40px; width: 90%; max-width: 400px; text-align: center; }
-        .error { color: red; margin-top: 10px; }
         .comision-control { background: #eef7fb; border-radius: 28px; padding: 15px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 20px; align-items: center; }
+        .login-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .login-card { background: white; border-radius: 32px; padding: 40px; width: 90%; max-width: 500px; text-align: center; }
+        .error { color: red; margin-top: 10px; }
+        .separator { margin: 20px 0; border-top: 1px solid #dee2e6; }
         @media (max-width: 700px) { .btn { padding: 12px 20px; font-size: 18px; } .field input, .field select { padding: 12px; font-size: 16px; } }
     </style>
 </head>
@@ -78,18 +76,32 @@
 <div id="loginOverlay" class="login-overlay">
     <div class="login-card">
         <h2>✨ Divina Compras ✨</h2>
-        <p style="margin-bottom: 20px;">Ingresa para acceder</p>
-        <div class="field">
-            <label>Tu código (4 dígitos de WhatsApp)</label>
-            <input type="text" id="codigoAcceso" maxlength="4" placeholder="Ej: 1234">
+        <p style="margin-bottom: 20px;">Ingresa según tu rol</p>
+        
+        <!-- Acceso para clientes y vendedores -->
+        <div style="background: #f8f9fa; border-radius: 28px; padding: 20px; margin-bottom: 20px;">
+            <h3>👥 Cliente / Vendedor</h3>
+            <div class="field">
+                <label>Últimos 4 dígitos de WhatsApp</label>
+                <input type="text" id="codigoAcceso" maxlength="4" placeholder="Ej: 1234">
+            </div>
+            <button id="btnLoginUsuario" class="btn btn-primary">Ingresar como cliente/vendedor</button>
         </div>
-        <div class="field" id="adminPassField" style="display: none;">
-            <label>Clave de administrador</label>
-            <input type="password" id="adminPassword" placeholder="Clave especial">
+
+        <div class="separator"></div>
+
+        <!-- Acceso para administrador -->
+        <div style="background: #f8f9fa; border-radius: 28px; padding: 20px;">
+            <h3>🔐 Administrador</h3>
+            <div class="field">
+                <label>Clave de administrador</label>
+                <input type="password" id="adminPassword" placeholder="Clave especial">
+            </div>
+            <button id="btnLoginAdmin" class="btn btn-warning">Ingresar como administrador</button>
         </div>
-        <button id="btnLogin" class="btn btn-primary" style="margin-top: 10px;">Ingresar</button>
+
         <div id="loginError" class="error"></div>
-        <p style="margin-top: 20px; font-size: 14px;">Administrador: clave <strong>spena748</strong><br>Clientes y vendedores: usen sus 4 dígitos registrados</p>
+        <p style="margin-top: 20px; font-size: 14px;">¿No tienes cuenta? Contacta al administrador.</p>
     </div>
 </div>
 
@@ -243,7 +255,12 @@
         let v = localStorage.getItem("ventas_divina");
         ventas = v ? JSON.parse(v) : [];
         let u = localStorage.getItem("divina_usuarios");
-        usuarios = u ? JSON.parse(u) : [{codigo:"spena", nombre:"Administrador", rol:"admin"}];
+        usuarios = u ? JSON.parse(u) : [];
+        // Asegurar que el administrador existe en la lista
+        if (!usuarios.find(u => u.rol === "admin")) {
+            usuarios.push({ codigo: "admin", nombre: "Administrador", rol: "admin" });
+            guardarTodo();
+        }
         comisionGlobal = parseFloat(localStorage.getItem("comision_divina") || "10");
         horaFelizActiva = localStorage.getItem("horaFelizActiva_divina") === "true";
         descuentoHH = parseFloat(localStorage.getItem("descuentoHH_divina") || "10");
@@ -487,7 +504,6 @@
             row.insertCell(7).appendChild(acc);
             if(p.estado !== "cancelado" && p.estado !== "pagado") total += p.totalMXN;
         });
-        // Ejemplo para desglose
         let ejemplo = misProductos.find(p => p.estado !== "cancelado");
         if(ejemplo) {
             let base = ejemplo.precioUSD * ejemplo.pzas * TC;
@@ -522,7 +538,44 @@
         reader.readAsDataURL(file);
     }
 
-    // ---------- LOGIN Y CAMBIO DE VISTA ----------
+    // ---------- LOGIN ----------
+    function loginUsuario() {
+        let codigo = document.getElementById("codigoAcceso").value.trim();
+        if(!codigo) {
+            document.getElementById("loginError").innerText = "Ingresa tu código de 4 dígitos";
+            return;
+        }
+        cargarDatos();
+        let usuario = usuarios.find(u => u.codigo === codigo && (u.rol === "cliente" || u.rol === "shopper"));
+        if(usuario) {
+            usuarioActual = usuario;
+            document.getElementById("loginOverlay").style.display = "none";
+            document.getElementById("mainApp").style.display = "block";
+            document.getElementById("bienvenidaUsuario").innerHTML = `Bienvenido, ${usuario.nombre} (${usuario.rol === "shopper" ? "Vendedor" : "Cliente"})`;
+            mostrarPantallaSegunRol();
+        } else {
+            document.getElementById("loginError").innerText = "Código no registrado o rol incorrecto. Contacta al administrador.";
+        }
+    }
+    function loginAdmin() {
+        let pass = document.getElementById("adminPassword").value.trim();
+        if(pass !== "spena748") {
+            document.getElementById("loginError").innerText = "Clave de administrador incorrecta";
+            return;
+        }
+        cargarDatos();
+        usuarioActual = usuarios.find(u => u.rol === "admin");
+        if(!usuarioActual) {
+            // Si no existe, lo creamos
+            usuarioActual = { codigo: "admin", nombre: "Administrador", rol: "admin" };
+            usuarios.push(usuarioActual);
+            guardarTodo();
+        }
+        document.getElementById("loginOverlay").style.display = "none";
+        document.getElementById("mainApp").style.display = "block";
+        document.getElementById("bienvenidaUsuario").innerHTML = `Bienvenido, Administrador`;
+        mostrarPantallaSegunRol();
+    }
     function mostrarPantallaSegunRol() {
         document.getElementById("adminPanel").style.display = "none";
         document.getElementById("shopperPanel").style.display = "none";
@@ -539,36 +592,6 @@
             document.getElementById("clientePanel").style.display = "block";
             actualizarVistaCliente();
         }
-        document.getElementById("bienvenidaUsuario").innerHTML = `Bienvenido, ${usuarioActual.nombre} (${usuarioActual.rol === "admin" ? "Administrador" : (usuarioActual.rol === "shopper" ? "Vendedor" : "Cliente")})`;
-    }
-    function login() {
-        let codigo = document.getElementById("codigoAcceso").value.trim();
-        let adminPass = document.getElementById("adminPassword").value.trim();
-        cargarDatos();
-        // Verificar si es administrador
-        if(codigo === "" && adminPass === "spena748") {
-            usuarioActual = usuarios.find(u => u.rol === "admin");
-            if(!usuarioActual) {
-                // Si no existe admin en la lista, lo creamos
-                usuarioActual = { codigo: "spena", nombre: "Administrador", rol: "admin" };
-                usuarios.push(usuarioActual);
-                guardarTodo();
-            }
-            document.getElementById("loginOverlay").style.display = "none";
-            document.getElementById("mainApp").style.display = "block";
-            mostrarPantallaSegunRol();
-            return;
-        }
-        // Buscar usuario por código
-        let usuario = usuarios.find(u => u.codigo === codigo);
-        if(usuario && (usuario.rol === "cliente" || usuario.rol === "shopper")) {
-            usuarioActual = usuario;
-            document.getElementById("loginOverlay").style.display = "none";
-            document.getElementById("mainApp").style.display = "block";
-            mostrarPantallaSegunRol();
-        } else {
-            document.getElementById("loginError").innerText = "Código no autorizado o incorrecto. Intenta de nuevo.";
-        }
     }
     function cerrarSesion() {
         usuarioActual = null;
@@ -578,12 +601,12 @@
         document.getElementById("adminPassword").value = "";
         document.getElementById("loginError").innerText = "";
     }
-    // Mostrar/ocultar campo de clave de admin cuando se ingresa "(admin)" o algo? Lo dejamos siempre visible pero condicional al login.
-    // Para simplificar, siempre mostramos el campo de clave de admin, pero solo se usa si el código está vacío.
+
+    // ---------- EVENTOS E INICIALIZACIÓN ----------
     window.onload = () => {
         cargarDatos();
-        // Eventos generales
-        document.getElementById("btnLogin").onclick = login;
+        document.getElementById("btnLoginUsuario").onclick = loginUsuario;
+        document.getElementById("btnLoginAdmin").onclick = loginAdmin;
         document.getElementById("btnCerrarSesion").onclick = cerrarSesion;
         // Eventos del administrador
         document.getElementById("comisionPorcentaje").onchange = () => { comisionGlobal = parseFloat(document.getElementById("comisionPorcentaje").value); guardarTodo(); };
@@ -607,20 +630,12 @@
         // Eventos cliente
         document.getElementById("btnSubirComprobanteCliente").onclick = subirComprobanteCliente;
         document.getElementById("btnRefrescarCliente").onclick = () => { cargarDatos(); if(usuarioActual && usuarioActual.rol === "cliente") actualizarVistaCliente(); };
-        // Eventos vendedor (actualizar al recargar)
+        // Sincronización entre pestañas
         window.addEventListener("storage", () => {
             cargarDatos();
-            if(usuarioActual) {
-                if(usuarioActual.rol === "admin") {
-                    cargarSelectVendedores();
-                    actualizarTablaUsuarios();
-                    sincronizarUIAdmin();
-                    if(document.getElementById("clienteSeleccionado").value) cargarProductosClienteAdmin();
-                } else if(usuarioActual.rol === "shopper") actualizarVistaShopper();
-                else if(usuarioActual.rol === "cliente") actualizarVistaCliente();
-            }
+            if(usuarioActual) mostrarPantallaSegunRol();
         });
-        // Asegurar que al inicio se muestre login
+        // Asegurar que se vea el login
         document.getElementById("mainApp").style.display = "none";
         document.getElementById("loginOverlay").style.display = "flex";
     };
