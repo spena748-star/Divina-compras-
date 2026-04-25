@@ -76,6 +76,7 @@
         </div>
 
         <div id="adminPanel" style="display: none;">
+            <!-- Configuración comisión y Hora Feliz -->
             <div class="card">
                 <div class="comision-control">
                     <div><label>💰 Comisión global (%)</label><input type="number" id="comisionPorcentaje" step="1" min="0" max="100" style="width:100px"></div>
@@ -87,6 +88,7 @@
                     <div><span id="estadoHH" class="badge estado-pendiente">HH INACTIVA</span></div>
                 </div>
             </div>
+            <!-- Agregar producto -->
             <div class="card">
                 <div class="card-title">📝 Agregar producto</div>
                 <div class="form-simple">
@@ -108,6 +110,7 @@
                     <button id="btnLimpiarForm" class="btn">🗑️ Limpiar</button>
                 </div>
             </div>
+            <!-- Ver productos -->
             <div class="card">
                 <div class="card-title">📋 Productos del cliente</div>
                 <div class="form-simple">
@@ -116,11 +119,12 @@
                 </div>
                 <div class="table-wrapper">
                     <table id="tablaProductosCliente">
-                        <thead><tr><th>Producto</th><th>Marca</th><th>Pzas</th><th>USD</th><th>Total MXN</th><th>Talla</th><th>Banco</th><th>Vendedor</th><th>Estado</th><th>Comprobante</th><th>Acciones</th></td></thead>
+                        <thead><tr><th>Producto</th><th>Marca</th><th>Pzas</th><th>USD</th><th>Total MXN</th><th>Talla</th><th>Banco</th><th>Vendedor</th><th>Estado</th><th>Comprobante</th><th>Acciones</th></tr></thead>
                         <tbody id="tbodyProductosCliente"></tbody>
                     </table>
                 </div>
             </div>
+            <!-- Gestión de usuarios -->
             <div class="card">
                 <div class="card-title">👥 Gestión de usuarios</div>
                 <div class="form-simple">
@@ -175,9 +179,7 @@
             </div>
         </div>
     </div>
-</div>
-
-<script>
+</div><script>
     const TC = 17.40;
     let ventas = [], usuarios = [];
     let comisionGlobal = 10, horaFelizActiva = false, descuentoHH = 10;
@@ -375,7 +377,7 @@
             else if(p.estado === "aprobado") acc.innerText = "Espera liberación";
             else acc.innerText = "—";
         });
-        if(productos.length === 0) tbody.innerHTML = "<tr><td colspan='11'>Sin productos para este cliente</tr>";
+        if(productos.length === 0) tbody.innerHTML = "<tr><td colspan='11'>Sin productos para este cliente</td>";
         let existing = document.getElementById("btnLiberarGlobal");
         if(existing) existing.remove();
         if(tieneComp && productos.some(p => p.estado === "aprobado")) {
@@ -468,7 +470,7 @@
             let final = sub - desc;
             document.getElementById("desglose").innerHTML = `<strong>💰 Conversión actual:</strong><br>USD $${(ejemplo.precioUSD * ejemplo.pzas).toFixed(2)} × TC $${TC} = $${base.toFixed(2)}<br>+ Comisión ${comisionGlobal}% = $${com.toFixed(2)}<br>= Subtotal $${sub.toFixed(2)}<br>${horaFelizActiva ? `- Descuento Hora Feliz (${descuentoHH}%) = $${desc.toFixed(2)}<br>` : ""}<strong>Total a pagar: $${final.toFixed(2)}</strong>`;
         } else document.getElementById("desglose").innerHTML = "No hay productos activos";
-        if(misProductos.length === 0) tbody.innerHTML = "<tr><td colspan='8'>No hay productos para ti</tr>";
+        if(misProductos.length === 0) tbody.innerHTML = "<tr><td colspan='8'>No hay productos para ti<tr>";
     }
     function subirComprobanteCliente() {
         if(!usuarioActual) return;
