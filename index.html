@@ -3,45 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Divina Compras - Sistema Integrado</title>
+    <title>Divina Compras - Sistema de Ventas</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            background: #eef2f5;
-            padding: 20px;
-            min-height: 100vh;
-        }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #eef2f5; padding: 20px; min-height: 100vh; }
         .container { max-width: 1400px; margin: 0 auto; }
-        .card {
-            background: white;
-            border-radius: 32px;
-            padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-            border: 1px solid #dee2e6;
-        }
-        .card-title {
-            font-size: 28px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: #1e466e;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        .btn {
-            border: none;
-            border-radius: 60px;
-            padding: 14px 28px;
-            font-size: 20px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-            background: #e9ecef;
-            color: #1e2a3e;
-        }
+        .card { background: white; border-radius: 32px; padding: 24px; margin-bottom: 24px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); border: 1px solid #dee2e6; }
+        .card-title { font-size: 28px; font-weight: 600; margin-bottom: 20px; color: #1e466e; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .btn { border: none; border-radius: 60px; padding: 14px 28px; font-size: 20px; font-weight: 600; cursor: pointer; transition: 0.2s; background: #e9ecef; color: #1e2a3e; }
         .btn-primary { background: #2c7da0; color: white; }
         .btn-success { background: #2e7d64; color: white; }
         .btn-danger { background: #bc4742; color: white; }
@@ -72,13 +41,10 @@
 </head>
 <body>
 
-<!-- Pantalla de login -->
 <div id="loginOverlay" class="login-overlay">
     <div class="login-card">
         <h2>✨ Divina Compras ✨</h2>
         <p style="margin-bottom: 20px;">Ingresa según tu rol</p>
-        
-        <!-- Acceso para clientes y vendedores -->
         <div style="background: #f8f9fa; border-radius: 28px; padding: 20px; margin-bottom: 20px;">
             <h3>👥 Cliente / Vendedor</h3>
             <div class="field">
@@ -87,10 +53,7 @@
             </div>
             <button id="btnLoginUsuario" class="btn btn-primary">Ingresar como cliente/vendedor</button>
         </div>
-
         <div class="separator"></div>
-
-        <!-- Acceso para administrador -->
         <div style="background: #f8f9fa; border-radius: 28px; padding: 20px;">
             <h3>🔐 Administrador</h3>
             <div class="field">
@@ -99,25 +62,20 @@
             </div>
             <button id="btnLoginAdmin" class="btn btn-warning">Ingresar como administrador</button>
         </div>
-
         <div id="loginError" class="error"></div>
         <p style="margin-top: 20px; font-size: 14px;">¿No tienes cuenta? Contacta al administrador.</p>
     </div>
 </div>
 
-<!-- CONTENEDOR PRINCIPAL (se muestra tras login) -->
 <div id="mainApp" style="display: none;">
     <div class="container">
-        <!-- Cabecera con nombre de usuario y botón salir -->
         <div class="card" style="background: #2c7da0; color: white; text-align: center;">
             <h1>✨ Divina Compras ✨</h1>
             <p id="bienvenidaUsuario"></p>
             <button id="btnCerrarSesion" class="btn" style="background: white; color: #2c7da0; margin-top: 10px;">🔓 Cerrar sesión</button>
         </div>
 
-        <!-- ======================= PANEL ADMINISTRADOR ======================= -->
         <div id="adminPanel" style="display: none;">
-            <!-- Configuración comisión y Hora Feliz -->
             <div class="card">
                 <div class="comision-control">
                     <div><label>💰 Comisión global (%)</label><input type="number" id="comisionPorcentaje" step="1" min="0" max="100" style="width:100px"></div>
@@ -129,7 +87,6 @@
                     <div><span id="estadoHH" class="badge estado-pendiente">HH INACTIVA</span></div>
                 </div>
             </div>
-            <!-- Agregar producto -->
             <div class="card">
                 <div class="card-title">📝 Agregar producto</div>
                 <div class="form-simple">
@@ -151,7 +108,6 @@
                     <button id="btnLimpiarForm" class="btn">🗑️ Limpiar</button>
                 </div>
             </div>
-            <!-- Ver productos de un cliente -->
             <div class="card">
                 <div class="card-title">📋 Productos del cliente</div>
                 <div class="form-simple">
@@ -160,47 +116,44 @@
                 </div>
                 <div class="table-wrapper">
                     <table id="tablaProductosCliente">
-                        <thead><tr><th>Producto</th><th>Marca</th><th>Pzas</th><th>USD</th><th>Total MXN</th><th>Talla</th><th>Banco</th><th>Vendedor</th><th>Estado</th><th>Comprobante</th><th>Acciones</th></tr></thead>
+                        <thead><tr><th>Producto</th><th>Marca</th><th>Pzas</th><th>USD</th><th>Total MXN</th><th>Talla</th><th>Banco</th><th>Vendedor</th><th>Estado</th><th>Comprobante</th><th>Acciones</th></td></thead>
                         <tbody id="tbodyProductosCliente"></tbody>
                     </table>
                 </div>
             </div>
-            <!-- Gestión de usuarios -->
             <div class="card">
                 <div class="card-title">👥 Gestión de usuarios</div>
                 <div class="form-simple">
                     <div class="field"><label>Código (4 dígitos WhatsApp)</label><input type="text" id="nuevoCodigo" maxlength="4"></div>
                     <div class="field"><label>Nombre completo</label><input type="text" id="nuevoNombre"></div>
                     <div class="field"><label>Rol</label><select id="nuevoRol"><option value="cliente">Cliente</option><option value="shopper">Vendedor</option></select></div>
+                    <div class="field" id="socioCheckboxField" style="display: none;"><label><input type="checkbox" id="nuevoEsSocio"> ¿Es socio (dueño)?</label></div>
                     <button id="btnAgregarUsuario" class="btn btn-primary">➕ Agregar</button>
                 </div>
                 <div class="table-wrapper">
-                    <table id="tablaUsuarios">
-                        <thead><tr><th>Código</th><th>Nombre</th><th>Rol</th><th>Acciones</th></tr></thead>
-                        <tbody id="tbodyUsuarios"></tbody>
-                    </table>
+                    <table id="tablaUsuarios"><thead><tr><th>Código</th><th>Nombre</th><th>Rol</th><th>Socio?</th><th>Acciones</th></tr></thead><tbody id="tbodyUsuarios"></tbody></table>
                 </div>
             </div>
         </div>
 
-        <!-- ======================= PANEL VENDEDOR ======================= -->
         <div id="shopperPanel" style="display: none;">
             <div class="card">
-                <div class="card-title">💰 Tu comisión acumulada (10% sobre pagado)</div>
-                <div style="font-size: 32px; font-weight: bold;" id="comisionTotalShopper">$0.00</div>
+                <div class="card-title">💰 Tus ganancias</div>
+                <div id="gananciasShopper" style="font-size: 24px; font-weight: bold;"></div>
             </div>
             <div class="card">
                 <div class="card-title">📋 Productos pagados que te corresponden</div>
                 <div class="table-wrapper">
-                    <table id="tablaProductosShopper">
-                        <thead><tr><th>Fecha</th><th>Cliente</th><th>Producto</th><th>Marca</th><th>Pzas</th><th>Total MXN</th><th>Tu comisión (10%)</th></tr></thead>
-                        <tbody id="tbodyProductosShopper"></tbody>
-                    </table>
+                    <table id="tablaProductosShopper"><thead><tr><th>Fecha</th><th>Cliente</th><th>Producto</th><th>Marca</th><th>Pzas</th><th>Total MXN</th><th>Tu comisión (10%)</th></tr></thead><tbody id="tbodyProductosShopper"></tbody></table>
                 </div>
+            </div>
+            <div class="card" id="socioExtraPanel" style="display: none;">
+                <div class="card-title">🏢 Participación como socio (dueño)</div>
+                <div id="socioGanancias" style="font-size: 24px; font-weight: bold;"></div>
+                <p>Te corresponde la parte igual de la ganancia total del negocio (comisión global acumulada).</p>
             </div>
         </div>
 
-        <!-- ======================= PANEL CLIENTE ======================= -->
         <div id="clientePanel" style="display: none;">
             <div class="card">
                 <div class="card-title">📊 Desglose de precios</div>
@@ -209,10 +162,7 @@
             <div class="card">
                 <div class="card-title">🛍️ Tus productos</div>
                 <div class="table-wrapper">
-                    <table id="tablaProductosClienteFinal">
-                        <thead><tr><th>Producto</th><th>Marca</th><th>Pzas</th><th>Precio USD</th><th>Total MXN</th><th>Talla</th><th>Estado</th><th>Decisión</th></tr></thead>
-                        <tbody id="tbodyProductosClienteFinal"></tbody>
-                    </table>
+                    <table id="tablaProductosClienteFinal"><thead><tr><th>Producto</th><th>Marca</th><th>Pzas</th><th>Precio USD</th><th>Total MXN</th><th>Talla</th><th>Estado</th><th>Decisión</th></tr></thead><tbody id="tbodyProductosClienteFinal"></tbody></table>
                 </div>
                 <div class="card" style="margin-top:20px; background: #faf0f5;">
                     <h3>📎 Subir comprobante de depósito</h3>
@@ -228,12 +178,11 @@
 </div>
 
 <script>
-    // ---------- DATOS GLOBALES ----------
     const TC = 17.40;
     let ventas = [], usuarios = [];
     let comisionGlobal = 10, horaFelizActiva = false, descuentoHH = 10;
     let nextId = 1;
-    let usuarioActual = null; // { codigo, nombre, rol }
+    let usuarioActual = null;
 
     const tallasData = {
         mujer: { usa: ["5","5.5","6","6.5","7","7.5","8","8.5","9","9.5","10","10.5","11"], mx: ["22","22.5","23","23.5","24","24.5","25","25.5","26","26.5","27","27.5","28"], cm: ["22.5","23","23.5","24","24.5","25","25.5","26","26.5","27","27.5","28","28.5"] },
@@ -243,7 +192,6 @@
         bebes: { usa: ["1","2","3","4","5","6","7","8","9","10"], mx: ["9","10","11","12","13","14","15","16","17","18"], cm: ["9","10","11","12","13","14","15","16","17","18"] }
     };
 
-    // ---------- FUNCIONES DE ALMACENAMIENTO ----------
     function guardarTodo() {
         localStorage.setItem("ventas_divina", JSON.stringify(ventas));
         localStorage.setItem("divina_usuarios", JSON.stringify(usuarios));
@@ -256,9 +204,8 @@
         ventas = v ? JSON.parse(v) : [];
         let u = localStorage.getItem("divina_usuarios");
         usuarios = u ? JSON.parse(u) : [];
-        // Asegurar que el administrador existe en la lista
         if (!usuarios.find(u => u.rol === "admin")) {
-            usuarios.push({ codigo: "admin", nombre: "Administrador", rol: "admin" });
+            usuarios.push({ codigo: "admin", nombre: "Administrador", rol: "admin", esSocio: false });
             guardarTodo();
         }
         comisionGlobal = parseFloat(localStorage.getItem("comision_divina") || "10");
@@ -267,14 +214,16 @@
         if(ventas.length) nextId = Math.max(...ventas.map(v=>v.id)) + 1;
         else nextId = 1;
     }
-
-    // ---------- UTILIDADES ----------
     function calcularTotal(precioUSD, pzas) {
         let base = precioUSD * pzas * TC;
         let com = base * comisionGlobal / 100;
         let total = base + com;
         if(horaFelizActiva) total *= (1 - descuentoHH / 100);
         return total;
+    }
+    function calcularComisionMonto(precioUSD, pzas) {
+        let base = precioUSD * pzas * TC;
+        return base * comisionGlobal / 100;
     }
     function cargarSelectTalla() {
         let cat = document.getElementById("categoria").value;
@@ -296,11 +245,59 @@
         let shoppers = usuarios.filter(u => u.rol === "shopper");
         shoppers.forEach(s => { let opt = document.createElement("option"); opt.value = s.codigo; opt.text = `${s.nombre} (${s.codigo})`; select.appendChild(opt); });
     }
-
-    // ---------- ADMINISTRADOR ----------
+    function toggleSocioCheckbox() {
+        let rol = document.getElementById("nuevoRol").value;
+        document.getElementById("socioCheckboxField").style.display = rol === "shopper" ? "block" : "none";
+    }
+    function agregarUsuario() {
+        let codigo = document.getElementById("nuevoCodigo").value.trim();
+        let nombre = document.getElementById("nuevoNombre").value.trim();
+        let rol = document.getElementById("nuevoRol").value;
+        let esSocio = document.getElementById("nuevoEsSocio").checked;
+        if(!codigo || !nombre) { alert("Código y nombre obligatorios"); return; }
+        if(codigo.length !== 4 || !/^\d+$/.test(codigo)) { alert("El código debe ser 4 dígitos"); return; }
+        if(usuarios.find(u => u.codigo === codigo)) { alert("Ya existe"); return; }
+        usuarios.push({ codigo, nombre, rol, esSocio: (rol === "shopper" ? esSocio : false) });
+        guardarTodo();
+        actualizarTablaUsuarios();
+        document.getElementById("nuevoCodigo").value = "";
+        document.getElementById("nuevoNombre").value = "";
+        document.getElementById("nuevoEsSocio").checked = false;
+        cargarSelectVendedores();
+    }
+    function eliminarUsuario(idx) {
+        if(usuarios[idx].rol === "admin") { alert("No se puede eliminar al administrador"); return; }
+        usuarios.splice(idx,1);
+        guardarTodo();
+        actualizarTablaUsuarios();
+        cargarSelectVendedores();
+    }
+    function actualizarTablaUsuarios() {
+        let tbody = document.getElementById("tbodyUsuarios");
+        tbody.innerHTML = "";
+        usuarios.forEach((u, idx) => {
+            let row = tbody.insertRow();
+            row.insertCell(0).innerText = u.codigo;
+            row.insertCell(1).innerText = u.nombre;
+            row.insertCell(2).innerText = u.rol === "admin" ? "Administrador" : (u.rol === "shopper" ? "Vendedor" : "Cliente");
+            row.insertCell(3).innerText = (u.rol === "shopper" && u.esSocio) ? "Sí" : "No";
+            if(u.rol !== "admin") {
+                let btn = document.createElement("button"); btn.innerText = "🗑️ Eliminar"; btn.className = "btn btn-danger"; btn.style.padding="6px 12px";
+                btn.onclick = () => eliminarUsuario(idx);
+                row.insertCell(4).appendChild(btn);
+            } else row.insertCell(4).innerText = "—";
+        });
+    }
+    function sincronizarUIAdmin() {
+        document.getElementById("comisionPorcentaje").value = comisionGlobal;
+        document.getElementById("descuentoHH").value = descuentoHH;
+        let span = document.getElementById("estadoHH");
+        span.innerText = horaFelizActiva ? "🎉 HH ACTIVA" : "⛔ HH INACTIVA";
+        span.className = `badge ${horaFelizActiva ? "estado-aprobado" : "estado-pendiente"}`;
+    }
     function agregarProducto() {
         let codCliente = document.getElementById("codCliente").value.trim();
-        if(!codCliente || codCliente.length!==4 || !/^\d+$/.test(codCliente)) { alert("Código de cliente debe ser 4 dígitos"); return; }
+        if(!codCliente || codCliente.length!==4 || !/^\d+$/.test(codCliente)) { alert("Código cliente 4 dígitos"); return; }
         let producto = document.getElementById("producto").value.trim();
         let marca = document.getElementById("marca").value.trim();
         let precioUSD = parseFloat(document.getElementById("precioUSD").value);
@@ -315,13 +312,7 @@
         let idx = tallasData[cat].usa.indexOf(usa);
         let tallaInfo = idx>=0 ? `USA ${usa} → Mex ${tallasData[cat].mx[idx]} / CM ${tallasData[cat].cm[idx]}` : `USA ${usa}`;
         let now = new Date();
-        let venta = {
-            id: nextId++, codCliente, producto, marca, pzas, precioUSD, totalMXN: total,
-            talla: usa, tallaInfo, categoria: cat, banco, nota, estado: "pendiente",
-            fecha: now.toISOString().slice(0,10),
-            createdAt: now.toISOString(),
-            tienda: "Ross", shopper: shopper
-        };
+        let venta = { id: nextId++, codCliente, producto, marca, pzas, precioUSD, totalMXN: total, talla: usa, tallaInfo, categoria: cat, banco, nota, estado: "pendiente", fecha: now.toISOString().slice(0,10), createdAt: now.toISOString(), tienda: "Ross", shopper: shopper };
         ventas.push(venta);
         guardarTodo();
         alert("Producto agregado");
@@ -343,15 +334,13 @@
     }
     function verComprobante(codCliente) {
         let data = localStorage.getItem(`comprobante_${codCliente}`);
-        if (data) {
-            let win = window.open();
-            win.document.write(`<html><body><h3>Comprobante - Cliente ${codCliente}</h3><img src="${data}" style="max-width:100%;"><p><a href="${data}" download>Descargar</a></p></body></html>`);
-        } else alert("No hay comprobante");
+        if (data) { let win = window.open(); win.document.write(`<html><body><h3>Comprobante - Cliente ${codCliente}</h3><img src="${data}" style="max-width:100%;"><p><a href="${data}" download>Descargar</a></p></body></html>`); }
+        else alert("No hay comprobante");
     }
     function liberarPagoAdmin(codCliente) {
         let aprobados = ventas.filter(v => v.codCliente === codCliente && v.estado === "aprobado");
-        if(aprobados.length === 0) { alert("No hay productos aprobados para este cliente"); return; }
-        if(confirm(`Liberar pago para ${codCliente}? Se marcarán como PAGADOS ${aprobados.length} productos.`)) {
+        if(aprobados.length === 0) { alert("No hay productos aprobados"); return; }
+        if(confirm(`Liberar pago para ${codCliente}?`)) {
             for(let v of ventas) if(v.codCliente === codCliente && v.estado === "aprobado") v.estado = "pagado";
             guardarTodo();
             cargarProductosClienteAdmin();
@@ -379,20 +368,14 @@
             badge.innerText = {pendiente:"Pendiente",aprobado:"Aprobado",cancelado:"Cancelado",pagado:"Pagado"}[p.estado];
             row.insertCell(8).appendChild(badge);
             let compCel = row.insertCell(9);
-            if(tieneComp) {
-                let btn = document.createElement("button"); btn.innerText = "📄 Ver"; btn.className = "btn btn-info"; btn.style.padding="6px 12px";
-                btn.onclick = () => verComprobante(codigo);
-                compCel.appendChild(btn);
-            } else compCel.innerText = "—";
+            if(tieneComp) { let btn = document.createElement("button"); btn.innerText = "📄 Ver"; btn.className = "btn btn-info"; btn.style.padding="6px 12px"; btn.onclick = () => verComprobante(codigo); compCel.appendChild(btn); }
+            else compCel.innerText = "—";
             let acc = row.insertCell(10);
-            if(p.estado === "pendiente") {
-                let btn = document.createElement("button"); btn.innerText = "❌ Cancelar"; btn.className = "btn-danger"; btn.style.padding="6px 12px";
-                btn.onclick = () => cancelarProductoAdmin(p.id);
-                acc.appendChild(btn);
-            } else if(p.estado === "aprobado") acc.innerText = "Espera liberación";
+            if(p.estado === "pendiente") { let btn = document.createElement("button"); btn.innerText = "❌ Cancelar"; btn.className = "btn-danger"; btn.style.padding="6px 12px"; btn.onclick = () => cancelarProductoAdmin(p.id); acc.appendChild(btn); }
+            else if(p.estado === "aprobado") acc.innerText = "Espera liberación";
             else acc.innerText = "—";
         });
-        if(productos.length === 0) tbody.innerHTML = "<tr><td colspan='11'>Sin productos para este cliente</td></tr>";
+        if(productos.length === 0) tbody.innerHTML = "<tr><td colspan='11'>Sin productos para este cliente</tr>";
         let existing = document.getElementById("btnLiberarGlobal");
         if(existing) existing.remove();
         if(tieneComp && productos.some(p => p.estado === "aprobado")) {
@@ -404,59 +387,19 @@
             document.querySelector("#tablaProductosCliente").parentNode.parentNode.appendChild(btn);
         }
     }
-    function agregarUsuario() {
-        let codigo = document.getElementById("nuevoCodigo").value.trim();
-        let nombre = document.getElementById("nuevoNombre").value.trim();
-        let rol = document.getElementById("nuevoRol").value;
-        if(!codigo || !nombre) { alert("Código y nombre son obligatorios"); return; }
-        if(codigo.length !== 4 || !/^\d+$/.test(codigo)) { alert("El código debe ser 4 dígitos"); return; }
-        if(usuarios.find(u => u.codigo === codigo)) { alert("Ya existe un usuario con ese código"); return; }
-        usuarios.push({ codigo, nombre, rol });
-        guardarTodo();
-        actualizarTablaUsuarios();
-        document.getElementById("nuevoCodigo").value = "";
-        document.getElementById("nuevoNombre").value = "";
-        cargarSelectVendedores();
+    function obtenerSocios() { return usuarios.filter(u => u.rol === "shopper" && u.esSocio === true); }
+    function calcularGananciaTotalNegocio() {
+        let ventasPagadas = ventas.filter(v => v.estado === "pagado");
+        let gananciaTotal = 0;
+        for (let v of ventasPagadas) gananciaTotal += calcularComisionMonto(v.precioUSD, v.pzas);
+        return gananciaTotal;
     }
-    function eliminarUsuario(idx) {
-        if(usuarios[idx].rol === "admin") { alert("No se puede eliminar al administrador"); return; }
-        usuarios.splice(idx,1);
-        guardarTodo();
-        actualizarTablaUsuarios();
-        cargarSelectVendedores();
-    }
-    function actualizarTablaUsuarios() {
-        let tbody = document.getElementById("tbodyUsuarios");
-        tbody.innerHTML = "";
-        usuarios.forEach((u, idx) => {
-            let row = tbody.insertRow();
-            row.insertCell(0).innerText = u.codigo;
-            row.insertCell(1).innerText = u.nombre;
-            row.insertCell(2).innerText = u.rol === "admin" ? "Administrador" : (u.rol === "shopper" ? "Vendedor" : "Cliente");
-            if(u.rol !== "admin") {
-                let btn = document.createElement("button"); btn.innerText = "🗑️ Eliminar"; btn.className = "btn btn-danger"; btn.style.padding="6px 12px";
-                btn.onclick = () => eliminarUsuario(idx);
-                row.insertCell(3).appendChild(btn);
-            } else {
-                row.insertCell(3).innerText = "—";
-            }
-        });
-    }
-    function sincronizarUIAdmin() {
-        document.getElementById("comisionPorcentaje").value = comisionGlobal;
-        document.getElementById("descuentoHH").value = descuentoHH;
-        let span = document.getElementById("estadoHH");
-        span.innerText = horaFelizActiva ? "🎉 HH ACTIVA" : "⛔ HH INACTIVA";
-        span.className = `badge ${horaFelizActiva ? "estado-aprobado" : "estado-pendiente"}`;
-    }
-
-    // ---------- VENDEDOR ----------
     function actualizarVistaShopper() {
         if(!usuarioActual) return;
         let misProductos = ventas.filter(v => v.shopper === usuarioActual.codigo && v.estado === "pagado");
-        let totalComision = 0;
         let tbody = document.getElementById("tbodyProductosShopper");
         tbody.innerHTML = "";
+        let comisionPersonal = 0;
         misProductos.forEach(p => {
             let row = tbody.insertRow();
             row.insertCell(0).innerText = p.fecha;
@@ -466,14 +409,26 @@
             row.insertCell(4).innerText = p.pzas;
             row.insertCell(5).innerText = `$${p.totalMXN.toFixed(2)}`;
             let comision = p.totalMXN * 0.1;
-            totalComision += comision;
+            comisionPersonal += comision;
             row.insertCell(6).innerText = `$${comision.toFixed(2)}`;
         });
-        document.getElementById("comisionTotalShopper").innerHTML = `$${totalComision.toFixed(2)}`;
-        if(misProductos.length === 0) tbody.innerHTML = "<tr><td colspan='7'>No tienes productos pagados aún</td></tr>";
+        let socioExtra = document.getElementById("socioExtraPanel");
+        if (usuarioActual.esSocio === true) {
+            socioExtra.style.display = "block";
+            let socios = obtenerSocios();
+            let gananciaTotal = calcularGananciaTotalNegocio();
+            let parteSocio = socios.length > 0 ? gananciaTotal / socios.length : 0;
+            document.getElementById("socioGanancias").innerHTML = `$${parteSocio.toFixed(2)} (de total negocio: $${gananciaTotal.toFixed(2)})`;
+        } else socioExtra.style.display = "none";
+        let totalGanancias = comisionPersonal;
+        if (usuarioActual.esSocio === true) {
+            let socios = obtenerSocios();
+            let gananciaTotal = calcularGananciaTotalNegocio();
+            let parteSocio = socios.length > 0 ? gananciaTotal / socios.length : 0;
+            totalGanancias += parteSocio;
+        }
+        document.getElementById("gananciasShopper").innerHTML = `$${totalGanancias.toFixed(2)} (10% personal + parte de socios)`;
     }
-
-    // ---------- CLIENTE ----------
     function actualizarVistaCliente() {
         if(!usuarioActual) return;
         let misProductos = ventas.filter(v => v.codCliente === usuarioActual.codigo);
@@ -511,18 +466,9 @@
             let sub = base + com;
             let desc = horaFelizActiva ? sub * descuentoHH / 100 : 0;
             let final = sub - desc;
-            document.getElementById("desglose").innerHTML = `
-                <strong>💰 Conversión actual:</strong><br>
-                USD $${(ejemplo.precioUSD * ejemplo.pzas).toFixed(2)} × TC $${TC} = $${base.toFixed(2)}<br>
-                + Comisión ${comisionGlobal}% = $${com.toFixed(2)}<br>
-                = Subtotal $${sub.toFixed(2)}<br>
-                ${horaFelizActiva ? `- Descuento Hora Feliz (${descuentoHH}%) = $${desc.toFixed(2)}<br>` : ""}
-                <strong>Total a pagar: $${final.toFixed(2)}</strong>
-            `;
-        } else {
-            document.getElementById("desglose").innerHTML = "No hay productos activos";
-        }
-        if(misProductos.length === 0) tbody.innerHTML = "<tr><td colspan='8'>No hay productos para ti</td></tr>";
+            document.getElementById("desglose").innerHTML = `<strong>💰 Conversión actual:</strong><br>USD $${(ejemplo.precioUSD * ejemplo.pzas).toFixed(2)} × TC $${TC} = $${base.toFixed(2)}<br>+ Comisión ${comisionGlobal}% = $${com.toFixed(2)}<br>= Subtotal $${sub.toFixed(2)}<br>${horaFelizActiva ? `- Descuento Hora Feliz (${descuentoHH}%) = $${desc.toFixed(2)}<br>` : ""}<strong>Total a pagar: $${final.toFixed(2)}</strong>`;
+        } else document.getElementById("desglose").innerHTML = "No hay productos activos";
+        if(misProductos.length === 0) tbody.innerHTML = "<tr><td colspan='8'>No hay productos para ti</tr>";
     }
     function subirComprobanteCliente() {
         if(!usuarioActual) return;
@@ -537,14 +483,9 @@
         };
         reader.readAsDataURL(file);
     }
-
-    // ---------- LOGIN ----------
     function loginUsuario() {
         let codigo = document.getElementById("codigoAcceso").value.trim();
-        if(!codigo) {
-            document.getElementById("loginError").innerText = "Ingresa tu código de 4 dígitos";
-            return;
-        }
+        if(!codigo) { document.getElementById("loginError").innerText = "Ingresa tu código de 4 dígitos"; return; }
         cargarDatos();
         let usuario = usuarios.find(u => u.codigo === codigo && (u.rol === "cliente" || u.rol === "shopper"));
         if(usuario) {
@@ -553,24 +494,14 @@
             document.getElementById("mainApp").style.display = "block";
             document.getElementById("bienvenidaUsuario").innerHTML = `Bienvenido, ${usuario.nombre} (${usuario.rol === "shopper" ? "Vendedor" : "Cliente"})`;
             mostrarPantallaSegunRol();
-        } else {
-            document.getElementById("loginError").innerText = "Código no registrado o rol incorrecto. Contacta al administrador.";
-        }
+        } else document.getElementById("loginError").innerText = "Código no registrado.";
     }
     function loginAdmin() {
         let pass = document.getElementById("adminPassword").value.trim();
-        if(pass !== "spena748") {
-            document.getElementById("loginError").innerText = "Clave de administrador incorrecta";
-            return;
-        }
+        if(pass !== "spena748") { document.getElementById("loginError").innerText = "Clave incorrecta"; return; }
         cargarDatos();
         usuarioActual = usuarios.find(u => u.rol === "admin");
-        if(!usuarioActual) {
-            // Si no existe, lo creamos
-            usuarioActual = { codigo: "admin", nombre: "Administrador", rol: "admin" };
-            usuarios.push(usuarioActual);
-            guardarTodo();
-        }
+        if(!usuarioActual) { usuarioActual = { codigo: "admin", nombre: "Administrador", rol: "admin", esSocio: false }; usuarios.push(usuarioActual); guardarTodo(); }
         document.getElementById("loginOverlay").style.display = "none";
         document.getElementById("mainApp").style.display = "block";
         document.getElementById("bienvenidaUsuario").innerHTML = `Bienvenido, Administrador`;
@@ -601,41 +532,27 @@
         document.getElementById("adminPassword").value = "";
         document.getElementById("loginError").innerText = "";
     }
-
-    // ---------- EVENTOS E INICIALIZACIÓN ----------
     window.onload = () => {
         cargarDatos();
         document.getElementById("btnLoginUsuario").onclick = loginUsuario;
         document.getElementById("btnLoginAdmin").onclick = loginAdmin;
         document.getElementById("btnCerrarSesion").onclick = cerrarSesion;
-        // Eventos del administrador
         document.getElementById("comisionPorcentaje").onchange = () => { comisionGlobal = parseFloat(document.getElementById("comisionPorcentaje").value); guardarTodo(); };
         document.getElementById("descuentoHH").onchange = () => { descuentoHH = parseFloat(document.getElementById("descuentoHH").value); guardarTodo(); };
         document.getElementById("btnActivarHH").onclick = () => { horaFelizActiva = true; guardarTodo(); sincronizarUIAdmin(); };
         document.getElementById("btnDesactivarHH").onclick = () => { horaFelizActiva = false; guardarTodo(); sincronizarUIAdmin(); };
         document.getElementById("btnAgregar").onclick = agregarProducto;
-        document.getElementById("btnLimpiarForm").onclick = () => {
-            document.getElementById("producto").value = "";
-            document.getElementById("marca").value = "";
-            document.getElementById("precioUSD").value = "";
-            document.getElementById("pzas").value = "1";
-            document.getElementById("nota").value = "";
-            document.getElementById("bancoVenta").value = "";
-        };
+        document.getElementById("btnLimpiarForm").onclick = () => { document.getElementById("producto").value=""; document.getElementById("marca").value=""; document.getElementById("precioUSD").value=""; document.getElementById("pzas").value="1"; document.getElementById("nota").value=""; document.getElementById("bancoVenta").value=""; };
         document.getElementById("btnCargarCliente").onclick = cargarProductosClienteAdmin;
         document.getElementById("btnAgregarUsuario").onclick = agregarUsuario;
         document.getElementById("categoria").onchange = cargarSelectTalla;
         document.getElementById("tallaUSA").onchange = actualizarInfoTalla;
+        document.getElementById("nuevoRol").onchange = toggleSocioCheckbox;
         cargarSelectTalla();
-        // Eventos cliente
+        toggleSocioCheckbox();
         document.getElementById("btnSubirComprobanteCliente").onclick = subirComprobanteCliente;
         document.getElementById("btnRefrescarCliente").onclick = () => { cargarDatos(); if(usuarioActual && usuarioActual.rol === "cliente") actualizarVistaCliente(); };
-        // Sincronización entre pestañas
-        window.addEventListener("storage", () => {
-            cargarDatos();
-            if(usuarioActual) mostrarPantallaSegunRol();
-        });
-        // Asegurar que se vea el login
+        window.addEventListener("storage", () => { cargarDatos(); if(usuarioActual) mostrarPantallaSegunRol(); });
         document.getElementById("mainApp").style.display = "none";
         document.getElementById("loginOverlay").style.display = "flex";
     };
