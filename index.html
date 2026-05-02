@@ -1,834 +1,1384 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=yes"/>
-<title>Divina Compras ✨</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>✨ Divina Compras</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 <style>
-:root{
-  --rose:#c0737a; --rose-light:#f7e8ea; --rose-dark:#8b4a50;
-  --navy:#1e2d40; --navy-light:#2c3e55; --cream:#faf8f5;
-  --gold:#c9a84c; --green:#2e7d64; --red:#bc4742;
-  --gray:#6b7280; --border:#e5ddd5;
-  --shadow:0 4px 24px rgba(30,45,64,.08);
-  --shadow-lg:0 12px 48px rgba(30,45,64,.14);
-  --font-display:'Playfair Display',Georgia,serif;
-  --font-body:'DM Sans',system-ui,sans-serif;
+:root {
+  --cream: #fdf8f2; --white: #ffffff;
+  --rose: #b5566e; --rose-light: #f5e2ea; --rose-dark: #8c3a52;
+  --gold: #c9903a; --gold-light: #fdf0d8;
+  --plum: #2c1a28; --plum-mid: #6b4a62; --plum-light: #a08898;
+  --success: #3d8f72; --success-bg: #e6f5ef;
+  --warning: #c07e20; --warning-bg: #fef4df;
+  --danger: #b03535; --danger-bg: #fce8e8;
+  --info: #2a6fb0; --info-bg: #e4eefa;
+  --paid: #1d6b8f; --paid-bg: #d8eef8;
+  --border: rgba(181,86,110,0.15);
+  --shadow: 0 4px 20px rgba(125,63,92,0.09);
+  --shadow-lg: 0 8px 40px rgba(125,63,92,0.15);
+  --r: 18px; --r-sm: 10px; --r-pill: 100px;
+  --font-head: 'Playfair Display', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
 }
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--cream);color:var(--navy);font-family:var(--font-body);min-height:100vh}
-input,select,button{font-family:var(--font-body)}
-::-webkit-scrollbar{width:5px;height:5px}
-::-webkit-scrollbar-track{background:#f0ebe4}
-::-webkit-scrollbar-thumb{background:var(--rose);border-radius:3px}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-body); background: var(--cream); color: var(--plum); min-height: 100vh; }
+.app-wrap { max-width: 1300px; margin: 0 auto; padding: 16px; }
 
-/* ── LOGIN ── */
-.login-bg{min-height:100vh;background:linear-gradient(135deg,var(--navy) 0%,#2c3e55 50%,var(--rose-dark) 100%);display:flex;align-items:center;justify-content:center;padding:20px;position:relative;overflow:hidden}
-.login-bg::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}
-.login-card{background:white;border-radius:32px;padding:40px 36px;width:100%;max-width:480px;box-shadow:var(--shadow-lg);position:relative;z-index:1}
-.login-logo{text-align:center;margin-bottom:28px}
-.login-logo h1{font-family:var(--font-display);font-size:32px;color:var(--navy)}
-.login-logo p{color:var(--gray);font-size:14px;margin-top:4px}
-.tab-bar{display:flex;background:#f5f0eb;border-radius:16px;padding:4px;margin-bottom:24px;gap:4px}
-.tab-btn{flex:1;padding:10px;border:none;border-radius:12px;cursor:pointer;font-size:13px;font-weight:500;transition:all .2s;background:none;color:var(--gray)}
-.tab-btn.active{background:white;color:var(--navy);box-shadow:0 2px 8px rgba(0,0,0,.1);font-weight:600}
+/* HEADER */
+.app-header { background: linear-gradient(135deg, var(--rose-dark) 0%, var(--rose) 60%, var(--gold) 100%); border-radius: var(--r); padding: 22px 28px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; box-shadow: var(--shadow-lg); }
+.app-header h1 { font-family: var(--font-head); color: white; font-size: 26px; letter-spacing: 0.5px; }
+.app-header p { color: rgba(255,255,255,0.85); font-size: 14px; }
+.btn-logout { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.4); border-radius: var(--r-pill); padding: 8px 18px; font-size: 14px; cursor: pointer; font-family: var(--font-body); transition: background 0.2s; }
+.btn-logout:hover { background: rgba(255,255,255,0.35); }
 
-/* ── LAYOUT ── */
-.app{min-height:100vh;background:var(--cream)}
-.topbar{background:var(--navy);color:white;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.2)}
-.topbar-brand{font-family:var(--font-display);font-size:20px;color:white;display:flex;align-items:center;gap:8px}
-.topbar-user{font-size:12px;color:#94a3b8;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.role-badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
-.role-admin{background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44}
-.role-shopper{background:#22c55e22;color:#22c55e;border:1px solid #22c55e44}
-.role-cliente{background:var(--rose-light);color:var(--rose-dark);border:1px solid var(--rose)}
-.main{padding:24px;max-width:1300px;margin:0 auto}
-.tabs-nav{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:24px;overflow-x:auto}
-.tab-nav-btn{background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;padding:12px 20px;cursor:pointer;font-size:13px;font-weight:500;color:var(--gray);transition:all .2s;white-space:nowrap}
-.tab-nav-btn.active{color:var(--rose-dark);border-bottom-color:var(--rose);font-weight:600}
+/* CARDS */
+.card { background: var(--white); border-radius: var(--r); padding: 22px; margin-bottom: 18px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+.card-title { font-family: var(--font-head); font-size: 20px; color: var(--rose-dark); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
 
-/* ── CARDS ── */
-.card{background:white;border-radius:20px;padding:22px;margin-bottom:18px;box-shadow:var(--shadow);border:1px solid var(--border)}
-.card-title{font-family:var(--font-display);font-size:20px;color:var(--navy);margin-bottom:16px;display:flex;align-items:center;gap:8px}
-.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:18px}
-.stat-card{background:var(--navy);border-radius:16px;padding:16px;color:white}
-.stat-val{font-size:22px;font-weight:700;color:var(--gold)}
-.stat-lbl{font-size:10px;color:#94a3b8;margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
+/* TABS */
+.tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; background: var(--white); padding: 8px; border-radius: var(--r); box-shadow: var(--shadow); border: 1px solid var(--border); }
+.tab-btn { background: none; border: none; padding: 10px 18px; border-radius: var(--r-sm); cursor: pointer; font-family: var(--font-body); font-size: 14px; font-weight: 500; color: var(--plum-mid); transition: all 0.2s; position: relative; }
+.tab-btn:hover { background: var(--rose-light); color: var(--rose); }
+.tab-btn.active { background: var(--rose); color: white; }
+.tab-badge { position: absolute; top: 4px; right: 4px; background: var(--gold); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 11px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
 
-/* ── FORMS ── */
-.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:16px}
-.field label{display:block;font-size:11px;font-weight:600;color:var(--gray);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
-.field input,.field select{width:100%;padding:10px 14px;font-size:14px;border:1.5px solid var(--border);border-radius:12px;background:white;color:var(--navy);outline:none;transition:border .2s}
-.field input:focus,.field select:focus{border-color:var(--rose)}
+/* FORMS */
+.form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; margin-bottom: 16px; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-size: 13px; font-weight: 600; color: var(--plum-mid); }
+.field input, .field select, .field textarea { padding: 10px 14px; font-size: 15px; border: 1.5px solid var(--border); border-radius: var(--r-sm); background: var(--cream); font-family: var(--font-body); color: var(--plum); transition: border 0.2s; }
+.field input:focus, .field select:focus { outline: none; border-color: var(--rose); }
+.talla-hint { font-size: 12px; color: var(--plum-light); margin-top: 4px; }
 
-/* ── BUTTONS ── */
-.btn{border:none;border-radius:50px;padding:10px 22px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
-.btn-primary{background:var(--navy);color:white}
-.btn-primary:hover{background:var(--navy-light)}
-.btn-rose{background:var(--rose);color:white}
-.btn-rose:hover{background:var(--rose-dark)}
-.btn-success{background:var(--green);color:white}
-.btn-danger{background:var(--red);color:white}
-.btn-gold{background:var(--gold);color:white}
-.btn-ghost{background:#f5f0eb;color:var(--navy);border:1px solid var(--border)}
-.btn-sm{padding:6px 14px;font-size:12px}
-.btn-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+/* BUTTONS */
+.btn { border: none; border-radius: var(--r-pill); padding: 10px 22px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: var(--font-body); transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.btn:hover { opacity: 0.88; transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn-primary { background: var(--rose); color: white; }
+.btn-success { background: var(--success); color: white; }
+.btn-danger { background: var(--danger); color: white; }
+.btn-warning { background: var(--gold); color: white; }
+.btn-info { background: var(--info); color: white; }
+.btn-ghost { background: var(--rose-light); color: var(--rose); }
+.btn-sm { padding: 6px 14px; font-size: 12px; }
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
 
-/* ── TABLE ── */
-.table-wrap{overflow-x:auto;border-radius:14px;border:1px solid var(--border)}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th{background:#f5f0eb;padding:11px 12px;text-align:left;font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
-td{padding:11px 12px;border-bottom:1px solid #f5f0eb;color:var(--navy);vertical-align:middle}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:#faf8f5}
+/* TABLE */
+.table-wrap { overflow-x: auto; border-radius: var(--r-sm); border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead { background: var(--rose-light); }
+th { padding: 11px 12px; text-align: left; font-weight: 600; color: var(--rose-dark); white-space: nowrap; }
+td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--cream); }
 
-/* ── BADGES ── */
-.badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;display:inline-block;white-space:nowrap}
-.b-pendiente{background:#fff3cd;color:#856404}
-.b-aprobado{background:#d1e7dd;color:#0f5132}
-.b-cancelado{background:#f8d7da;color:#721c24}
-.b-pagado{background:#cff4fc;color:#055160}
-.b-hh{background:#fff3cd;color:#856404;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
+/* BADGES */
+.badge { padding: 4px 12px; border-radius: var(--r-pill); font-size: 12px; font-weight: 600; display: inline-block; }
+.b-pendiente { background: var(--warning-bg); color: var(--warning); }
+.b-aprobado { background: var(--success-bg); color: var(--success); }
+.b-cancelado { background: var(--danger-bg); color: var(--danger); }
+.b-pagado { background: var(--paid-bg); color: var(--paid); }
 
-/* ── ALERTS ── */
-.alert{border-radius:12px;padding:12px 16px;font-size:13px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.alert-warn{background:#fff3cd;color:#856404;border:1px solid #ffc10744}
-.alert-ok{background:#d1e7dd;color:#0f5132;border:1px solid #22c55e44}
-.alert-err{background:#f8d7da;color:#721c24;border:1px solid #ef444444}
-.alert-info{background:var(--rose-light);color:var(--rose-dark);border:1px solid var(--rose)}
+/* STAT CARDS */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; margin-bottom: 20px; }
+.stat-card { background: var(--white); border-radius: var(--r); padding: 18px; border: 1px solid var(--border); box-shadow: var(--shadow); text-align: center; }
+.stat-card .stat-num { font-family: var(--font-head); font-size: 30px; color: var(--rose); }
+.stat-card .stat-label { font-size: 12px; color: var(--plum-light); margin-top: 4px; }
+.stat-card.gold .stat-num { color: var(--gold); }
+.stat-card.green .stat-num { color: var(--success); }
+.stat-card.blue .stat-num { color: var(--info); }
 
-/* ── HH BANNER ── */
-.hh-banner{background:linear-gradient(135deg,#f59e0b,#d97706);color:white;text-align:center;padding:10px;font-size:13px;font-weight:600;letter-spacing:.5px;position:sticky;top:57px;z-index:99}
+/* LOGIN OVERLAY */
+.login-overlay { position: fixed; inset: 0; background: rgba(44,26,40,0.85); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 16px; }
+.login-card { background: var(--white); border-radius: 24px; padding: 36px; width: 100%; max-width: 480px; box-shadow: var(--shadow-lg); }
+.login-logo { font-family: var(--font-head); font-size: 32px; text-align: center; color: var(--rose); margin-bottom: 6px; }
+.login-sub { text-align: center; font-size: 14px; color: var(--plum-light); margin-bottom: 28px; }
+.login-block { background: var(--cream); border-radius: var(--r); padding: 20px; margin-bottom: 14px; }
+.login-block h3 { font-size: 15px; font-weight: 600; margin-bottom: 14px; color: var(--plum); }
+.login-sep { text-align: center; font-size: 12px; color: var(--plum-light); margin: 10px 0; }
+.login-err { color: var(--danger); font-size: 13px; text-align: center; margin-top: 10px; min-height: 20px; }
 
-/* ── LOGIN ATTEMPTS ── */
-.attempt-dots{display:flex;gap:6px;justify-content:center;margin-top:8px}
-.dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:background .3s}
-.dot.used{background:var(--red)}
+/* EDIT MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(44,26,40,0.7); display: flex; align-items: center; justify-content: center; z-index: 900; padding: 16px; }
+.modal-box { background: var(--white); border-radius: var(--r); padding: 28px; width: 100%; max-width: 520px; box-shadow: var(--shadow-lg); }
+.modal-title { font-family: var(--font-head); font-size: 20px; color: var(--rose-dark); margin-bottom: 18px; }
 
-/* ── TALLA INFO ── */
-.talla-info{font-size:11px;color:var(--rose-dark);margin-top:4px;font-weight:500}
+/* TOAST */
+#toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 2000; display: flex; flex-direction: column; gap: 8px; }
+.toast { background: var(--plum); color: white; padding: 12px 20px; border-radius: var(--r-sm); font-size: 14px; box-shadow: var(--shadow-lg); animation: slideUp 0.3s ease; max-width: 320px; }
+.toast.success { background: var(--success); }
+.toast.error { background: var(--danger); }
+.toast.warning { background: var(--gold); }
+@keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 
-/* ── COMISION BAR ── */
-.config-bar{background:var(--navy);border-radius:16px;padding:16px 20px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin-bottom:18px}
-.config-bar label{color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:4px}
-.config-bar input{background:#1e2d40;border:1px solid #334155;border-radius:8px;padding:6px 10px;color:white;font-size:14px;width:80px;outline:none}
-.config-bar .sep{width:1px;height:36px;background:#334155}
+/* LOADING */
+#loading-bar { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, var(--rose), var(--gold)); width: 0; z-index: 3000; transition: width 0.3s; }
 
-/* ── DESGLOSE ── */
-.desglose-card{background:linear-gradient(135deg,var(--rose-light),#fff);border:1px solid var(--rose);border-radius:16px;padding:18px;margin-bottom:18px}
-.desglose-row{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid var(--border)}
-.desglose-row:last-child{border:none;font-weight:700;font-size:15px;color:var(--rose-dark)}
+/* DESGLOSE */
+.desglose-card { background: linear-gradient(135deg, var(--rose-light), var(--gold-light)); border-radius: var(--r); padding: 18px; font-size: 14px; line-height: 1.8; }
+.desglose-card strong { color: var(--rose-dark); }
+.desglose-total { font-family: var(--font-head); font-size: 22px; color: var(--rose-dark); }
 
-/* ── RESPONSIVE ── */
-@media(max-width:600px){.main{padding:14px}.card{padding:16px}.form-grid{grid-template-columns:1fr}}
+/* COMP SECTION */
+.comp-section { background: var(--cream); border-radius: var(--r); padding: 18px; margin-top: 16px; border: 1.5px dashed var(--border); }
+.comp-section h3 { font-size: 15px; font-weight: 600; margin-bottom: 10px; color: var(--plum); }
 
-.fade{animation:fadeIn .25s ease}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+/* WA BTN */
+.btn-wa { background: #25D366; color: white; }
+
+
+
+/* CAPTURA EN VIVO */
+.captura-panel { background: linear-gradient(135deg,#fdf8f2,#fef4df); border: 1.5px solid var(--gold); border-radius: var(--r); padding: 20px; margin-top: 20px; }
+.captura-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+.captura-title { font-family: var(--font-head); font-size: 18px; color: var(--gold); }
+.captura-cliente-tag { background: var(--rose); color: white; border-radius: var(--r-pill); padding: 4px 14px; font-size: 13px; font-weight: 600; }
+.captura-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: white; border-radius: var(--r-sm); margin-bottom: 8px; border-left: 3px solid var(--rose); box-shadow: 0 2px 6px rgba(0,0,0,0.05); animation: fadeIn .25s ease; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+.captura-item-info { flex: 1; }
+.captura-item-name { font-weight: 600; font-size: 14px; color: var(--plum); }
+.captura-item-sub { font-size: 12px; color: var(--plum-light); }
+.captura-item-price { font-family: var(--font-head); font-size: 16px; color: var(--rose); white-space: nowrap; }
+.captura-total { display: flex; justify-content: space-between; align-items: center; padding: 12px 0 4px; border-top: 1.5px dashed var(--gold); margin-top: 6px; }
+.captura-total-label { font-size: 14px; font-weight: 600; color: var(--plum-mid); }
+.captura-total-num { font-family: var(--font-head); font-size: 26px; color: var(--gold); }
+.btn-done { background: linear-gradient(135deg, var(--success), #2eb87e); color: white; font-size: 16px; padding: 14px 28px; border-radius: var(--r-pill); border: none; cursor: pointer; font-family: var(--font-body); font-weight: 700; box-shadow: 0 4px 16px rgba(61,143,114,.35); transition: all .2s; width: 100%; margin-top: 14px; }
+.btn-done:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(61,143,114,.45); }
+.captura-empty { text-align: center; color: var(--plum-light); font-size: 14px; padding: 20px 0; }
+.cliente-banner { background: linear-gradient(135deg, var(--rose-light), var(--gold-light)); border-radius: var(--r-sm); padding: 10px 14px; margin-bottom: 12px; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+
+/* TALLA SECTIONS */
+[id^="sec-"] { transition: opacity 0.2s; }
+
+/* MISC */
+.empty-state { text-align: center; padding: 40px; color: var(--plum-light); font-size: 15px; }
+.chip { display: inline-block; padding: 3px 10px; border-radius: var(--r-pill); background: var(--rose-light); color: var(--rose); font-size: 12px; font-weight: 600; }
+.divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+.text-small { font-size: 12px; color: var(--plum-light); }
+.comp-badge-yes { background: var(--success-bg); color: var(--success); padding: 3px 10px; border-radius: var(--r-pill); font-size: 12px; font-weight: 600; }
+.comp-badge-no { background: var(--warning-bg); color: var(--warning); padding: 3px 10px; border-radius: var(--r-pill); font-size: 12px; font-weight: 600; }
+
+@media (max-width: 600px) {
+  .app-header h1 { font-size: 20px; }
+  .form-grid { grid-template-columns: 1fr 1fr; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .btn { padding: 9px 16px; font-size: 13px; }
+}
 </style>
 </head>
 <body>
-<div id="root"></div>
 
-<!-- ╔══════════════════════════════════════════════════╗
-     ║  🔧 CONFIGURACIÓN FIREBASE                      ║
-     ║  Reemplaza TU_... con los datos de tu proyecto  ║
-     ╚══════════════════════════════════════════════════╝ -->
+<div id="loading-bar"></div>
+<div id="toast-container"></div>
+
+<!-- LOGIN -->
+<div id="loginOverlay" class="login-overlay" style="display:none;">
+  <div class="login-card">
+    <div class="login-logo">✨ Divina Compras</div>
+    <p class="login-sub">Sistema de personal shopper</p>
+    <div class="login-block">
+      <h3>👤 Cliente / Vendedor</h3>
+      <div class="field">
+        <label>Últimos 4 dígitos de WhatsApp</label>
+        <input type="text" id="codigoAcceso" maxlength="4" placeholder="Ej: 1234" inputmode="numeric">
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px;" onclick="loginUsuario()">Ingresar</button>
+    </div>
+    <div class="login-sep">— o —</div>
+    <div class="login-block">
+      <h3>🔐 Administrador</h3>
+      <div class="field">
+        <label>Clave de administrador</label>
+        <input type="password" id="adminPassword" placeholder="Clave">
+      </div>
+      <button class="btn btn-warning" style="width:100%;justify-content:center;margin-top:8px;" onclick="loginAdmin()">Ingresar como admin</button>
+    </div>
+    <div id="loginError" class="login-err"></div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div id="editModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-title">✏️ Editar producto</div>
+    <input type="hidden" id="editId">
+    <div class="form-grid">
+      <div class="field"><label>Producto</label><input type="text" id="editProducto"></div>
+      <div class="field"><label>Marca</label><input type="text" id="editMarca"></div>
+      <div class="field"><label>Precio USD</label><input type="number" id="editPrecioUSD" step="0.01"></div>
+      <div class="field"><label>Piezas</label><input type="number" id="editPzas" min="1"></div>
+      <div class="field"><label>Banco</label><select id="editBanco"><option value="">Sin banco</option><option>BANORTE</option><option>HSBC</option><option>EFECTIVO</option></select></div>
+      <div class="field"><label>Nota</label><input type="text" id="editNota"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="guardarEdicion()">💾 Guardar</button>
+      <button class="btn btn-ghost" onclick="cerrarModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainApp" style="display:none;">
+  <div class="app-wrap">
+    <div class="app-header">
+      <div>
+        <h1>✨ Divina Compras</h1>
+        <p id="bienvenidaUsuario"></p>
+      </div>
+      <button class="btn-logout" onclick="cerrarSesion()">🔓 Salir</button>
+    </div>
+
+    <!-- ADMIN PANEL -->
+    <div id="adminPanel" style="display:none;">
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="dashboard" onclick="switchTab('dashboard')">📊 Dashboard</button>
+        <button class="tab-btn" data-tab="agregar" onclick="switchTab('agregar')">➕ Agregar</button>
+        <button class="tab-btn" data-tab="clientes" onclick="switchTab('clientes')">👤 Clientes<span id="compBadge" class="tab-badge" style="display:none;">0</span></button>
+        <button class="tab-btn" data-tab="usuarios" onclick="switchTab('usuarios')">👥 Usuarios</button>
+        <button class="tab-btn" data-tab="configTab" onclick="switchTab('configTab')">⚙️ Config</button>
+      </div>
+
+      <!-- TAB: DASHBOARD -->
+      <div id="tab-dashboard" class="tab-content active">
+        <div class="stats-grid" id="statsGrid"></div>
+        <div class="card">
+          <div class="card-title">📋 Comprobantes pendientes de revisar</div>
+          <div id="comprobantesAdmin"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">💰 Ganancias por vendedor</div>
+          <div id="gananciasPorShopper"></div>
+        </div>
+      </div>
+
+      <!-- TAB: AGREGAR -->
+      <div id="tab-agregar" class="tab-content">
+        <div class="card">
+          <div class="card-title">➕ Agregar producto</div>
+          <div class="form-grid">
+            <div class="field"><label>Código cliente (4 díg.)</label><input type="text" id="codCliente" maxlength="4" placeholder="1234" inputmode="numeric"></div>
+            <div class="field"><label>Producto</label><input type="text" id="producto" placeholder="Nombre del artículo"></div>
+            <div class="field"><label>Marca</label><input type="text" id="marca"></div>
+            <div class="field"><label>Precio USD</label><input type="number" id="precioUSD" step="0.01" min="0"></div>
+            <div class="field"><label>Piezas</label><input type="number" id="pzas" value="1" min="1"></div>
+            <div class="field">
+              <label>Tipo de artículo</label>
+              <select id="tipoArticulo" onchange="onTipoChange()">
+                <option value="calzado">👟 Calzado</option>
+                <option value="ropa">👕 Ropa</option>
+                <option value="interior">🩲 Ropa Interior</option>
+                <option value="otro">✏️ Otro / Libre</option>
+              </select>
+            </div>
+            <!-- CALZADO -->
+            <div id="sec-calzado" class="field">
+              <label>Categoría calzado</label>
+              <select id="categoria" onchange="cargarSelectTalla()">
+                <option value="mujer">Mujer</option>
+                <option value="hombre">Hombre</option>
+                <option value="juniors">Juniors</option>
+                <option value="ninos">Niños</option>
+                <option value="bebes">Bebés</option>
+              </select>
+            </div>
+            <div id="sec-calzado2" class="field">
+              <label>Talla USA (calzado)</label>
+              <select id="tallaUSA" onchange="actualizarInfoTalla()"></select>
+              <div id="infoTalla" class="talla-hint"></div>
+            </div>
+            <!-- ROPA -->
+            <div id="sec-ropa" class="field" style="display:none;">
+              <label>Género / Edad</label>
+              <select id="ropaGenero" onchange="cargarTallaRopa()">
+                <option value="dam">Dama</option>
+                <option value="cab">Caballero</option>
+                <option value="jun">Juniors (Mujer)</option>
+                <option value="jun_h">Juniors (Hombre)</option>
+                <option value="nin">Niños</option>
+                <option value="beb">Bebés</option>
+              </select>
+            </div>
+            <div id="sec-ropa2" class="field" style="display:none;">
+              <label>Talla ropa</label>
+              <select id="tallaRopa" onchange="actualizarInfoRopa()"></select>
+              <div id="infoRopa" class="talla-hint"></div>
+            </div>
+            <!-- ROPA INTERIOR -->
+            <div id="sec-interior" class="field" style="display:none;">
+              <label>Tipo interior</label>
+              <select id="tipoInterior" onchange="cargarTallaInterior()">
+                <option value="brasier">Brasier / Bra</option>
+                <option value="panty">Panty / Tanga / Bikini</option>
+                <option value="boxer">Boxer / Trunk</option>
+                <option value="calzon">Calzón / Brief</option>
+                <option value="bañador">Traje de baño mujer</option>
+                <option value="bañador_h">Traje de baño hombre</option>
+                <option value="pijama">Pijama / Ropa de dormir</option>
+                <option value="media">Medias / Calcetines</option>
+              </select>
+            </div>
+            <div id="sec-interior2" class="field" style="display:none;">
+              <label>Talla interior</label>
+              <select id="tallaInterior" onchange="actualizarInfoInterior()"></select>
+              <div id="infoInterior" class="talla-hint"></div>
+            </div>
+            <div id="sec-interior3" class="field" style="display:none;">
+              <label>Copa (brasier)</label>
+              <select id="tallaInteriorCopa">
+                <option value="A">A</option>
+                <option value="B" selected>B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+                <option value="DD">DD</option>
+                <option value="DDD/F">DDD/F</option>
+                <option value="G">G</option>
+              </select>
+            </div>
+            <!-- OTRO -->
+            <div id="sec-otro" class="field" style="display:none;">
+              <label>Talla / Especificación (libre)</label>
+              <input type="text" id="tallaLibre" placeholder="Ej: L / 38 / Unitalla / 34B...">
+            </div>
+            <div class="field"><label>Banco</label><select id="bancoVenta"><option value="">Sin banco</option><option>BANORTE</option><option>HSBC</option><option>EFECTIVO</option></select></div>
+            <div class="field"><label>Vendedor (shopper)</label><select id="shopperAsignado"></select></div>
+            <div class="field"><label>Tienda</label><input type="text" id="tienda" value="Ross"></div>
+            <div class="field"><label>Nota</label><input type="text" id="nota"></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="agregarProducto()">➕ Agregar producto</button>
+            <button class="btn btn-ghost" onclick="limpiarFormProducto()">🗑️ Limpiar</button>
+          </div>
+          <div id="previewPrecio" style="margin-top:14px;font-size:13px;color:var(--plum-mid);"></div>
+        </div>
+
+        <!-- LIVE CAPTURE PANEL -->
+        <div class="captura-panel" id="capturaPanel" style="display:none;">
+          <div class="captura-header">
+            <div>
+              <div class="captura-title">📋 Captura en curso</div>
+              <div id="capturaClienteTag" class="captura-cliente-tag" style="margin-top:6px;"></div>
+            </div>
+            <div style="text-align:right;">
+              <div class="text-small">Productos agregados:</div>
+              <div id="capturaCount" style="font-family:var(--font-head);font-size:28px;color:var(--rose);">0</div>
+            </div>
+          </div>
+          <div id="capturaListado"></div>
+          <div class="captura-total">
+            <div class="captura-total-label">💰 Total del cliente</div>
+            <div class="captura-total-num" id="capturaTotal">$0.00</div>
+          </div>
+          <button class="btn-done" onclick="capturaTerminada()">✅ Captura terminada — Notificar cliente</button>
+        </div>
+      </div>
+
+      <!-- TAB: CLIENTES -->
+      <div id="tab-clientes" class="tab-content">
+        <div class="card">
+          <div class="card-title">👤 Productos del cliente</div>
+          <div class="btn-row" style="margin-bottom:14px;">
+            <div class="field" style="max-width:200px;"><label>Código cliente</label><input type="text" id="clienteSeleccionado" maxlength="4" placeholder="1234" inputmode="numeric"></div>
+            <button class="btn btn-info" onclick="cargarProductosClienteAdmin()">🔍 Cargar</button>
+          </div>
+          <div id="infoClienteHeader"></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Producto</th><th>Marca</th><th>Pzas</th><th>USD</th><th>Total MXN</th><th>Talla</th><th>Banco</th><th>Shopper</th><th>Estado</th><th>Comp.</th><th>Acciones</th></tr></thead>
+              <tbody id="tbodyProductosCliente"></tbody>
+            </table>
+          </div>
+          <div id="footerCliente" style="margin-top:12px;"></div>
+        </div>
+      </div>
+
+      <!-- TAB: USUARIOS -->
+      <div id="tab-usuarios" class="tab-content">
+        <div class="card">
+          <div class="card-title">➕ Agregar usuario</div>
+          <div class="form-grid" style="max-width:700px;">
+            <div class="field"><label>Código (4 dígitos)</label><input type="text" id="nuevoCodigo" maxlength="4" inputmode="numeric"></div>
+            <div class="field"><label>Nombre completo</label><input type="text" id="nuevoNombre"></div>
+            <div class="field"><label>Rol</label><select id="nuevoRol" onchange="toggleSocioCheck()"><option value="cliente">Cliente</option><option value="shopper">Vendedor</option></select></div>
+            <div class="field"><label>WhatsApp (10 dígitos)</label><input type="text" id="nuevoWhatsapp" maxlength="10" placeholder="6561234567" inputmode="numeric"></div>
+            <div class="field" id="socioField" style="display:none;"><label style="display:flex;gap:8px;align-items:center;"><input type="checkbox" id="nuevoEsSocio"> ¿Es socio/dueño?</label></div>
+          </div>
+          <button class="btn btn-primary" onclick="agregarUsuario()">➕ Agregar</button>
+        </div>
+        <div class="card">
+          <div class="card-title">👥 Usuarios registrados</div>
+          <div class="table-wrap">
+            <table><thead><tr><th>Código</th><th>Nombre</th><th>Rol</th><th>Socio</th><th>Acciones</th></tr></thead><tbody id="tbodyUsuarios"></tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: CONFIG -->
+      <div id="tab-configTab" class="tab-content">
+        <div class="card">
+          <div class="card-title">⚙️ Configuración general</div>
+          <div class="form-grid" style="max-width:600px;">
+            <div class="field"><label>Tipo de cambio (TC) USD→MXN</label><input type="number" id="cfgTC" step="0.01" min="1"></div>
+            <div class="field"><label>Comisión global (%)</label><input type="number" id="cfgComision" step="1" min="0" max="100"></div>
+            <div class="field"><label>Descuento Hora Feliz (%)</label><input type="number" id="cfgDescuentoHH" step="1" min="0" max="100"></div>
+            <div class="field"><label>Cambiar clave admin</label><input type="password" id="cfgNuevaPass" placeholder="Nueva clave"></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="guardarConfig()">💾 Guardar configuración</button>
+            <button id="btnActivarHH" class="btn btn-warning" onclick="toggleHH(true)">🎉 Activar Hora Feliz</button>
+            <button id="btnDesactivarHH" class="btn btn-ghost" onclick="toggleHH(false)">⛔ Desactivar HH</button>
+          </div>
+          <div id="estadoHHBadge" style="margin-top:12px;"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">🔧 Firebase</div>
+          <button class="btn btn-ghost" onclick="reconfigurarFirebase()">Reconfigurar Firebase</button>
+          <p class="text-small" style="margin-top:8px;">Toca esto solo si cambiaste de proyecto Firebase.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SHOPPER PANEL -->
+    <div id="shopperPanel" style="display:none;">
+      <div class="stats-grid" id="statsShopperGrid"></div>
+      <div class="card">
+        <div class="card-title">📋 Tus ventas pagadas</div>
+        <div class="table-wrap">
+          <table><thead><tr><th>Fecha</th><th>Cliente</th><th>Producto</th><th>Marca</th><th>Pzas</th><th>Total MXN</th><th>Tu comisión</th></tr></thead><tbody id="tbodyProductosShopper"></tbody></table>
+        </div>
+      </div>
+      <div class="card" id="socioCard" style="display:none;">
+        <div class="card-title">🏢 Participación como socio</div>
+        <div id="socioInfo" style="font-size:15px;line-height:1.8;"></div>
+      </div>
+    </div>
+
+    <!-- CLIENTE PANEL -->
+    <div id="clientePanel" style="display:none;">
+      <div id="bannerCaptura"></div>
+    <div id="desgloseCard" class="card">
+        <div class="card-title">💰 Desglose de precios</div>
+        <div id="desgloseContent" class="desglose-card">Cargando...</div>
+      </div>
+      <div class="card">
+        <div class="card-title">🛍️ Tus productos</div>
+        <div class="table-wrap">
+          <table><thead><tr><th>Producto</th><th>Marca</th><th>Pzas</th><th>USD</th><th>Total MXN</th><th>Talla</th><th>Estado</th><th>Decisión</th></tr></thead><tbody id="tbodyClienteFinal"></tbody></table>
+        </div>
+        <div class="comp-section">
+          <h3>📎 Comprobante de depósito</h3>
+          <p class="text-small" style="margin-bottom:10px;">Sube tu comprobante después de aprobar los productos. El admin liberará tu pedido.</p>
+          <div id="estadoCompActual"></div>
+          <input type="file" id="fileComp" accept="image/*,application/pdf" style="margin-top:8px;">
+          <div class="btn-row" style="margin-top:10px;">
+            <button class="btn btn-success" onclick="subirComprobante()">💾 Subir comprobante</button>
+            <button class="btn btn-wa" onclick="generarMensajeWA()">📲 Resumen por WhatsApp</button>
+            <button class="btn btn-ghost" onclick="refrescarCliente()">🔄 Actualizar</button>
+          </div>
+          <div id="uploadProgress" style="margin-top:8px;font-size:13px;"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <script>
+// ─────────────────────────────────────────────
+// FIREBASE CONFIG
+// ─────────────────────────────────────────────
 const FIREBASE_CONFIG = {
-  apiKey:            "AIzaSyCJdHwwPMFuUzgEB0wJmGvesDkma1XMSEI",
-  authDomain:        "omega-congregacion.firebaseapp.com",
-  databaseURL:       "https://omega-congregacion-default-rtdb.firebaseio.com",
-  projectId:         "omega-congregacion",
-  storageBucket:     "omega-congregacion.firebasestorage.app",
-  messagingSenderId: "37872899561",
-  appId:             "1:37872899561:web:17bb4628177af3c7fc2778"
-};
-// Contraseña admin inicial: spena748
-// Hash SHA-256 de "spena748"
-const ADMIN_HASH_DEFAULT = "acadf5ff5fde90f8423e30cecd0a0e5c00a15a835642bb937ea64095ece6e107";
-const IS_CONFIGURED = !FIREBASE_CONFIG.apiKey.includes("TU_");
-let db = null;
-if(IS_CONFIGURED){
-  try{ firebase.initializeApp(FIREBASE_CONFIG); db = firebase.database(); }
-  catch(e){ console.error(e); }
-}
-const TC = 17.40; // Tipo de cambio USD → MXN
-const DB_PATH = "/divina"; // Ruta en Firebase (separada de Omega)
-</script>
-
-<script type="text/babel">
-const { useState, useEffect, useMemo, useRef } = React;
-
-/* ── TALLAS ─────────────────────────────────────────────── */
-const TALLAS = {
-  mujer:  { usa:["5","5.5","6","6.5","7","7.5","8","8.5","9","9.5","10","10.5","11"],   mx:["22","22.5","23","23.5","24","24.5","25","25.5","26","26.5","27","27.5","28"],   cm:["22.5","23","23.5","24","24.5","25","25.5","26","26.5","27","27.5","28","28.5"] },
-  hombre: { usa:["6","6.5","7","7.5","8","8.5","9","9.5","10","10.5","11","11.5","12","13"], mx:["23.5","24","24.5","25","25.5","26","26.5","27","27.5","28","28.5","29","29.5","30.5"], cm:["24","24.5","25","25.5","26","26.5","27","27.5","28","28.5","29","29.5","30","31"] },
-  juniors:{ usa:["1","1.5","2","2.5","3","3.5","4","4.5","5","5.5","6","6.5","7"], mx:["19","19.5","20","20.5","21","21.5","22","22.5","23","23.5","24","24.5","25"], cm:["19","19.5","20","20.5","21","21.5","22","22.5","23","23.5","24","24.5","25"] },
-  ninos:  { usa:["8","8.5","9","9.5","10","10.5","11","11.5","12","12.5","13","13.5","1","1.5","2","2.5","3"], mx:["15","15.5","16","16.5","17","17.5","18","18.5","19","19.5","20","20.5","21","21.5","22","22.5","23"], cm:["15","15.5","16","16.5","17","17.5","18","18.5","19","19.5","20","20.5","21","21.5","22","22.5","23"] },
-  bebes:  { usa:["1","2","3","4","5","6","7","8","9","10"], mx:["9","10","11","12","13","14","15","16","17","18"], cm:["9","10","11","12","13","14","15","16","17","18"] },
+  apiKey: "AIzaSyC7nz2vN0moz-sgGyY_HXo-pSxt9474jSw",
+  authDomain: "ventas-eb527.firebaseapp.com",
+  projectId: "ventas-eb527",
+  storageBucket: "ventas-eb527.firebasestorage.app",
+  messagingSenderId: "862696234377",
+  appId: "1:862696234377:web:4be4874468dec39fdc1558",
+  measurementId: "G-K1SQLQWSWN"
 };
 
-/* ── UTILS ───────────────────────────────────────────────── */
-async function sha256(s){
-  const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));
-  return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,"0")).join("");
-}
-function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
-const fmt = n => "$"+Number(n||0).toLocaleString("es-MX",{minimumFractionDigits:2,maximumFractionDigits:2});
-const today = () => new Date().toISOString().slice(0,10);
+let db, storage;
+let ventas = [], usuarios = [], comprobantes = {};
+let cfg = { TC: 17.40, comisionGlobal: 10, horaFelizActiva: false, descuentoHH: 10, adminPassword: 'spena748' };
+let usuarioActual = null;
+let unsubs = [];
 
-function calcTotal(precioUSD, pzas, comision, hhActiva, descHH){
-  const base = precioUSD * pzas * TC;
-  const com  = base * comision / 100;
-  let total  = base + com;
-  if(hhActiva) total *= (1 - descHH / 100);
+const tallasData = {
+  mujer:   { usa: ["5","5.5","6","6.5","7","7.5","8","8.5","9","9.5","10","10.5","11"],       mx: ["22","22.5","23","23.5","24","24.5","25","25.5","26","26.5","27","27.5","28"],     cm: ["22.5","23","23.5","24","24.5","25","25.5","26","26.5","27","27.5","28","28.5"] },
+  hombre:  { usa: ["6","6.5","7","7.5","8","8.5","9","9.5","10","10.5","11","11.5","12","13"], mx: ["23.5","24","24.5","25","25.5","26","26.5","27","27.5","28","28.5","29","29.5","30.5"], cm: ["24","24.5","25","25.5","26","26.5","27","27.5","28","28.5","29","29.5","30","31"] },
+  juniors: { usa: ["1","1.5","2","2.5","3","3.5","4","4.5","5","5.5","6","6.5","7"],           mx: ["19","19.5","20","20.5","21","21.5","22","22.5","23","23.5","24","24.5","25"],     cm: ["19","19.5","20","20.5","21","21.5","22","22.5","23","23.5","24","24.5","25"] },
+  ninos:   { usa: ["8","8.5","9","9.5","10","10.5","11","11.5","12","12.5","13","13.5","1","1.5","2","2.5","3"], mx: ["15","15.5","16","16.5","17","17.5","18","18.5","19","19.5","20","20.5","21","21.5","22","22.5","23"], cm: ["15","15.5","16","16.5","17","17.5","18","18.5","19","19.5","20","20.5","21","21.5","22","22.5","23"] },
+  bebes:   { usa: ["1","2","3","4","5","6","7","8","9","10"],                                  mx: ["9","10","11","12","13","14","15","16","17","18"],                                 cm: ["9","10","11","12","13","14","15","16","17","18"] }
+};
+
+// ─── FIREBASE INIT ───────────────────────────
+function iniciarFirebase() {
+  try {
+    firebase.initializeApp(FIREBASE_CONFIG);
+    db = firebase.firestore();
+    storage = firebase.storage();
+    return true;
+  } catch(e) {
+    console.error('Firebase init error:', e);
+    document.getElementById('loginError').innerText = 'Error Firebase: ' + e.message;
+    return false;
+  }
+}
+function reconfigurarFirebase() { if (confirm('Recargar la app?')) location.reload(); }
+
+// ─── LISTENERS ───────────────────────────────
+function setupListeners() {
+  unsubs.forEach(u => u());
+  unsubs = [];
+  unsubs.push(db.collection('config').doc('settings').onSnapshot(snap => {
+    if (snap.exists) Object.assign(cfg, snap.data());
+    syncUI();
+  }));
+  unsubs.push(db.collection('ventas').orderBy('createdAt','desc').onSnapshot(snap => {
+    ventas = snap.docs.map(d => ({ _id: d.id, ...d.data() }));
+    refreshCurrentView();
+  }));
+  unsubs.push(db.collection('usuarios').onSnapshot(snap => {
+    usuarios = snap.docs.map(d => ({ ...d.data() }));
+    if (usuarioActual && usuarioActual.rol === 'admin') {
+      renderTablaUsuarios();
+      cargarSelectVendedores();
+    }
+  }));
+  // Notificación de captura lista (solo si es cliente)
+  if (usuarioActual && usuarioActual.rol === 'cliente') {
+    unsubs.push(db.collection('notificaciones').doc(usuarioActual.codigo).onSnapshot(snap => {
+      if (snap.exists && !snap.data().visto) mostrarBannerCaptura(snap.data());
+    }));
+  }
+  unsubs.push(db.collection('comprobantes').onSnapshot(snap => {
+    comprobantes = {};
+    snap.docs.forEach(d => { comprobantes[d.id] = d.data(); });
+    refreshCurrentView();
+  }));
+}
+function refreshCurrentView() {
+  if (!usuarioActual) return;
+  if (usuarioActual.rol === 'admin') { renderDashboard(); cargarProductosClienteAdmin(); actualizarCompBadge(); actualizarCapturaPanel(); }
+  else if (usuarioActual.rol === 'shopper') renderShopper();
+  else if (usuarioActual.rol === 'cliente') renderCliente();
+}
+
+// ─── CÁLCULOS ────────────────────────────────
+function calcTotal(precioUSD, pzas) {
+  let base = precioUSD * pzas * cfg.TC;
+  let total = base * (1 + cfg.comisionGlobal / 100);
+  if (cfg.horaFelizActiva) total *= (1 - cfg.descuentoHH / 100);
   return total;
 }
-function calcComisionMonto(precioUSD, pzas, comision){
-  return precioUSD * pzas * TC * comision / 100;
+function calcBase(precioUSD, pzas) { return precioUSD * pzas * cfg.TC; }
+function calcComision(precioUSD, pzas) { return calcBase(precioUSD, pzas) * cfg.comisionGlobal / 100; }
+function fmt(n) { return '$' + Number(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+
+// ─── DATOS ROPA ──────────────────────────────
+const ropaTallas = {
+  dam: { tallas:['XS','S','M','L','XL','XXL','3XL','4XL'], mx:['32','34','36','38','40','42','44','46'], num:['0','2','4','6','8','10','12','14'] },
+  cab: { tallas:['XS','S','M','L','XL','XXL','3XL','4XL'], mx:['32','34','36','38','40','42','44','46'], num:['28','30','32','34','36','38','40','42'] },
+  jun: { tallas:['XS','S','M','L','XL','0/2','2/4','4/6','6/8','8/10','10/12'], mx:['28','30','32','34','36','1','3','5','7','9','11'], num:[] },
+  jun_h: { tallas:['XS','S','M','L','XL','XXL'], mx:['28','30','32','34','36','38'], num:[] },
+  nin: { tallas:['2T','3T','4T','5','6','7','8','10','12','14','16','18'], mx:['2','3','4','5','6','7','8','10','12','14','16','18'], num:[] },
+  beb: { tallas:['NB','0-3M','3-6M','6-9M','9-12M','12-18M','18-24M','2T'], mx:['RN','0-3M','3-6M','6-9M','9-12M','12-18M','18-24M','2'], num:[] }
+};
+
+const interiorTallas = {
+  brasier:   { bandas:['28','30','32','34','36','38','40','42','44'], label:'Banda' },
+  panty:     { tallas:['XS (2)','S (4)','M (6)','L (8)','XL (10)','XXL (12)','3XL (14)','4XL (16)'] },
+  boxer:     { tallas:['S','M','L','XL','XXL','3XL','4XL'] },
+  calzon:    { tallas:['XS (2)','S (4)','M (6)','L (8)','XL (10)','XXL (12)','3XL (14)'] },
+  bañador:   { tallas:['XS','S','M','L','XL','XXL','3XL','4','6','8','10','12','14','16'] },
+  bañador_h: { tallas:['XS','S','M','L','XL','XXL','3XL','28','30','32','34','36','38'] },
+  pijama:    { tallas:['XS','S','M','L','XL','XXL','3XL','4XL'] },
+  media:     { tallas:['S (4-6)','M (6-8)','L (8-10)','XL (10-12)','One Size'] }
+};
+
+// ─── TALLAS ──────────────────────────────────
+// Calzado
+function cargarSelectTalla() {
+  const cat = document.getElementById('categoria').value;
+  const sel = document.getElementById('tallaUSA');
+  sel.innerHTML = tallasData[cat].usa.map(t => `<option>${t}</option>`).join('');
+  actualizarInfoTalla();
 }
-function getTallaInfo(cat, usa){
-  const d = TALLAS[cat];
-  const i = d.usa.indexOf(usa);
-  return i>=0 ? { mx: d.mx[i], cm: d.cm[i] } : null;
+function actualizarInfoTalla() {
+  const cat = document.getElementById('categoria').value;
+  const usa = document.getElementById('tallaUSA').value;
+  const idx = tallasData[cat].usa.indexOf(usa);
+  document.getElementById('infoTalla').innerHTML = idx >= 0 ? `🇲🇽 ${tallasData[cat].mx[idx]} | 📏 ${tallasData[cat].cm[idx]} cm` : '';
 }
 
-/* ── FIREBASE HELPERS ────────────────────────────────────── */
-const ref  = path => db.ref(DB_PATH + path);
-const set  = (path, val) => ref(path).set(val);
-const upd  = (path, val) => ref(path).update(val);
-const push = (path, val) => ref(path).push(val);
-const remove = path => ref(path).remove();
-
-function useListener(path, def=null){
-  const [val,setVal]=useState(def);
-  useEffect(()=>{
-    if(!db) return;
-    const r=ref(path);
-    r.on("value",snap=>setVal(snap.val()));
-    return()=>r.off("value");
-  },[path]);
-  return val;
+// Tipo articulo
+function onTipoChange() {
+  const tipo = document.getElementById('tipoArticulo').value;
+  const sections = { calzado:['sec-calzado','sec-calzado2'], ropa:['sec-ropa','sec-ropa2'], interior:['sec-interior','sec-interior2'], otro:['sec-otro'] };
+  const allSecs = ['sec-calzado','sec-calzado2','sec-ropa','sec-ropa2','sec-interior','sec-interior2','sec-interior3','sec-otro'];
+  allSecs.forEach(id => { const el=document.getElementById(id); if(el) el.style.display='none'; });
+  (sections[tipo] || []).forEach(id => { const el=document.getElementById(id); if(el) el.style.display=''; });
+  if (tipo === 'calzado') cargarSelectTalla();
+  if (tipo === 'ropa') cargarTallaRopa();
+  if (tipo === 'interior') cargarTallaInterior();
 }
 
-/* ── SHARED COMPONENTS ───────────────────────────────────── */
-function Alert({type,children}){ return <div className={`alert alert-${type}`}>{children}</div>; }
-function Field({label,children}){ return <div className="field"><label>{label}</label>{children}</div>; }
-function Btn({cls="btn-primary",sm,onClick,disabled,children}){
-  return <button className={`btn ${cls}${sm?" btn-sm":""}`} onClick={onClick} disabled={disabled}>{children}</button>;
+// Ropa
+function cargarTallaRopa() {
+  const gen = document.getElementById('ropaGenero').value;
+  const data = ropaTallas[gen];
+  const sel = document.getElementById('tallaRopa');
+  sel.innerHTML = data.tallas.map(t => `<option value="${t}">${t}</option>`).join('');
+  actualizarInfoRopa();
+}
+function actualizarInfoRopa() {
+  const gen = document.getElementById('ropaGenero').value;
+  const talla = document.getElementById('tallaRopa').value;
+  const data = ropaTallas[gen];
+  const idx = data.tallas.indexOf(talla);
+  let hint = '';
+  if (idx >= 0 && data.mx[idx]) hint += `🇲🇽 Mex: ${data.mx[idx]}`;
+  if (idx >= 0 && data.num && data.num[idx]) hint += ` | # ${data.num[idx]}`;
+  document.getElementById('infoRopa').innerHTML = hint;
 }
 
-/* ── LOGIN ───────────────────────────────────────────────── */
-function Login({onLogin}){
-  const [tab,setTab]=useState("cliente");
-  const [codigo,setCodigo]=useState("");
-  const [pass,setPass]=useState("");
-  const [err,setErr]=useState("");
-  const [loading,setLoading]=useState(false);
-  const [attempts,setAttempts]=useState(0);
-  const MAX_ATTEMPTS=5;
+// Ropa Interior
+function cargarTallaInterior() {
+  const tipo = document.getElementById('tipoInterior').value;
+  const data = interiorTallas[tipo];
+  const sel = document.getElementById('tallaInterior');
+  const copa = document.getElementById('sec-interior3');
+  if (tipo === 'brasier') {
+    sel.innerHTML = data.bandas.map(b => `<option value="${b}">${b}</option>`).join('');
+    copa.style.display = '';
+    document.getElementById('infoInterior').innerHTML = 'Selecciona banda + copa → Ej: 34B';
+  } else {
+    sel.innerHTML = data.tallas.map(t => `<option value="${t}">${t}</option>`).join('');
+    copa.style.display = 'none';
+    document.getElementById('infoInterior').innerHTML = '';
+  }
+}
+function actualizarInfoInterior() {
+  const tipo = document.getElementById('tipoInterior').value;
+  if (tipo !== 'brasier') { document.getElementById('infoInterior').innerHTML = ''; return; }
+  const banda = document.getElementById('tallaInterior').value;
+  const copa = document.getElementById('tallaInteriorCopa').value;
+  document.getElementById('infoInterior').innerHTML = `📐 Talla brasier: <strong>${banda}${copa}</strong>`;
+}
 
-  async function loginAdmin(){
-    if(attempts>=MAX_ATTEMPTS){setErr("Demasiados intentos. Espera unos minutos.");return;}
-    if(!pass.trim()){setErr("Ingresa la contraseña");return;}
-    setLoading(true); setErr("");
-    const h = await sha256(pass.trim());
-    let stored = ADMIN_HASH_DEFAULT;
-    try{
-      const snap=await Promise.race([ref("/cfg/adminHash").once("value"),new Promise((_,r)=>setTimeout(()=>r(),6000))]);
-      if(snap?.val()) stored=snap.val();
-    }catch{}
-    if(h===stored){
-      onLogin({rol:"admin",nombre:"Administrador",codigo:"admin"});
-    } else {
-      const newAttempts=attempts+1;
-      setAttempts(newAttempts);
-      setErr(`Contraseña incorrecta (${MAX_ATTEMPTS-newAttempts} intentos restantes)`);
-    }
-    setLoading(false);
+// Helper: obtener talla capturada para guardar
+function getTallaCapturada() {
+  const tipo = document.getElementById('tipoArticulo').value;
+  if (tipo === 'calzado') {
+    const cat = document.getElementById('categoria').value;
+    const usa = document.getElementById('tallaUSA').value;
+    return { tallaDisplay: getTallaInfo(cat, usa), tipo: 'calzado', cat };
+  }
+  if (tipo === 'ropa') {
+    const gen = document.getElementById('ropaGenero').value;
+    const talla = document.getElementById('tallaRopa').value;
+    const data = ropaTallas[gen];
+    const idx = data.tallas.indexOf(talla);
+    const mx = (idx >= 0 && data.mx[idx]) ? ` / Mex ${data.mx[idx]}` : '';
+    const genLabels = { dam:'Dama', cab:'Caballero', jun:'Juniors Mujer', jun_h:'Juniors Hombre', nin:'Niños', beb:'Bebés' };
+    return { tallaDisplay: `${genLabels[gen]} ${talla}${mx}`, tipo: 'ropa', gen };
+  }
+  if (tipo === 'interior') {
+    const tipoInt = document.getElementById('tipoInterior').value;
+    const tallaInt = document.getElementById('tallaInterior').value;
+    const tipoLabels = { brasier:'Brasier', panty:'Panty', boxer:'Boxer', calzon:'Calzón', bañador:'Baño Mujer', bañador_h:'Baño Hombre', pijama:'Pijama', media:'Medias' };
+    let display = `${tipoLabels[tipoInt] || tipoInt}: `;
+    if (tipoInt === 'brasier') {
+      const copa = document.getElementById('tallaInteriorCopa').value;
+      display += `${tallaInt}${copa}`;
+    } else display += tallaInt;
+    return { tallaDisplay: display, tipo: 'interior', tipoInt };
+  }
+  // otro
+  const libre = document.getElementById('tallaLibre').value.trim();
+  return { tallaDisplay: libre || 'N/A', tipo: 'otro' };
+}
+
+function getTallaInfo(cat, usa) {
+  const idx = tallasData[cat]?.usa.indexOf(usa) ?? -1;
+  return idx >= 0 ? `USA ${usa} → Mex ${tallasData[cat].mx[idx]} / CM ${tallasData[cat].cm[idx]}` : `USA ${usa}`;
+}
+
+// ─── VENDEDORES SELECT ────────────────────────
+function cargarSelectVendedores() {
+  const sel = document.getElementById('shopperAsignado');
+  if (!sel) return;
+  const shoppers = usuarios.filter(u => u.rol === 'shopper');
+  sel.innerHTML = shoppers.length
+    ? shoppers.map(s => `<option value="${s.codigo}">${s.nombre} (${s.codigo})</option>`).join('')
+    : '<option value="">Sin vendedores</option>';
+}
+
+// ─── TOAST ───────────────────────────────────
+function toast(msg, type = '') {
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = msg;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(() => el.remove(), 3200);
+}
+
+// ─── CAPTURA EN VIVO ─────────────────────────
+let capturaActualCodigo = null;
+
+function actualizarCapturaPanel() {
+  const codInput = document.getElementById('codCliente');
+  if (!codInput) return;
+  const cod = codInput.value.trim();
+
+  if (!cod || cod.length < 4) {
+    document.getElementById('capturaPanel').style.display = 'none';
+    capturaActualCodigo = null;
+    return;
   }
 
-  async function loginCliente(){
-    if(!codigo.trim()||codigo.length!==4){setErr("Ingresa tus 4 dígitos");return;}
-    setLoading(true); setErr("");
-    const snap=await ref("/usuarios/"+codigo).once("value");
-    const user=snap.val();
-    if(user&&(user.rol==="cliente"||user.rol==="shopper")){
-      onLogin({...user,codigo});
-    } else {
-      setErr("Código no registrado. Contacta al administrador.");
-    }
-    setLoading(false);
+  capturaActualCodigo = cod;
+  const panel = document.getElementById('capturaPanel');
+  panel.style.display = 'block';
+
+  // Nombre del cliente
+  const usuario = usuarios.find(u => u.codigo === cod);
+  const nombre = usuario ? usuario.nombre : cod;
+  document.getElementById('capturaClienteTag').innerHTML = `👤 ${nombre} · ${cod}`;
+
+  // Filtrar ventas del cliente actual (pendientes y aprobadas)
+  const items = ventas.filter(v => v.codCliente === cod && v.estado !== 'cancelado' && v.estado !== 'pagado');
+  document.getElementById('capturaCount').textContent = items.length;
+
+  // Listado
+  const listado = document.getElementById('capturaListado');
+  if (items.length === 0) {
+    listado.innerHTML = '<div class="captura-empty">Aún no hay productos agregados para este cliente</div>';
+    document.getElementById('capturaTotal').textContent = '$0.00';
+    return;
   }
 
-  return(
-    <div className="login-bg">
-      <div className="login-card fade">
-        <div className="login-logo">
-          <h1>✨ Divina Compras</h1>
-          <p>Personal shopper · Ropa y calzado USA</p>
+  listado.innerHTML = items.map(p => `
+    <div class="captura-item">
+      <div class="captura-item-info">
+        <div class="captura-item-name">${p.producto}${p.marca ? ' · ' + p.marca : ''}</div>
+        <div class="captura-item-sub">
+          ${p.tallaInfo || p.talla || ''} ${p.tallaInfo ? '·' : ''} ×${p.pzas} pza${p.pzas > 1 ? 's' : ''} · $${p.precioUSD?.toFixed(2)} USD
+          ${p.nota ? ' · 📝 ' + p.nota : ''}
+          <span class="badge b-${p.estado}" style="margin-left:6px;">${{pendiente:'Pendiente',aprobado:'Aprobado'}[p.estado] || p.estado}</span>
         </div>
-        <div className="tab-bar">
-          {[["cliente","👤 Cliente / Vendedor"],["admin","🔐 Admin"]].map(([k,l])=>(
-            <button key={k} className={`tab-btn${tab===k?" active":""}`} onClick={()=>{setTab(k);setErr("");}}>{l}</button>
-          ))}
-        </div>
-        {tab==="cliente"?(
-          <>
-            <Field label="Últimos 4 dígitos de tu WhatsApp">
-              <input value={codigo} onChange={e=>setCodigo(e.target.value.replace(/\D/g,"").slice(0,4))}
-                onKeyDown={e=>e.key==="Enter"&&loginCliente()} placeholder="1234" maxLength={4}
-                style={{textAlign:"center",fontSize:24,letterSpacing:8,fontWeight:700}}/>
-            </Field>
-            {err&&<Alert type="err">⚠️ {err}</Alert>}
-            <Btn cls="btn-rose" onClick={loginCliente} disabled={loading}>
-              {loading?"Verificando...":"Ingresar →"}
-            </Btn>
-          </>
-        ):(
-          <>
-            <Field label="Contraseña de administrador">
-              <input type="password" value={pass} onChange={e=>setPass(e.target.value)}
-                onKeyDown={e=>e.key==="Enter"&&loginAdmin()} placeholder="••••••••" autoFocus/>
-            </Field>
-            {attempts>0&&<div className="attempt-dots">
-              {Array.from({length:MAX_ATTEMPTS}).map((_,i)=>(
-                <div key={i} className={`dot${i<attempts?" used":""}`}/>
-              ))}
-            </div>}
-            {err&&<Alert type="err">🔒 {err}</Alert>}
-            <Btn cls="btn-primary" onClick={loginAdmin} disabled={loading||attempts>=MAX_ATTEMPTS}>
-              {loading?"Verificando...":"Entrar como Admin →"}
-            </Btn>
-          </>
-        )}
-        <p style={{textAlign:"center",fontSize:12,color:"var(--gray)",marginTop:16}}>¿No tienes acceso? Contacta al administrador.</p>
       </div>
-    </div>
-  );
+      <div class="captura-item-price">${fmt(p.totalMXN)}</div>
+      <button onclick="cancelarProducto('${p._id}')" style="background:none;border:none;cursor:pointer;color:var(--danger);font-size:18px;padding:0 4px;" title="Eliminar">✕</button>
+    </div>`).join('');
+
+  const total = items.reduce((s, v) => s + (v.totalMXN || 0), 0);
+  document.getElementById('capturaTotal').textContent = fmt(total);
 }
 
-/* ── ADMIN PANEL ─────────────────────────────────────────── */
-function AdminPanel(){
-  const [tab,setTab]=useState("productos");
-  const cfg      = useListener("/cfg")    ||{comision:10,hhActiva:false,descHH:10};
-  const usuarios = useListener("/usuarios")||{};
-  const ventas   = useListener("/ventas") ||{};
-  const [codCliente,setCodCliente]=useState("");
-  const [cargandoCliente,setCargandoCliente]=useState(false);
-  const [clienteVer,setClienteVer]=useState("");
+async function capturaTerminada() {
+  if (!capturaActualCodigo) return;
+  const cod = capturaActualCodigo;
+  const items = ventas.filter(v => v.codCliente === cod && v.estado === 'pendiente');
+  if (items.length === 0) { toast('No hay productos pendientes para este cliente', 'error'); return; }
 
-  // Config local state
-  const [comision,setComision]=useState(cfg.comision||10);
-  const [descHH,setDescHH]=useState(cfg.descHH||10);
-  useEffect(()=>{setComision(cfg.comision||10);setDescHH(cfg.descHH||10);},[cfg]);
+  const usuario = usuarios.find(u => u.codigo === cod);
+  const nombre = usuario ? usuario.nombre : cod;
+  const total = items.reduce((s, v) => s + (v.totalMXN || 0), 0);
 
-  async function toggleHH(val){ await upd("/cfg",{hhActiva:val}); }
-  async function saveComision(){ await upd("/cfg",{comision:parseFloat(comision)||10}); }
-  async function saveDescHH(){ await upd("/cfg",{descHH:parseFloat(descHH)||10}); }
-  async function changeAdminPass(newPass){
-    if(!newPass||newPass.length<6){alert("Mínimo 6 caracteres");return;}
-    const h=await sha256(newPass);
-    await set("/cfg/adminHash",h);
-    alert("✓ Contraseña actualizada");
-  }
-
-  // Producto form
-  const [pCod,setPCod]=useState(""); const [pNombre,setPNombre]=useState("");
-  const [pMarca,setPMarca]=useState(""); const [pPrecio,setPPrecio]=useState("");
-  const [pPzas,setPPzas]=useState("1"); const [pCat,setPCat]=useState("mujer");
-  const [pTalla,setPTalla]=useState(""); const [pBanco,setPBanco]=useState("");
-  const [pShopper,setPShopper]=useState(""); const [pNota,setPNota]=useState("");
-  const [pGuardando,setPGuardando]=useState(false);
-
-  const shoppers=Object.entries(usuarios).filter(([,u])=>u.rol==="shopper");
-  useEffect(()=>{ if(shoppers.length>0&&!pShopper) setPShopper(shoppers[0][0]); },[JSON.stringify(shoppers)]);
-
-  const tallaOpts = TALLAS[pCat]?.usa||[];
-  useEffect(()=>{ if(tallaOpts.length) setPTalla(tallaOpts[0]); },[pCat]);
-  const tallaInfo = getTallaInfo(pCat, pTalla);
-  const totalPreview = pPrecio && pPzas ? calcTotal(parseFloat(pPrecio),parseInt(pPzas)||1,cfg.comision||10,cfg.hhActiva,cfg.descHH||10) : 0;
-
-  async function agregarProducto(){
-    if(!pCod||pCod.length!==4){alert("Código de cliente: 4 dígitos");return;}
-    if(!pNombre||!pPrecio||parseFloat(pPrecio)<=0){alert("Nombre y precio requeridos");return;}
-    const snap=await ref("/usuarios/"+pCod).once("value");
-    if(!snap.exists()){alert("Cliente no registrado");return;}
-    setPGuardando(true);
-    const ti=getTallaInfo(pCat,pTalla);
-    const total=calcTotal(parseFloat(pPrecio),parseInt(pPzas)||1,cfg.comision||10,cfg.hhActiva,cfg.descHH||10);
-    const id=uid();
-    await set("/ventas/"+id,{
-      id, codCliente:pCod, producto:pNombre.trim(), marca:pMarca.trim(),
-      precioUSD:parseFloat(pPrecio), pzas:parseInt(pPzas)||1,
-      totalMXN:total, categoria:pCat, talla:pTalla,
-      tallaInfo:ti?`USA ${pTalla} → Mex ${ti.mx} / CM ${ti.cm}`:`USA ${pTalla}`,
-      banco:pBanco, shopper:pShopper, nota:pNota.trim(),
-      estado:"pendiente", fecha:today(), ts:Date.now(),
-      comisionSnapshot:cfg.comision||10, hhActiva:cfg.hhActiva, descHH:cfg.descHH||10
+  // Guardar marca de "captura lista" en Firestore para que cliente vea aviso
+  try {
+    await db.collection('notificaciones').doc(cod).set({
+      tipo: 'capturaLista',
+      totalMXN: total,
+      items: items.length,
+      fecha: new Date().toISOString(),
+      visto: false
     });
-    setPNombre(""); setPMarca(""); setPPrecio(""); setPPzas("1"); setPBanco(""); setPNota("");
-    setPGuardando(false);
-    alert("✓ Producto agregado");
+  } catch(e) { /* no-op si falla */ }
+
+  // Generar mensaje WhatsApp
+  const lineas = items.map(p =>
+    `• ${p.producto}${p.marca ? ' ' + p.marca : ''} ×${p.pzas} — ${fmt(p.totalMXN)}`
+  ).join('%0A');
+
+  const msg = `✨ *Divina Compras* ✨%0A` +
+    `Hola ${nombre} 👋 Ya están listos tus artículos:%0A%0A` +
+    lineas + `%0A%0A` +
+    `💰 *Total: ${fmt(total)}*%0A%0A` +
+    `Por favor ingresa a la app con tu código *${cod}* para aprobar o cancelar cada artículo y subir tu comprobante. 🛍️`;
+
+  toast(`Captura terminada — ${items.length} productos para ${nombre}`, 'success');
+
+  // Abrir WhatsApp (con número si lo tienen)
+  if (usuario && usuario.whatsapp) {
+    window.open(`https://wa.me/52${usuario.whatsapp}?text=${msg}`);
+  } else {
+    // Copiar al portapapeles y dar opción de abrir WA sin número
+    const plain = decodeURIComponent(msg.replace(/%0A/g, '\n'));
+    try { await navigator.clipboard.writeText(plain); toast('Mensaje copiado al portapapeles 📋', 'success'); } catch(e) {}
+    if (confirm('¿Abrir WhatsApp para elegir contacto?')) window.open(`https://wa.me/?text=${msg}`);
+  }
+}
+
+// ─── LOADING BAR ─────────────────────────────
+function setLoading(pct) {
+  document.getElementById('loading-bar').style.width = pct + '%';
+  if (pct >= 100) setTimeout(() => { document.getElementById('loading-bar').style.width = '0'; }, 400);
+}
+
+// ─── ADMIN: AGREGAR PRODUCTO ─────────────────
+async function agregarProducto() {
+  const codCliente = document.getElementById('codCliente').value.trim();
+  const producto = document.getElementById('producto').value.trim();
+  const marca = document.getElementById('marca').value.trim();
+  const precioUSD = parseFloat(document.getElementById('precioUSD').value);
+  const pzas = parseInt(document.getElementById('pzas').value) || 1;
+  const banco = document.getElementById('bancoVenta').value;
+  const nota = document.getElementById('nota').value.trim();
+  const shopper = document.getElementById('shopperAsignado').value;
+  const tienda = document.getElementById('tienda').value.trim() || 'Ross';
+  const { tallaDisplay, tipo: tipoArt } = getTallaCapturada();
+  const usa = tallaDisplay;
+
+  if (!codCliente || codCliente.length !== 4 || !/^\d+$/.test(codCliente)) { toast('Código cliente: 4 dígitos', 'error'); return; }
+  if (!producto || isNaN(precioUSD) || precioUSD <= 0) { toast('Producto y precio válidos requeridos', 'error'); return; }
+
+  const totalMXN = calcTotal(precioUSD, pzas);
+  const now = new Date();
+  const venta = {
+    codCliente, producto, marca, pzas, precioUSD, totalMXN,
+    talla: usa, tallaInfo: tallaDisplay, categoria: tipoArt,
+    banco, nota, shopper, tienda,
+    estado: 'pendiente',
+    fecha: now.toISOString().slice(0,10),
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    historial: [{ estado: 'pendiente', fecha: now.toISOString(), por: 'admin' }]
+  };
+
+  try {
+    setLoading(50);
+    await db.collection('ventas').add(venta);
+    setLoading(100);
+    toast('Producto agregado ✓', 'success');
+    const codigoTemp = document.getElementById('codCliente').value.trim();
+    limpiarFormProducto();
+    // Restore codCliente so panel keeps updating
+    document.getElementById('codCliente').value = codigoTemp;
+    actualizarCapturaPanel();
+  } catch(e) { toast('Error: ' + e.message, 'error'); setLoading(0); }
+}
+function limpiarFormProducto() {
+  ['producto','marca','precioUSD','nota','tallaLibre'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = ''; });
+  document.getElementById('pzas').value = '1';
+  document.getElementById('bancoVenta').value = '';
+  document.getElementById('tienda').value = 'Ross';
+  document.getElementById('previewPrecio').innerHTML = '';
+  if(document.getElementById('tipoArticulo')) document.getElementById('tipoArticulo').value = 'calzado';
+  onTipoChange();
+}
+
+// ─── PREVIEW PRECIO (agregar form) ───────────
+function actualizarPreviewPrecio() {
+  const usd = parseFloat(document.getElementById('precioUSD')?.value);
+  const pzas = parseInt(document.getElementById('pzas')?.value) || 1;
+  if (isNaN(usd) || usd <= 0) { document.getElementById('previewPrecio').innerHTML = ''; return; }
+  const total = calcTotal(usd, pzas);
+  document.getElementById('previewPrecio').innerHTML = `💡 Total estimado: <strong>${fmt(total)} MXN</strong> (TC: ${cfg.TC} | Com: ${cfg.comisionGlobal}%${cfg.horaFelizActiva ? ` | HH -${cfg.descuentoHH}%` : ''})`;
+}
+
+// ─── ADMIN: VER CLIENTE ───────────────────────
+function cargarProductosClienteAdmin() {
+  const codigo = (document.getElementById('clienteSeleccionado')?.value || '').trim();
+  if (!codigo) return;
+  const productos = ventas.filter(v => v.codCliente === codigo);
+  const usuario = usuarios.find(u => u.codigo === codigo);
+  const comp = comprobantes[codigo];
+
+  // Header info
+  const hdr = document.getElementById('infoClienteHeader');
+  if (hdr) {
+    hdr.innerHTML = usuario
+      ? `<div style="margin-bottom:10px;"><span class="chip">${usuario.nombre}</span> ${comp ? `<span class="comp-badge-yes">✅ Comprobante recibido</span>` : '<span class="comp-badge-no">⏳ Sin comprobante</span>'}</div>`
+      : `<div class="text-small" style="margin-bottom:10px;">⚠️ Cliente no encontrado en usuarios</div>`;
   }
 
-  // Usuario form
-  const [uCod,setUCod]=useState(""); const [uNombre,setUNombre]=useState("");
-  const [uRol,setURol]=useState("cliente"); const [uSocio,setUSocio]=useState(false);
-  async function agregarUsuario(){
-    if(!uCod||uCod.length!==4||!/^\d+$/.test(uCod)){alert("Código: exactamente 4 dígitos numéricos");return;}
-    if(!uNombre.trim()){alert("Nombre requerido");return;}
-    const snap=await ref("/usuarios/"+uCod).once("value");
-    if(snap.exists()){alert("Ya existe un usuario con ese código");return;}
-    await set("/usuarios/"+uCod,{nombre:uNombre.trim(),rol:uRol,esSocio:uRol==="shopper"?uSocio:false});
-    setUCod(""); setUNombre(""); setUSocio(false);
-    alert("✓ Usuario agregado");
+  const tbody = document.getElementById('tbodyProductosCliente');
+  tbody.innerHTML = '';
+  if (productos.length === 0) { tbody.innerHTML = '<tr><td colspan="11" class="empty-state">Sin productos para este cliente</td></tr>'; }
+
+  let totalPendiente = 0;
+  productos.forEach(p => {
+    if (p.estado === 'pendiente' || p.estado === 'aprobado') totalPendiente += p.totalMXN;
+    const shopperUser = usuarios.find(u => u.codigo === p.shopper);
+    const row = tbody.insertRow();
+    row.innerHTML = `
+      <td><strong>${p.producto}</strong></td>
+      <td>${p.marca || '—'}</td>
+      <td>${p.pzas}</td>
+      <td>$${p.precioUSD?.toFixed(2)}</td>
+      <td><strong>${fmt(p.totalMXN)}</strong></td>
+      <td class="text-small">${p.tallaInfo || p.talla}</td>
+      <td>${p.banco || '—'}</td>
+      <td>${shopperUser ? shopperUser.nombre : (p.shopper || '—')}</td>
+      <td><span class="badge b-${p.estado}">${{pendiente:'Pendiente',aprobado:'Aprobado',cancelado:'Cancelado',pagado:'Pagado'}[p.estado]}</span></td>
+      <td>${comp ? `<a href="${comp.url}" target="_blank" class="btn btn-info btn-sm">📄 Ver</a>` : '—'}</td>
+      <td>
+        ${p.estado === 'pendiente' ? `<button class="btn btn-ghost btn-sm" onclick="abrirEditar('${p._id}')">✏️</button> <button class="btn btn-danger btn-sm" onclick="cancelarProducto('${p._id}')">❌</button>` : ''}
+        ${p.estado === 'aprobado' && comp ? `<button class="btn btn-success btn-sm" onclick="liberarPago('${codigo}')">✅ Liberar</button>` : ''}
+        ${p.estado === 'aprobado' && !comp ? '<span class="text-small">Esperando comp.</span>' : ''}
+        ${p.estado === 'pagado' || p.estado === 'cancelado' ? '—' : ''}
+      </td>`;
+  });
+
+  const footer = document.getElementById('footerCliente');
+  if (footer && productos.length > 0) {
+    footer.innerHTML = `<div class="desglose-card"><strong>Total pendiente/aprobado:</strong> <span class="desglose-total">${fmt(totalPendiente)}</span></div>`;
   }
-  async function eliminarUsuario(cod){
-    if(!window.confirm(`¿Eliminar usuario ${cod}?`))return;
-    await remove("/usuarios/"+cod);
+}
+
+async function cancelarProducto(id) {
+  if (!confirm('¿Cancelar este producto?')) return;
+  try {
+    await db.collection('ventas').doc(id).update({ estado: 'cancelado', historial: firebase.firestore.FieldValue.arrayUnion({ estado: 'cancelado', fecha: new Date().toISOString(), por: 'admin' }) });
+    toast('Producto cancelado', 'warning');
+    cargarProductosClienteAdmin();
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
+}
+
+async function liberarPago(codCliente) {
+  if (!confirm(`¿Liberar pago para cliente ${codCliente}?`)) return;
+  const aprobados = ventas.filter(v => v.codCliente === codCliente && v.estado === 'aprobado');
+  if (aprobados.length === 0) { toast('No hay productos aprobados', 'error'); return; }
+  try {
+    setLoading(30);
+    const batch = db.batch();
+    aprobados.forEach(v => {
+      batch.update(db.collection('ventas').doc(v._id), { estado: 'pagado', historial: firebase.firestore.FieldValue.arrayUnion({ estado: 'pagado', fecha: new Date().toISOString(), por: 'admin' }) });
+    });
+    await batch.commit();
+    setLoading(100);
+    toast('Pago liberado ✓', 'success');
+    cargarProductosClienteAdmin();
+  } catch(e) { toast('Error: ' + e.message, 'error'); setLoading(0); }
+}
+
+// ─── EDITAR PRODUCTO ──────────────────────────
+function abrirEditar(id) {
+  const v = ventas.find(x => x._id === id);
+  if (!v) return;
+  document.getElementById('editId').value = id;
+  document.getElementById('editProducto').value = v.producto;
+  document.getElementById('editMarca').value = v.marca || '';
+  document.getElementById('editPrecioUSD').value = v.precioUSD;
+  document.getElementById('editPzas').value = v.pzas;
+  document.getElementById('editBanco').value = v.banco || '';
+  document.getElementById('editNota').value = v.nota || '';
+  document.getElementById('editModal').style.display = 'flex';
+}
+function cerrarModal() { document.getElementById('editModal').style.display = 'none'; }
+async function guardarEdicion() {
+  const id = document.getElementById('editId').value;
+  const precioUSD = parseFloat(document.getElementById('editPrecioUSD').value);
+  const pzas = parseInt(document.getElementById('editPzas').value) || 1;
+  const totalMXN = calcTotal(precioUSD, pzas);
+  try {
+    await db.collection('ventas').doc(id).update({
+      producto: document.getElementById('editProducto').value.trim(),
+      marca: document.getElementById('editMarca').value.trim(),
+      precioUSD, pzas, totalMXN,
+      banco: document.getElementById('editBanco').value,
+      nota: document.getElementById('editNota').value.trim(),
+      historial: firebase.firestore.FieldValue.arrayUnion({ estado: 'editado', fecha: new Date().toISOString(), por: 'admin' })
+    });
+    cerrarModal();
+    toast('Producto actualizado ✓', 'success');
+    cargarProductosClienteAdmin();
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
+}
+
+// ─── DASHBOARD ────────────────────────────────
+function renderDashboard() {
+  const total = ventas.length;
+  const pendientes = ventas.filter(v => v.estado === 'pendiente').length;
+  const pagados = ventas.filter(v => v.estado === 'pagado');
+  const totalPagadoMXN = pagados.reduce((s, v) => s + (v.totalMXN || 0), 0);
+  const gananciaTotal = pagados.reduce((s, v) => s + calcComision(v.precioUSD, v.pzas), 0);
+  const compPendientes = Object.keys(comprobantes).filter(cod => ventas.some(v => v.codCliente === cod && v.estado === 'aprobado'));
+
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-label">Total productos</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--warning)">${pendientes}</div><div class="stat-label">Pendientes</div></div>
+    <div class="stat-card green"><div class="stat-num">${pagados.length}</div><div class="stat-label">Pagados</div></div>
+    <div class="stat-card gold"><div class="stat-num">${fmt(totalPagadoMXN)}</div><div class="stat-label">Total vendido MXN</div></div>
+    <div class="stat-card blue"><div class="stat-num">${fmt(gananciaTotal)}</div><div class="stat-label">Ganancia negocio</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--rose)">TC ${cfg.TC}</div><div class="stat-label">${cfg.horaFelizActiva ? '🎉 Hora Feliz' : 'Sin Hora Feliz'}</div></div>`;
+
+  // Comprobantes pendientes de revisar
+  const compDiv = document.getElementById('comprobantesAdmin');
+  if (compPendientes.length === 0) { compDiv.innerHTML = '<p class="text-small">Sin comprobantes pendientes por revisar ✓</p>'; }
+  else {
+    compDiv.innerHTML = compPendientes.map(cod => {
+      const u = usuarios.find(x => x.codigo === cod);
+      const comp = comprobantes[cod];
+      return `<div style="display:flex;align-items:center;gap:12px;padding:10px;background:var(--warning-bg);border-radius:var(--r-sm);margin-bottom:8px;">
+        <span>⏳ <strong>${u ? u.nombre : cod}</strong> (${cod})</span>
+        <a href="${comp.url}" target="_blank" class="btn btn-info btn-sm">📄 Ver</a>
+        <button class="btn btn-success btn-sm" onclick="document.getElementById('clienteSeleccionado').value='${cod}';switchTab('clientes');cargarProductosClienteAdmin()">Ir a cliente</button>
+      </div>`;
+    }).join('');
   }
 
-  // Ver cliente
-  const ventasCliente = clienteVer ? Object.values(ventas).filter(v=>v.codCliente===clienteVer) : [];
-  async function cancelarVenta(id){ await upd("/ventas/"+id,{estado:"cancelado"}); }
-  async function liberarPago(cod){
-    const aprobados=Object.values(ventas).filter(v=>v.codCliente===cod&&v.estado==="aprobado");
-    if(!aprobados.length){alert("No hay productos aprobados");return;}
-    if(!window.confirm(`¿Liberar pago de ${aprobados.length} productos para cliente ${cod}?`))return;
-    const updates={};
-    aprobados.forEach(v=>{ updates[`/ventas/${v.id}/estado`]="pagado"; });
-    await db.ref(DB_PATH).update(updates);
-    alert("✓ Pago liberado");
-  }
+  // Ganancias por shopper
+  const shoppers = usuarios.filter(u => u.rol === 'shopper');
+  const gDiv = document.getElementById('gananciasPorShopper');
+  if (shoppers.length === 0) { gDiv.innerHTML = '<p class="text-small">Sin vendedores registrados</p>'; return; }
+  const rows = shoppers.map(s => {
+    const misVentas = pagados.filter(v => v.shopper === s.codigo);
+    const ganancia = misVentas.reduce((sum, v) => sum + v.totalMXN * 0.10, 0);
+    return `<tr><td>${s.nombre} (${s.codigo})</td><td>${misVentas.length}</td><td>${fmt(misVentas.reduce((a,v)=>a+v.totalMXN,0))}</td><td><strong>${fmt(ganancia)}</strong></td></tr>`;
+  }).join('');
+  gDiv.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Vendedor</th><th>Ventas pagadas</th><th>Total vendido</th><th>Su ganancia (10%)</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+// ─── ADMIN: USUARIOS ─────────────────────────
+function renderTablaUsuarios() {
+  const tbody = document.getElementById('tbodyUsuarios');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  usuarios.forEach(u => {
+    const row = tbody.insertRow();
+    row.innerHTML = `
+      <td><span class="chip">${u.codigo}</span></td>
+      <td>${u.nombre}</td>
+      <td>${{admin:'Administrador',shopper:'Vendedor',cliente:'Cliente'}[u.rol] || u.rol}</td>
+      <td>${u.esSocio ? '✅' : '—'}</td>
+      <td>${u.rol !== 'admin' ? `<button class="btn btn-danger btn-sm" onclick="eliminarUsuario('${u.codigo}')">🗑️</button>` : '—'}</td>`;
+  });
+}
+function toggleSocioCheck() {
+  document.getElementById('socioField').style.display = document.getElementById('nuevoRol').value === 'shopper' ? 'block' : 'none';
+}
+async function agregarUsuario() {
+  const codigo = document.getElementById('nuevoCodigo').value.trim();
+  const nombre = document.getElementById('nuevoNombre').value.trim();
+  const rol = document.getElementById('nuevoRol').value;
+  const esSocio = document.getElementById('nuevoEsSocio').checked;
+  if (!codigo || codigo.length !== 4 || !/^\d+$/.test(codigo)) { toast('Código debe ser 4 dígitos', 'error'); return; }
+  if (!nombre) { toast('Nombre requerido', 'error'); return; }
+  if (usuarios.find(u => u.codigo === codigo)) { toast('Código ya existe', 'error'); return; }
+  try {
+    const nuevoWa = document.getElementById('nuevoWhatsapp')?.value.trim() || '';
+    await db.collection('usuarios').doc(codigo).set({ codigo, nombre, rol, esSocio: rol === 'shopper' ? esSocio : false, whatsapp: nuevoWa, creadoEn: new Date().toISOString() });
+    toast('Usuario agregado ✓', 'success');
+    document.getElementById('nuevoCodigo').value = '';
+    document.getElementById('nuevoNombre').value = '';
+    document.getElementById('nuevoEsSocio').checked = false;
+    if(document.getElementById('nuevoWhatsapp')) document.getElementById('nuevoWhatsapp').value = '';
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
+}
+async function eliminarUsuario(codigo) {
+  if (!confirm(`¿Eliminar usuario ${codigo}?`)) return;
+  try {
+    await db.collection('usuarios').doc(codigo).delete();
+    toast('Usuario eliminado', 'warning');
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
+}
+
+// ─── CONFIG ───────────────────────────────────
+function syncUI() {
+  if (usuarioActual?.rol !== 'admin') return;
+  ['cfgTC','cfgComision','cfgDescuentoHH'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = { cfgTC: cfg.TC, cfgComision: cfg.comisionGlobal, cfgDescuentoHH: cfg.descuentoHH }[id];
+  });
+  const badge = document.getElementById('estadoHHBadge');
+  if (badge) badge.innerHTML = cfg.horaFelizActiva
+    ? `<span class="badge b-aprobado">🎉 Hora Feliz ACTIVA — ${cfg.descuentoHH}% descuento</span>`
+    : `<span class="badge b-pendiente">Hora Feliz inactiva</span>`;
+}
+async function guardarConfig() {
+  const nuevaPass = document.getElementById('cfgNuevaPass').value.trim();
+  const updates = {
+    TC: parseFloat(document.getElementById('cfgTC').value) || cfg.TC,
+    comisionGlobal: parseFloat(document.getElementById('cfgComision').value) || cfg.comisionGlobal,
+    descuentoHH: parseFloat(document.getElementById('cfgDescuentoHH').value) || cfg.descuentoHH,
+  };
+  if (nuevaPass) updates.adminPassword = nuevaPass;
+  try {
+    await db.collection('config').doc('settings').set(updates, { merge: true });
+    toast('Configuración guardada ✓', 'success');
+    document.getElementById('cfgNuevaPass').value = '';
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
+}
+async function toggleHH(activar) {
+  try {
+    await db.collection('config').doc('settings').set({ horaFelizActiva: activar }, { merge: true });
+    toast(activar ? '🎉 Hora Feliz ACTIVADA' : 'Hora Feliz desactivada', activar ? 'success' : '');
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
+}
+
+// ─── BADGE COMPROBANTES ───────────────────────
+function actualizarCompBadge() {
+  const pendientes = Object.keys(comprobantes).filter(cod => ventas.some(v => v.codCliente === cod && v.estado === 'aprobado'));
+  const badge = document.getElementById('compBadge');
+  if (badge) { badge.textContent = pendientes.length; badge.style.display = pendientes.length > 0 ? 'flex' : 'none'; }
+}
+
+// ─── SHOPPER PANEL ────────────────────────────
+function renderShopper() {
+  if (!usuarioActual) return;
+  const misVentas = ventas.filter(v => v.shopper === usuarioActual.codigo && v.estado === 'pagado');
+  const comisionPersonal = misVentas.reduce((s, v) => s + v.totalMXN * 0.10, 0);
 
   // Stats
-  const totalVentas=Object.values(ventas).filter(v=>v.estado==="pagado").reduce((s,v)=>s+v.totalMXN,0);
-  const pendientes=Object.values(ventas).filter(v=>v.estado==="pendiente").length;
-  const aprobados=Object.values(ventas).filter(v=>v.estado==="aprobado").length;
-  const gananciaTotal=Object.values(ventas).filter(v=>v.estado==="pagado")
-    .reduce((s,v)=>s+calcComisionMonto(v.precioUSD,v.pzas,v.comisionSnapshot||cfg.comision||10),0);
+  document.getElementById('statsShopperGrid').innerHTML = `
+    <div class="stat-card"><div class="stat-num">${misVentas.length}</div><div class="stat-label">Ventas pagadas</div></div>
+    <div class="stat-card gold"><div class="stat-num">${fmt(comisionPersonal)}</div><div class="stat-label">Tu comisión (10%)</div></div>
+    <div class="stat-card green"><div class="stat-num">${fmt(misVentas.reduce((s,v)=>s+v.totalMXN,0))}</div><div class="stat-label">Total vendido</div></div>`;
 
-  // Change password state
-  const [newPass,setNewPass]=useState("");
+  // Tabla
+  const tbody = document.getElementById('tbodyProductosShopper');
+  tbody.innerHTML = '';
+  if (misVentas.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Sin ventas pagadas todavía</td></tr>'; }
+  misVentas.forEach(v => {
+    const u = usuarios.find(x => x.codigo === v.codCliente);
+    const row = tbody.insertRow();
+    row.innerHTML = `<td>${v.fecha}</td><td>${u ? u.nombre : v.codCliente}</td><td>${v.producto}</td><td>${v.marca||'—'}</td><td>${v.pzas}</td><td>${fmt(v.totalMXN)}</td><td><strong>${fmt(v.totalMXN*0.10)}</strong></td>`;
+  });
 
-  return(
-    <div className="fade">
-      {/* Config bar */}
-      <div className="config-bar">
-        <div>
-          <label>Comisión global (%)</label>
-          <div style={{display:"flex",gap:6,alignItems:"center"}}>
-            <input type="number" min="0" max="100" value={comision} onChange={e=>setComision(e.target.value)} onBlur={saveComision}/>
-            <span style={{fontSize:11,color:"#94a3b8"}}>Enter = guardar</span>
-          </div>
-        </div>
-        <div className="sep"/>
-        <div>
-          <label>Descuento Hora Feliz (%)</label>
-          <input type="number" min="0" max="100" value={descHH} onChange={e=>setDescHH(e.target.value)} onBlur={saveDescHH}/>
-        </div>
-        <div className="sep"/>
-        <div>
-          <label>Hora Feliz</label>
-          <div style={{display:"flex",gap:6}}>
-            <button className={`btn btn-sm ${cfg.hhActiva?"btn-gold":"btn-ghost"}`} onClick={()=>toggleHH(true)}>🎉 Activar</button>
-            <button className={`btn btn-sm ${!cfg.hhActiva?"btn-primary":"btn-ghost"}`} onClick={()=>toggleHH(false)}>⛔ Desactivar</button>
-          </div>
-        </div>
-        <div className="sep"/>
-        <div>
-          <label>Estado HH</label>
-          <span className={`badge ${cfg.hhActiva?"b-hh":"b-cancelado"}`}>{cfg.hhActiva?"🎉 ACTIVA":"⛔ INACTIVA"}</span>
-        </div>
-      </div>
-
-      {/* Stats */}
-      <div className="stat-grid">
-        {[
-          {l:"Ventas cobradas",v:fmt(totalVentas)},
-          {l:"Ganancia total",v:fmt(gananciaTotal)},
-          {l:"Pendientes",v:pendientes},
-          {l:"Por cobrar",v:aprobados},
-          {l:"Clientes",v:Object.values(usuarios).filter(u=>u.rol==="cliente").length},
-          {l:"Vendedores",v:shoppers.length},
-        ].map(s=><div key={s.l} className="stat-card"><div className="stat-val">{s.v}</div><div className="stat-lbl">{s.l}</div></div>)}
-      </div>
-
-      {/* Tabs */}
-      <div className="tabs-nav">
-        {[["productos","➕ Agregar"],["ver","👁️ Ver cliente"],["usuarios","👥 Usuarios"],["seguridad","🔐 Seguridad"]].map(([k,l])=>(
-          <button key={k} className={`tab-nav-btn${tab===k?" active":""}`} onClick={()=>setTab(k)}>{l}</button>
-        ))}
-      </div>
-
-      {/* TAB: Agregar producto */}
-      {tab==="productos"&&<div className="card fade">
-        <div className="card-title">➕ Agregar producto</div>
-        <div className="form-grid">
-          <Field label="Código cliente (4 dígitos)">
-            <input value={pCod} onChange={e=>setPCod(e.target.value.replace(/\D/g,"").slice(0,4))} placeholder="1234" maxLength={4}/>
-          </Field>
-          <Field label="Producto">
-            <input value={pNombre} onChange={e=>setPNombre(e.target.value)} placeholder="Nike Air Max..."/>
-          </Field>
-          <Field label="Marca">
-            <input value={pMarca} onChange={e=>setPMarca(e.target.value)} placeholder="Nike, Adidas..."/>
-          </Field>
-          <Field label="Precio USD">
-            <input type="number" min="0" step="0.01" value={pPrecio} onChange={e=>setPPrecio(e.target.value)} placeholder="29.99"/>
-          </Field>
-          <Field label="Piezas">
-            <input type="number" min="1" value={pPzas} onChange={e=>setPPzas(e.target.value)}/>
-          </Field>
-          <Field label="Categoría">
-            <select value={pCat} onChange={e=>setPCat(e.target.value)}>
-              <option value="mujer">Adulto Mujer</option>
-              <option value="hombre">Adulto Hombre</option>
-              <option value="juniors">Juniors</option>
-              <option value="ninos">Niños</option>
-              <option value="bebes">Bebés</option>
-            </select>
-          </Field>
-          <Field label="Talla USA">
-            <select value={pTalla} onChange={e=>setPTalla(e.target.value)}>
-              {tallaOpts.map(t=><option key={t} value={t}>{t}</option>)}
-            </select>
-            {tallaInfo&&<div className="talla-info">🇲🇽 Mex: {tallaInfo.mx} · 📏 CM: {tallaInfo.cm}</div>}
-          </Field>
-          <Field label="Banco">
-            <select value={pBanco} onChange={e=>setPBanco(e.target.value)}>
-              <option value="">Sin banco</option>
-              <option>BANORTE</option><option>HSBC</option><option>EFECTIVO</option>
-            </select>
-          </Field>
-          <Field label="Vendedor (shopper)">
-            <select value={pShopper} onChange={e=>setPShopper(e.target.value)}>
-              {shoppers.map(([cod,u])=><option key={cod} value={cod}>{u.nombre} ({cod})</option>)}
-            </select>
-          </Field>
-          <Field label="Nota">
-            <input value={pNota} onChange={e=>setPNota(e.target.value)} placeholder="Observaciones..."/>
-          </Field>
-        </div>
-        {totalPreview>0&&<Alert type="info">
-          💰 Total estimado para el cliente: <strong>{fmt(totalPreview)}</strong>
-          {cfg.hhActiva&&<span> 🎉 (con {cfg.descHH}% HH)</span>}
-        </Alert>}
-        <div className="btn-row">
-          <Btn cls="btn-rose" onClick={agregarProducto} disabled={pGuardando}>{pGuardando?"Guardando...":"➕ Agregar producto"}</Btn>
-          <Btn cls="btn-ghost" onClick={()=>{setPNombre("");setPMarca("");setPPrecio("");setPPzas("1");setPBanco("");setPNota("");}}>🗑️ Limpiar</Btn>
-        </div>
-      </div>}
-
-      {/* TAB: Ver cliente */}
-      {tab==="ver"&&<div className="card fade">
-        <div className="card-title">👁️ Productos del cliente</div>
-        <div style={{display:"flex",gap:10,marginBottom:16,flexWrap:"wrap",alignItems:"flex-end"}}>
-          <Field label="Código del cliente">
-            <input value={codCliente} onChange={e=>setCodCliente(e.target.value.replace(/\D/g,"").slice(0,4))} placeholder="1234" maxLength={4} style={{width:120}}/>
-          </Field>
-          <Btn cls="btn-primary" onClick={()=>setClienteVer(codCliente)}>Cargar</Btn>
-          {clienteVer&&ventasCliente.some(v=>v.estado==="aprobado")&&
-            <Btn cls="btn-success" onClick={()=>liberarPago(clienteVer)}>✅ Liberar pago</Btn>}
-        </div>
-        {clienteVer&&<>
-          {ventasCliente.length===0?<Alert type="warn">Sin productos para el cliente {clienteVer}</Alert>:
-          <div className="table-wrap">
-            <table>
-              <thead><tr><th>Producto</th><th>Marca</th><th>Pzas</th><th>USD</th><th>Total MXN</th><th>Talla</th><th>Banco</th><th>Vendedor</th><th>Estado</th><th>Acciones</th></tr></thead>
-              <tbody>
-                {ventasCliente.sort((a,b)=>b.ts-a.ts).map(v=>(
-                  <tr key={v.id}>
-                    <td style={{fontWeight:500}}>{v.producto}</td>
-                    <td>{v.marca||"—"}</td>
-                    <td>{v.pzas}</td>
-                    <td>${v.precioUSD?.toFixed(2)}</td>
-                    <td style={{fontWeight:700,color:"var(--green)"}}>{fmt(v.totalMXN)}</td>
-                    <td style={{fontSize:11}}>{v.tallaInfo}</td>
-                    <td>{v.banco||"—"}</td>
-                    <td>{usuarios[v.shopper]?.nombre||v.shopper}</td>
-                    <td><span className={`badge b-${v.estado}`}>{v.estado}</span></td>
-                    <td>
-                      {v.estado==="pendiente"&&<Btn sm cls="btn-danger" onClick={()=>cancelarVenta(v.id)}>❌ Cancelar</Btn>}
-                      {v.estado==="aprobado"&&<span style={{fontSize:11,color:"var(--gray)"}}>Espera liberación</span>}
-                      {(v.estado==="pagado"||v.estado==="cancelado")&&<span style={{fontSize:11,color:"var(--gray)"}}>—</span>}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>}
-        </>}
-      </div>}
-
-      {/* TAB: Usuarios */}
-      {tab==="usuarios"&&<div className="card fade">
-        <div className="card-title">👥 Gestión de usuarios</div>
-        <div className="form-grid" style={{marginBottom:16}}>
-          <Field label="Código (4 dígitos WhatsApp)">
-            <input value={uCod} onChange={e=>setUCod(e.target.value.replace(/\D/g,"").slice(0,4))} placeholder="1234" maxLength={4}/>
-          </Field>
-          <Field label="Nombre completo">
-            <input value={uNombre} onChange={e=>setUNombre(e.target.value)} placeholder="María López"/>
-          </Field>
-          <Field label="Rol">
-            <select value={uRol} onChange={e=>setURol(e.target.value)}>
-              <option value="cliente">Cliente</option>
-              <option value="shopper">Vendedor</option>
-            </select>
-          </Field>
-          {uRol==="shopper"&&<Field label="¿Es socio (dueño)?">
-            <label style={{display:"flex",alignItems:"center",gap:8,marginTop:8,cursor:"pointer"}}>
-              <input type="checkbox" checked={uSocio} onChange={e=>setUSocio(e.target.checked)} style={{width:18,height:18}}/>
-              <span style={{fontSize:14}}>Sí, es socio</span>
-            </label>
-          </Field>}
-        </div>
-        <Btn cls="btn-rose" onClick={agregarUsuario}>➕ Agregar usuario</Btn>
-        <div className="table-wrap" style={{marginTop:16}}>
-          <table>
-            <thead><tr><th>Código</th><th>Nombre</th><th>Rol</th><th>Socio</th><th></th></tr></thead>
-            <tbody>
-              {Object.entries(usuarios).map(([cod,u])=>(
-                <tr key={cod}>
-                  <td style={{fontFamily:"monospace",fontWeight:700}}>{cod}</td>
-                  <td style={{fontWeight:500}}>{u.nombre}</td>
-                  <td><span className={`badge ${u.rol==="shopper"?"b-aprobado":"b-pagado"}`}>{u.rol==="shopper"?"Vendedor":"Cliente"}</span></td>
-                  <td>{u.esSocio?"✅ Sí":"—"}</td>
-                  <td><Btn sm cls="btn-danger" onClick={()=>eliminarUsuario(cod)}>🗑️</Btn></td>
-                </tr>
-              ))}
-              {Object.keys(usuarios).length===0&&<tr><td colSpan={5} style={{textAlign:"center",color:"var(--gray)"}}>Sin usuarios registrados</td></tr>}
-            </tbody>
-          </table>
-        </div>
-      </div>}
-
-      {/* TAB: Seguridad */}
-      {tab==="seguridad"&&<div className="card fade">
-        <div className="card-title">🔐 Cambiar contraseña de administrador</div>
-        <Alert type="info">La contraseña se guarda cifrada en Firebase. Nadie puede verla, ni siquiera el desarrollador.</Alert>
-        <div style={{maxWidth:320,marginTop:16}}>
-          <Field label="Nueva contraseña (mín. 6 caracteres)">
-            <input type="password" value={newPass} onChange={e=>setNewPass(e.target.value)} placeholder="••••••••"/>
-          </Field>
-          <Btn cls="btn-primary" onClick={()=>changeAdminPass(newPass)} style={{marginTop:8}}>💾 Guardar contraseña</Btn>
-        </div>
-      </div>}
-    </div>
-  );
+  // Socio
+  const card = document.getElementById('socioCard');
+  if (usuarioActual.esSocio) {
+    card.style.display = 'block';
+    const socios = usuarios.filter(u => u.rol === 'shopper' && u.esSocio);
+    const gananciaTotal = ventas.filter(v => v.estado === 'pagado').reduce((s,v) => s + calcComision(v.precioUSD, v.pzas), 0);
+    const parte = socios.length > 0 ? gananciaTotal / socios.length : 0;
+    document.getElementById('socioInfo').innerHTML = `<strong>Ganancia total del negocio:</strong> ${fmt(gananciaTotal)}<br><strong>Socios:</strong> ${socios.length}<br><strong>Tu parte:</strong> <span class="desglose-total">${fmt(parte)}</span>`;
+  } else card.style.display = 'none';
 }
 
-/* ── SHOPPER PANEL ───────────────────────────────────────── */
-function ShopperPanel({usuario}){
-  const ventas  = useListener("/ventas") ||{};
-  const usuarios= useListener("/usuarios")||{};
-  const cfg     = useListener("/cfg")    ||{comision:10};
-
-  const misVentas=Object.values(ventas).filter(v=>v.shopper===usuario.codigo&&v.estado==="pagado");
-  const comisionPersonal=misVentas.reduce((s,v)=>s+v.totalMXN*0.1,0);
-
-  const socios=Object.entries(usuarios).filter(([,u])=>u.rol==="shopper"&&u.esSocio);
-  const gananciaTotal=Object.values(ventas).filter(v=>v.estado==="pagado")
-    .reduce((s,v)=>s+calcComisionMonto(v.precioUSD,v.pzas,v.comisionSnapshot||cfg.comision||10),0);
-  const parteSocio=usuario.esSocio&&socios.length>0?gananciaTotal/socios.length:0;
-  const totalGanancias=comisionPersonal+parteSocio;
-
-  return(
-    <div className="fade">
-      <div className="stat-grid">
-        <div className="stat-card"><div className="stat-val">{fmt(totalGanancias)}</div><div className="stat-lbl">Ganancia total</div></div>
-        <div className="stat-card"><div className="stat-val">{fmt(comisionPersonal)}</div><div className="stat-lbl">Comisión personal (10%)</div></div>
-        {usuario.esSocio&&<div className="stat-card"><div className="stat-val">{fmt(parteSocio)}</div><div className="stat-lbl">Parte como socio</div></div>}
-        <div className="stat-card"><div className="stat-val">{misVentas.length}</div><div className="stat-lbl">Productos cobrados</div></div>
+// ─── CLIENTE PANEL ────────────────────────────
+function mostrarBannerCaptura(data) {
+  const banner = document.getElementById('bannerCaptura');
+  if (!banner) return;
+  banner.innerHTML = `
+    <div style="background:linear-gradient(135deg,var(--success-bg),#e0f5ea);border:1.5px solid var(--success);border-radius:var(--r);padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:12px;animation:fadeIn .4s ease;">
+      <span style="font-size:28px;">🛍️</span>
+      <div>
+        <div style="font-weight:700;color:var(--success);font-size:15px;">¡Tus artículos están listos!</div>
+        <div style="font-size:13px;color:var(--plum-mid);">${data.items} producto${data.items>1?'s':''} registrados · Total: <strong>${fmt(data.totalMXN)}</strong></div>
+        <div style="font-size:12px;color:var(--plum-light);margin-top:2px;">Revisa la lista abajo, aprueba o cancela cada artículo.</div>
       </div>
-      <div className="card">
-        <div className="card-title">📋 Mis ventas cobradas</div>
-        <div className="table-wrap">
-          <table>
-            <thead><tr><th>Fecha</th><th>Cliente</th><th>Producto</th><th>Marca</th><th>Pzas</th><th>Total MXN</th><th>Mi comisión (10%)</th></tr></thead>
-            <tbody>
-              {misVentas.sort((a,b)=>b.ts-a.ts).map(v=>(
-                <tr key={v.id}>
-                  <td>{v.fecha}</td>
-                  <td style={{fontFamily:"monospace",fontWeight:700}}>{v.codCliente}</td>
-                  <td style={{fontWeight:500}}>{v.producto}</td>
-                  <td>{v.marca||"—"}</td>
-                  <td>{v.pzas}</td>
-                  <td style={{color:"var(--green)",fontWeight:700}}>{fmt(v.totalMXN)}</td>
-                  <td style={{color:"var(--gold)",fontWeight:700}}>{fmt(v.totalMXN*0.1)}</td>
-                </tr>
-              ))}
-              {misVentas.length===0&&<tr><td colSpan={7} style={{textAlign:"center",color:"var(--gray)"}}>Sin ventas cobradas aún</td></tr>}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      {usuario.esSocio&&<div className="card">
-        <div className="card-title">🏢 Participación como socio</div>
-        <Alert type="info">Eres socio junto con {socios.length} persona{socios.length!==1?"s":""}.
-          La ganancia total del negocio es {fmt(gananciaTotal)} y te corresponde {fmt(parteSocio)}.</Alert>
-      </div>}
-    </div>
-  );
+    </div>`;
+  // Mark as seen after 5s
+  setTimeout(() => {
+    if (db && usuarioActual) db.collection('notificaciones').doc(usuarioActual.codigo).update({ visto: true }).catch(()=>{});
+  }, 5000);
 }
 
-/* ── CLIENTE PANEL ───────────────────────────────────────── */
-function ClientePanel({usuario}){
-  const ventas = useListener("/ventas/") ||{};
-  const cfg    = useListener("/cfg")     ||{comision:10,hhActiva:false,descHH:10};
-  const [fileComp,setFileComp]=useState(null);
-  const [subiendo,setSubiendo]=useState(false);
-  const [compSubido,setCompSubido]=useState(false);
+function renderCliente() {
+  if (!usuarioActual) return;
+  const misProductos = ventas.filter(v => v.codCliente === usuarioActual.codigo);
+  const activos = misProductos.filter(v => v.estado !== 'cancelado');
 
-  const misVentas=Object.values(ventas).filter(v=>v.codCliente===usuario.codigo);
-  const total=misVentas.filter(v=>v.estado!=="cancelado"&&v.estado!=="pagado").reduce((s,v)=>s+v.totalMXN,0);
-
-  async function cambiarEstado(id,estado){ await upd("/ventas/"+id,{estado}); }
-
-  async function subirComprobante(){
-    if(!fileComp){alert("Selecciona un archivo");return;}
-    setSubiendo(true);
-    const reader=new FileReader();
-    reader.onload=async e=>{
-      // Store as base64 in Firebase (for files < 1MB)
-      if(e.target.result.length > 1_000_000){ alert("Archivo muy grande. Máximo ~750KB. Comprime la imagen."); setSubiendo(false); return; }
-      await set("/comprobantes/"+usuario.codigo,{data:e.target.result,fecha:today(),ts:Date.now()});
-      setCompSubido(true); setSubiendo(false); setFileComp(null);
-      alert("✓ Comprobante enviado al administrador");
-    };
-    reader.readAsDataURL(fileComp);
+  // Desglose
+  const ejemplo = activos.find(v => v.estado !== 'pagado');
+  if (ejemplo) {
+    const base = calcBase(ejemplo.precioUSD, ejemplo.pzas);
+    const com = calcComision(ejemplo.precioUSD, ejemplo.pzas);
+    const sub = base + com;
+    const desc = cfg.horaFelizActiva ? sub * cfg.descuentoHH / 100 : 0;
+    document.getElementById('desgloseContent').innerHTML = `
+      <strong>💱 TC actual:</strong> $${cfg.TC} MXN/USD<br>
+      <strong>Comisión:</strong> ${cfg.comisionGlobal}%${cfg.horaFelizActiva ? ` | 🎉 Hora Feliz -${cfg.descuentoHH}%` : ''}<br>
+      <hr style="border:none;border-top:1px solid rgba(181,86,110,0.2);margin:10px 0;">
+      Ej: ${ejemplo.producto} × ${ejemplo.pzas} → Base: ${fmt(base)} + Comisión: ${fmt(com)}${cfg.horaFelizActiva ? ` - Descuento: ${fmt(desc)}` : ''}<br>
+      = <span class="desglose-total">${fmt(ejemplo.totalMXN)}</span>`;
+  } else {
+    document.getElementById('desgloseContent').innerHTML = 'Sin productos activos.';
   }
 
-  // Ejemplo para desglose
-  const ejemplo=misVentas.find(v=>v.estado!=="cancelado");
+  // Tabla
+  const tbody = document.getElementById('tbodyClienteFinal');
+  tbody.innerHTML = '';
+  if (misProductos.length === 0) { tbody.innerHTML = '<tr><td colspan="8" class="empty-state">El administrador aún no ha registrado productos para ti</td></tr>'; }
+  misProductos.forEach(p => {
+    const row = tbody.insertRow();
+    let decision = '';
+    if (p.estado === 'pendiente') {
+      decision = `<div style="display:flex;gap:6px;"><button class="btn btn-success btn-sm" onclick="decidirProducto('${p._id}','aprobado')">✅</button><button class="btn btn-danger btn-sm" onclick="decidirProducto('${p._id}','cancelado')">❌</button></div>`;
+    } else if (p.estado === 'aprobado') decision = '<span class="text-small">Sube comprobante</span>';
+    else if (p.estado === 'pagado') decision = '✓ Pagado';
+    else decision = '—';
+    row.innerHTML = `<td><strong>${p.producto}</strong></td><td>${p.marca||'—'}</td><td>${p.pzas}</td><td>$${p.precioUSD?.toFixed(2)}</td><td><strong>${fmt(p.totalMXN)}</strong></td><td class="text-small">${p.tallaInfo||p.talla}</td><td><span class="badge b-${p.estado}">${{pendiente:'Pendiente',aprobado:'Aprobado',cancelado:'Cancelado',pagado:'Pagado'}[p.estado]}</span></td><td>${decision}</td>`;
+  });
 
-  return(
-    <div className="fade">
-      {cfg.hhActiva&&<div className="hh-banner">🎉 ¡HORA FELIZ ACTIVA! {cfg.descHH}% de descuento en todos los productos</div>}
-
-      {/* Desglose */}
-      {ejemplo&&<div className="desglose-card">
-        <div style={{fontFamily:"var(--font-display)",fontSize:18,color:"var(--navy)",marginBottom:12}}>💰 Desglose de precios</div>
-        {(()=>{
-          const base=ejemplo.precioUSD*ejemplo.pzas*TC;
-          const com=base*(cfg.comision||10)/100;
-          const sub=base+com;
-          const desc=cfg.hhActiva?sub*(cfg.descHH||10)/100:0;
-          const final=sub-desc;
-          return<>
-            <div className="desglose-row"><span>USD ${(ejemplo.precioUSD*ejemplo.pzas).toFixed(2)} × TC ${TC}</span><span>${base.toFixed(2)}</span></div>
-            <div className="desglose-row"><span>+ Comisión {cfg.comision||10}%</span><span>+${com.toFixed(2)}</span></div>
-            {cfg.hhActiva&&<div className="desglose-row" style={{color:"var(--gold)"}}><span>- Descuento HH {cfg.descHH||10}%</span><span>-${desc.toFixed(2)}</span></div>}
-            <div className="desglose-row"><span>Total a pagar</span><span>{fmt(final)}</span></div>
-          </>;
-        })()}
-      </div>}
-
-      {/* Mis productos */}
-      <div className="card">
-        <div className="card-title">🛍️ Mis productos</div>
-        {misVentas.length===0?<Alert type="warn">No tienes productos registrados. Contacta al administrador.</Alert>:
-        <div className="table-wrap">
-          <table>
-            <thead><tr><th>Producto</th><th>Marca</th><th>Pzas</th><th>USD</th><th>Total MXN</th><th>Talla</th><th>Estado</th><th>Decisión</th></tr></thead>
-            <tbody>
-              {misVentas.sort((a,b)=>b.ts-a.ts).map(v=>(
-                <tr key={v.id}>
-                  <td style={{fontWeight:500}}>{v.producto}</td>
-                  <td>{v.marca||"—"}</td>
-                  <td>{v.pzas}</td>
-                  <td>${v.precioUSD?.toFixed(2)}</td>
-                  <td style={{fontWeight:700,color:"var(--green)"}}>{fmt(v.totalMXN)}</td>
-                  <td style={{fontSize:11}}>{v.tallaInfo}</td>
-                  <td><span className={`badge b-${v.estado}`}>{v.estado}</span></td>
-                  <td>
-                    {v.estado==="pendiente"&&<div className="btn-row">
-                      <Btn sm cls="btn-success" onClick={()=>cambiarEstado(v.id,"aprobado")}>✅ Aprobar</Btn>
-                      <Btn sm cls="btn-danger"  onClick={()=>cambiarEstado(v.id,"cancelado")}>❌ Cancelar</Btn>
-                    </div>}
-                    {v.estado==="aprobado"&&<span style={{fontSize:11,color:"var(--gray)"}}>Sube comprobante ↓</span>}
-                    {v.estado==="pagado"&&<span style={{fontSize:11,color:"var(--green)"}}>✓ Pagado</span>}
-                    {v.estado==="cancelado"&&<span style={{fontSize:11,color:"var(--gray)"}}>Cancelado</span>}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>}
-
-        {/* Total pendiente */}
-        {total>0&&<div style={{textAlign:"right",marginTop:12,padding:"12px 16px",background:"var(--rose-light)",borderRadius:12,border:"1px solid var(--rose)"}}>
-          <span style={{fontSize:13,color:"var(--gray)"}}>Total pendiente: </span>
-          <span style={{fontSize:20,fontWeight:700,color:"var(--rose-dark)"}}>{fmt(total)}</span>
-        </div>}
-
-        {/* Comprobante */}
-        <div style={{marginTop:20,background:"#f8f9fa",borderRadius:16,padding:18,border:"1px solid var(--border)"}}>
-          <div style={{fontWeight:600,marginBottom:8,fontSize:14}}>📎 Subir comprobante de depósito</div>
-          <p style={{fontSize:12,color:"var(--gray)",marginBottom:12}}>Una vez que apruebes tus productos, sube tu comprobante para que el administrador libere tu pedido.</p>
-          <input type="file" accept="image/*,application/pdf" onChange={e=>setFileComp(e.target.files[0])} style={{marginBottom:10,fontSize:13}}/>
-          {compSubido&&<Alert type="ok">✅ Comprobante enviado. El admin lo revisará pronto.</Alert>}
-          <Btn cls="btn-success" onClick={subirComprobante} disabled={subiendo||!fileComp}>
-            {subiendo?"Subiendo...":"💾 Enviar comprobante"}
-          </Btn>
-        </div>
-      </div>
-    </div>
-  );
+  // Estado comprobante
+  const comp = comprobantes[usuarioActual.codigo];
+  document.getElementById('estadoCompActual').innerHTML = comp
+    ? `<div class="comp-badge-yes">✅ Comprobante enviado — <a href="${comp.url}" target="_blank">Ver</a></div>`
+    : '<div class="comp-badge-no">⏳ Sin comprobante subido</div>';
 }
 
-/* ── MAIN APP ────────────────────────────────────────────── */
-function App(){
-  const [usuario,setUsuario]=useState(null);
-  const cfg = useListener("/cfg")||{hhActiva:false};
-
-  if(!IS_CONFIGURED) return(
-    <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
-      <div style={{background:"white",borderRadius:20,padding:32,maxWidth:480,textAlign:"center",boxShadow:"0 8px 32px rgba(0,0,0,.1)"}}>
-        <div style={{fontSize:32,marginBottom:8}}>🔧</div>
-        <h2 style={{fontFamily:"var(--font-display)",marginBottom:8}}>Configura Firebase</h2>
-        <p style={{color:"var(--gray)",fontSize:13,lineHeight:1.7}}>
-          Abre este archivo en Bloc de notas, busca <code>TU_API_KEY</code> y reemplaza los valores con los de tu proyecto Firebase. Luego guarda y sube a Cloudflare Pages.
-        </p>
-      </div>
-    </div>
-  );
-
-  if(!usuario) return <Login onLogin={setUsuario}/>;
-
-  const roleLabel={admin:"Administrador",shopper:"Vendedor",cliente:"Cliente"};
-  const roleCls={admin:"role-admin",shopper:"role-shopper",cliente:"role-cliente"};
-
-  return(
-    <div className="app">
-      {cfg.hhActiva&&usuario.rol!=="cliente"&&<div className="hh-banner">🎉 HORA FELIZ ACTIVA — {cfg.descHH||10}% de descuento</div>}
-      <div className="topbar">
-        <div className="topbar-brand">✨ Divina Compras</div>
-        <div className="topbar-user">
-          <span className={`role-badge ${roleCls[usuario.rol]}`}>{roleLabel[usuario.rol]}</span>
-          <span>{usuario.nombre}</span>
-          <button className="btn btn-ghost btn-sm" onClick={()=>setUsuario(null)} style={{fontSize:11}}>🔓 Salir</button>
-        </div>
-      </div>
-      <div className="main">
-        {usuario.rol==="admin"   && <AdminPanel/>}
-        {usuario.rol==="shopper" && <ShopperPanel usuario={usuario}/>}
-        {usuario.rol==="cliente" && <ClientePanel usuario={usuario}/>}
-      </div>
-    </div>
-  );
+async function decidirProducto(id, estado) {
+  try {
+    await db.collection('ventas').doc(id).update({ estado, historial: firebase.firestore.FieldValue.arrayUnion({ estado, fecha: new Date().toISOString(), por: 'cliente' }) });
+    toast(estado === 'aprobado' ? '✅ Aprobado' : '❌ Cancelado', estado === 'aprobado' ? 'success' : '');
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+// ─── SUBIR COMPROBANTE ────────────────────────
+async function subirComprobante() {
+  if (!usuarioActual) return;
+  const file = document.getElementById('fileComp').files[0];
+  if (!file) { toast('Selecciona un archivo', 'error'); return; }
+  if (file.size > 10 * 1024 * 1024) { toast('Archivo muy grande (máx 10MB)', 'error'); return; }
+
+  const aprobados = ventas.filter(v => v.codCliente === usuarioActual.codigo && v.estado === 'aprobado');
+  if (aprobados.length === 0) { toast('Primero aprueba al menos un producto', 'error'); return; }
+
+  const ext = file.name.split('.').pop();
+  const ref = storage.ref(`comprobantes/${usuarioActual.codigo}_${Date.now()}.${ext}`);
+  document.getElementById('uploadProgress').innerHTML = '📤 Subiendo...';
+  try {
+    setLoading(30);
+    const snap = await ref.put(file);
+    setLoading(70);
+    const url = await snap.ref.getDownloadURL();
+    await db.collection('comprobantes').doc(usuarioActual.codigo).set({ url, subidoEn: new Date().toISOString(), tipo: file.type });
+    setLoading(100);
+    document.getElementById('uploadProgress').innerHTML = '';
+    document.getElementById('fileComp').value = '';
+    toast('Comprobante subido ✓ El admin lo revisará', 'success');
+  } catch(e) { toast('Error al subir: ' + e.message, 'error'); setLoading(0); document.getElementById('uploadProgress').innerHTML = ''; }
+}
+function refrescarCliente() { renderCliente(); toast('Actualizado'); }
+
+// ─── WHATSAPP SUMMARY ─────────────────────────
+function generarMensajeWA() {
+  if (!usuarioActual) return;
+  const misProductos = ventas.filter(v => v.codCliente === usuarioActual.codigo && v.estado !== 'cancelado');
+  if (misProductos.length === 0) { toast('Sin productos activos', 'error'); return; }
+  let total = misProductos.reduce((s,v) => s + v.totalMXN, 0);
+  let lineas = misProductos.map(p => `👟 ${p.producto}${p.marca ? ' '+p.marca : ''} ×${p.pzas} → *${fmt(p.totalMXN)} MXN*`).join('\n');
+  const msg = `✨ *Divina Compras — Tu resumen* ✨\n━━━━━━━━━━━━━━━━━━\n${lineas}\n━━━━━━━━━━━━━━━━━━\n💰 *Total a pagar: ${fmt(total)}*\nTC: $${cfg.TC} | Comisión: ${cfg.comisionGlobal}%${cfg.horaFelizActiva ? ` | 🎉 HH -${cfg.descuentoHH}%` : ''}`;
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg));
+}
+
+// ─── TABS ─────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  const tab = document.getElementById('tab-' + name);
+  if (tab) tab.classList.add('active');
+  const btn = document.querySelector(`[data-tab="${name}"]`);
+  if (btn) btn.classList.add('active');
+  if (name === 'dashboard') renderDashboard();
+  if (name === 'configTab') syncUI();
+}
+
+// ─── AUTH ─────────────────────────────────────
+async function loginUsuario() {
+  const codigo = document.getElementById('codigoAcceso').value.trim();
+  document.getElementById('loginError').innerText = '';
+  if (!codigo) { document.getElementById('loginError').innerText = 'Ingresa tu código'; return; }
+  const usuario = usuarios.find(u => u.codigo === codigo && (u.rol === 'cliente' || u.rol === 'shopper'));
+  if (usuario) {
+    usuarioActual = usuario;
+    mostrarApp();
+  } else {
+    // Try fetching from Firestore in case listeners haven't loaded yet
+    try {
+      const snap = await db.collection('usuarios').doc(codigo).get();
+      if (snap.exists && snap.data().rol !== 'admin') {
+        usuarioActual = snap.data();
+        mostrarApp();
+      } else document.getElementById('loginError').innerText = 'Código no registrado.';
+    } catch(e) { document.getElementById('loginError').innerText = 'Error de conexión'; }
+  }
+}
+async function loginAdmin() {
+  document.getElementById('loginError').innerText = '';
+  const pass = document.getElementById('adminPassword').value.trim();
+  // Check Firestore config first, fall back to default
+  let correctPass = cfg.adminPassword || 'spena748';
+  try {
+    const snap = await db.collection('config').doc('settings').get();
+    if (snap.exists && snap.data().adminPassword) correctPass = snap.data().adminPassword;
+  } catch(e) {}
+  if (pass !== correctPass) { document.getElementById('loginError').innerText = 'Clave incorrecta'; return; }
+  usuarioActual = { codigo: 'admin', nombre: 'Administrador', rol: 'admin', esSocio: false };
+  mostrarApp();
+}
+function mostrarApp() {
+  document.getElementById('loginOverlay').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'block';
+  document.getElementById('bienvenidaUsuario').innerText = `Bienvenida/o, ${usuarioActual.nombre || usuarioActual.codigo}`;
+  document.getElementById('adminPanel').style.display = usuarioActual.rol === 'admin' ? 'block' : 'none';
+  document.getElementById('shopperPanel').style.display = usuarioActual.rol === 'shopper' ? 'block' : 'none';
+  document.getElementById('clientePanel').style.display = usuarioActual.rol === 'cliente' ? 'block' : 'none';
+  if (usuarioActual.rol === 'admin') { renderDashboard(); renderTablaUsuarios(); cargarSelectVendedores(); syncUI(); }
+  else if (usuarioActual.rol === 'shopper') renderShopper();
+  else renderCliente();
+}
+function cerrarSesion() {
+  usuarioActual = null;
+  document.getElementById('mainApp').style.display = 'none';
+  document.getElementById('loginOverlay').style.display = 'flex';
+  document.getElementById('codigoAcceso').value = '';
+  document.getElementById('adminPassword').value = '';
+  document.getElementById('loginError').innerText = '';
+}
+
+// ─── INIT ─────────────────────────────────────
+window.onload = () => {
+  const ok = iniciarFirebase();
+  if (!ok) return;
+
+  // Bootstrap Firestore config if empty
+  db.collection('config').doc('settings').get().then(snap => {
+    if (!snap.exists) db.collection('config').doc('settings').set(cfg);
+    else Object.assign(cfg, snap.data());
+  });
+
+  // Bootstrap admin user if missing
+  db.collection('usuarios').doc('admin').get().then(snap => {
+    if (!snap.exists) db.collection('usuarios').doc('admin').set({ codigo: 'admin', nombre: 'Administrador', rol: 'admin', esSocio: false });
+  });
+
+  setupListeners();
+
+  // Init tallas
+  cargarSelectTalla();
+  onTipoChange();
+  toggleSocioCheck();
+
+  // Preview precio en tiempo real
+  ['precioUSD','pzas','categoria'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', actualizarPreviewPrecio);
+  });
+
+  // codCliente live panel
+  const codClienteEl = document.getElementById('codCliente');
+  if (codClienteEl) codClienteEl.addEventListener('input', actualizarCapturaPanel);
+
+  // Enter key login
+  document.getElementById('codigoAcceso').addEventListener('keydown', e => { if(e.key==='Enter') loginUsuario(); });
+  document.getElementById('adminPassword').addEventListener('keydown', e => { if(e.key==='Enter') loginAdmin(); });
+
+  document.getElementById('mainApp').style.display = 'none';
+  document.getElementById('loginOverlay').style.display = 'flex';
+};
 </script>
 </body>
 </html>
