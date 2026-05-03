@@ -137,6 +137,53 @@ tr:hover td { background: var(--cream); }
 
 
 
+/* TOOLTIP */
+.tip-wrap { position: relative; display: inline-block; width: 100%; }
+.tip-wrap input, .tip-wrap select, .tip-wrap textarea { width: 100%; }
+.tip-box {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  background: var(--plum);
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 9px 13px;
+  border-radius: 10px;
+  width: 240px;
+  z-index: 500;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  pointer-events: none;
+  white-space: normal;
+}
+.tip-box::after {
+  content: '';
+  position: absolute;
+  top: 100%; left: 18px;
+  border: 6px solid transparent;
+  border-top-color: var(--plum);
+}
+.tip-wrap:hover .tip-box,
+.tip-wrap input:focus ~ .tip-box,
+.tip-wrap select:focus ~ .tip-box { display: block; }
+.tip-icon { font-size: 13px; color: var(--plum-light); cursor: help; margin-left: 4px; vertical-align: middle; }
+
+/* MANUAL MODAL */
+.manual-overlay { position: fixed; inset: 0; background: rgba(44,26,40,0.8); backdrop-filter: blur(4px); z-index: 1500; display: flex; align-items: center; justify-content: center; padding: 16px; }
+.manual-box { background: var(--white); border-radius: var(--r); width: 100%; max-width: 680px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); }
+.manual-header { background: linear-gradient(135deg, var(--rose-dark), var(--rose)); color: white; padding: 20px 24px; border-radius: var(--r) var(--r) 0 0; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1; }
+.manual-header h2 { font-family: var(--font-head); font-size: 20px; }
+.manual-close { background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%; width: 32px; height: 32px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.manual-body { padding: 24px; }
+.manual-step { display: flex; gap: 14px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+.manual-step:last-child { border-bottom: none; margin-bottom: 0; }
+.manual-num { background: var(--rose); color: white; border-radius: 50%; width: 32px; height: 32px; font-weight: 700; font-size: 15px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-family: var(--font-head); }
+.manual-step h3 { font-size: 15px; font-weight: 700; color: var(--plum); margin-bottom: 4px; }
+.manual-step p { font-size: 13px; color: var(--plum-mid); line-height: 1.6; }
+.manual-step .tip { background: var(--gold-light); border-left: 3px solid var(--gold); border-radius: 0 var(--r-sm) var(--r-sm) 0; padding: 8px 12px; font-size: 12px; color: var(--plum-mid); margin-top: 8px; }
+.manual-section-title { font-family: var(--font-head); color: var(--rose-dark); font-size: 16px; margin: 20px 0 12px; padding-bottom: 6px; border-bottom: 2px solid var(--rose-light); }
+
 /* CAPTURA EN VIVO */
 .captura-panel { background: linear-gradient(135deg,#fdf8f2,#fef4df); border: 1.5px solid var(--gold); border-radius: var(--r); padding: 20px; margin-top: 20px; }
 .captura-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
@@ -173,6 +220,23 @@ tr:hover td { background: var(--cream); }
   .stats-grid { grid-template-columns: 1fr 1fr; }
   .btn { padding: 9px 16px; font-size: 13px; }
 }
+
+/* COUNT-UP */
+@keyframes countUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+.stat-num { animation: countUp 0.45s ease both; }
+
+/* PULSE BADGE */
+@keyframes pulse { 0%,100% { box-shadow:0 0 0 0 rgba(201,144,58,0.5); } 70% { box-shadow:0 0 0 6px rgba(201,144,58,0); } }
+.tab-badge.pulse { animation: pulse 1.4s ease infinite; }
+
+/* FILTER + EXPORT */
+.filter-row { display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; margin-bottom:12px; }
+.filter-row .field { margin:0; min-width:150px; }
+.export-row { display:flex; justify-content:flex-end; margin-bottom:14px; }
+
+/* WA LINK */
+.wa-link { color:var(--success); font-weight:600; text-decoration:none; font-size:13px; }
+.wa-link:hover { text-decoration:underline; }
 </style>
 </head>
 <body>
@@ -216,7 +280,7 @@ tr:hover td { background: var(--cream); }
       <div class="field"><label>Marca</label><input type="text" id="editMarca"></div>
       <div class="field"><label>Precio USD</label><input type="number" id="editPrecioUSD" step="0.01"></div>
       <div class="field"><label>Piezas</label><input type="number" id="editPzas" min="1"></div>
-      <div class="field"><label>Banco</label><select id="editBanco"><option value="">Sin banco</option><option>BANORTE</option><option>HSBC</option><option>EFECTIVO</option></select></div>
+      <div class="field"><label>Banco</label><select id="editBanco"><option value="">Sin banco</option><option>BANORTE</option><option>HSBC</option><option>BBVA</option><option>SANTANDER</option><option>BANAMEX</option><option>OXXO PAY</option><option>EFECTIVO</option></select></div>
       <div class="field"><label>Nota</label><input type="text" id="editNota"></div>
     </div>
     <div class="btn-row">
@@ -250,6 +314,9 @@ tr:hover td { background: var(--cream); }
       <!-- TAB: DASHBOARD -->
       <div id="tab-dashboard" class="tab-content active">
         <div class="stats-grid" id="statsGrid"></div>
+        <div class="export-row">
+          <button class="btn btn-ghost btn-sm" onclick="exportarCSV()">📥 Exportar ventas CSV</button>
+        </div>
         <div class="card">
           <div class="card-title">📋 Comprobantes pendientes de revisar</div>
           <div id="comprobantesAdmin"></div>
@@ -263,77 +330,92 @@ tr:hover td { background: var(--cream); }
       <!-- TAB: AGREGAR -->
       <div id="tab-agregar" class="tab-content">
         <div class="card">
-          <div class="card-title">➕ Agregar producto</div>
+          <div class="card-title" style="justify-content:space-between;">
+            <span>➕ Agregar producto</span>
+            <button class="btn btn-ghost btn-sm" onclick="abrirManual()" style="font-size:13px;">📖 Ver manual</button>
+          </div>
           <div class="form-grid">
-            <div class="field"><label>Código cliente (4 díg.)</label><input type="text" id="codCliente" maxlength="4" placeholder="1234" inputmode="numeric"></div>
-            <div class="field"><label>Producto</label><input type="text" id="producto" placeholder="Nombre del artículo"></div>
-            <div class="field"><label>Marca</label><input type="text" id="marca"></div>
-            <div class="field"><label>Precio USD</label><input type="number" id="precioUSD" step="0.01" min="0"></div>
-            <div class="field"><label>Piezas</label><input type="number" id="pzas" value="1" min="1"></div>
+            <div class="field"><label>Código cliente (4 díg.)</label><div class="tip-wrap"><input type="text" id="codCliente" maxlength="4" placeholder="1234" inputmode="numeric"><div class="tip-box">💬 Últimos 4 dígitos del WhatsApp del cliente. Ej: si su número termina en <strong>5678</strong>, pon <strong>5678</strong>. Debe estar en 👥 Usuarios.</div></div></div>
+            <div class="field"><label>Producto</label><div class="tip-wrap"><input type="text" id="producto" placeholder="Nombre del artículo"><div class="tip-box">💬 Nombre tal como aparece en la etiqueta. Ej: <em>Tenis running</em>, <em>Blusa floral</em>, <em>Jeans slim fit</em>.</div></div></div>
+            <div class="field"><label>Marca</label><div class="tip-wrap"><input type="text" id="marca"><div class="tip-box">💬 Marca del artículo. Ej: Nike, Levi's, H&M. Puedes dejarlo vacío si no tiene marca visible.</div></div></div>
+            <div class="field"><label>Precio USD</label><div class="tip-wrap"><input type="number" id="precioUSD" step="0.01" min="0"><div class="tip-box">💬 Precio en dólares de la etiqueta de la tienda, <strong>sin impuesto</strong>. El total en MXN con comisión aparece abajo automáticamente.</div></div></div>
+            <div class="field"><label>Piezas</label><div class="tip-wrap"><input type="number" id="pzas" value="1" min="1"><div class="tip-box">💬 Cantidad de piezas del mismo artículo. Si compró 2 iguales pon 2. Generalmente es 1.</div></div></div>
             <div class="field">
               <label>Tipo de artículo</label>
-              <select id="tipoArticulo" onchange="onTipoChange()">
-                <option value="calzado">👟 Calzado</option>
-                <option value="ropa">👕 Ropa</option>
-                <option value="interior">🩲 Ropa Interior</option>
-                <option value="otro">✏️ Otro / Libre</option>
-              </select>
+              <div class="tip-wrap">
+                <select id="tipoArticulo" onchange="onTipoChange()">
+                  <option value="calzado">👟 Calzado</option>
+                  <option value="ropa">👕 Ropa</option>
+                  <option value="interior">🩲 Ropa Interior</option>
+                  <option value="otro">✏️ Otro / Libre</option>
+                </select>
+                <div class="tip-box">💬 Tipo de artículo que vas a registrar. Cambia los campos de talla según lo que selecciones: calzado, ropa, interior o campo libre.</div>
+              </div>
             </div>
             <!-- CALZADO -->
             <div id="sec-calzado" class="field">
               <label>Categoría calzado</label>
-              <select id="categoria" onchange="cargarSelectTalla()">
-                <option value="mujer">Mujer</option>
-                <option value="hombre">Hombre</option>
-                <option value="juniors">Juniors</option>
-                <option value="ninos">Niños</option>
-                <option value="bebes">Bebés</option>
-              </select>
+              <div class="tip-wrap">
+                <select id="categoria" onchange="cargarSelectTalla()">
+                  <option value="mujer">Mujer</option>
+                  <option value="hombre">Hombre</option>
+                  <option value="juniors">Juniors</option>
+                  <option value="ninos">Niños</option>
+                  <option value="bebes">Bebés</option>
+                </select>
+                <div class="tip-box">💬 Categoría del calzado. Cambia las tallas disponibles: Mujer, Hombre, Juniors, Niños o Bebés.</div>
+              </div>
             </div>
             <div id="sec-calzado2" class="field">
               <label>Talla USA (calzado)</label>
-              <select id="tallaUSA" onchange="actualizarInfoTalla()"></select>
+              <div class="tip-wrap"><select id="tallaUSA" onchange="actualizarInfoTalla()"></select><div class="tip-box">💬 Talla USA del calzado tal como aparece en la caja. El equivalente en México y CM aparece abajo automáticamente.</div></div>
               <div id="infoTalla" class="talla-hint"></div>
             </div>
             <!-- ROPA -->
             <div id="sec-ropa" class="field" style="display:none;">
               <label>Género / Edad</label>
-              <select id="ropaGenero" onchange="cargarTallaRopa()">
-                <option value="dam">Dama</option>
-                <option value="cab">Caballero</option>
-                <option value="jun">Juniors (Mujer)</option>
-                <option value="jun_h">Juniors (Hombre)</option>
-                <option value="nin">Niños</option>
-                <option value="beb">Bebés</option>
-              </select>
+              <div class="tip-wrap">
+                <select id="ropaGenero" onchange="cargarTallaRopa()">
+                  <option value="dam">Dama</option>
+                  <option value="cab">Caballero</option>
+                  <option value="jun">Juniors (Mujer)</option>
+                  <option value="jun_h">Juniors (Hombre)</option>
+                  <option value="nin">Niños</option>
+                  <option value="beb">Bebés</option>
+                </select>
+                <div class="tip-box">💬 Selecciona para quién es la ropa. Esto determina las tallas disponibles (XS–4XL para adultos, tallas numeradas para niños).</div>
+              </div>
             </div>
             <div id="sec-ropa2" class="field" style="display:none;">
               <label>Talla ropa</label>
-              <select id="tallaRopa" onchange="actualizarInfoRopa()"></select>
+              <div class="tip-wrap"><select id="tallaRopa" onchange="actualizarInfoRopa()"></select><div class="tip-box">💬 Talla de la ropa tal como aparece en la etiqueta. El equivalente mexicano aparece abajo.</div></div>
               <div id="infoRopa" class="talla-hint"></div>
             </div>
             <!-- ROPA INTERIOR -->
             <div id="sec-interior" class="field" style="display:none;">
               <label>Tipo interior</label>
-              <select id="tipoInterior" onchange="cargarTallaInterior()">
-                <option value="brasier">Brasier / Bra</option>
-                <option value="panty">Panty / Tanga / Bikini</option>
-                <option value="boxer">Boxer / Trunk</option>
-                <option value="calzon">Calzón / Brief</option>
-                <option value="bañador">Traje de baño mujer</option>
-                <option value="bañador_h">Traje de baño hombre</option>
-                <option value="pijama">Pijama / Ropa de dormir</option>
-                <option value="media">Medias / Calcetines</option>
-              </select>
+              <div class="tip-wrap">
+                <select id="tipoInterior" onchange="cargarTallaInterior()">
+                  <option value="brasier">Brasier / Bra</option>
+                  <option value="panty">Panty / Tanga / Bikini</option>
+                  <option value="boxer">Boxer / Trunk</option>
+                  <option value="calzon">Calzón / Brief</option>
+                  <option value="bañador">Traje de baño mujer</option>
+                  <option value="bañador_h">Traje de baño hombre</option>
+                  <option value="pijama">Pijama / Ropa de dormir</option>
+                  <option value="media">Medias / Calcetines</option>
+                </select>
+                <div class="tip-box">💬 Tipo de ropa interior. Para brasier aparecerá un campo extra para la copa (A, B, C, D…).</div>
+              </div>
             </div>
             <div id="sec-interior2" class="field" style="display:none;">
               <label>Talla interior</label>
-              <select id="tallaInterior" onchange="actualizarInfoInterior()"></select>
+              <div class="tip-wrap"><select id="tallaInterior" onchange="actualizarInfoInterior()"></select><div class="tip-box">💬 Para brasier: banda (28, 30, 32, 34…). Para lo demás: talla del artículo.</div></div>
               <div id="infoInterior" class="talla-hint"></div>
             </div>
             <div id="sec-interior3" class="field" style="display:none;">
               <label>Copa (brasier)</label>
-              <select id="tallaInteriorCopa">
+              <div class="tip-wrap"><select id="tallaInteriorCopa"><div class="tip-box">💬 Copa del brasier. Combinada con la banda forma la talla completa. Ej: banda 34 + copa B = <strong>34B</strong>.</div></div>
                 <option value="A">A</option>
                 <option value="B" selected>B</option>
                 <option value="C">C</option>
@@ -346,12 +428,12 @@ tr:hover td { background: var(--cream); }
             <!-- OTRO -->
             <div id="sec-otro" class="field" style="display:none;">
               <label>Talla / Especificación (libre)</label>
-              <input type="text" id="tallaLibre" placeholder="Ej: L / 38 / Unitalla / 34B...">
+              <div class="tip-wrap"><input type="text" id="tallaLibre" placeholder="Ej: L / 38 / Unitalla / 34B..."><div class="tip-box">💬 Escribe la talla libremente: L, XL, 38, Unitalla, Talla única, 2XL, lo que necesites.</div></div>
             </div>
-            <div class="field"><label>Banco</label><select id="bancoVenta"><option value="">Sin banco</option><option>BANORTE</option><option>HSBC</option><option>EFECTIVO</option></select></div>
-            <div class="field"><label>Vendedor (shopper)</label><select id="shopperAsignado"></select></div>
-            <div class="field"><label>Tienda</label><input type="text" id="tienda" value="Ross"></div>
-            <div class="field"><label>Nota</label><input type="text" id="nota"></div>
+            <div class="field"><label>Banco</label><div class="tip-wrap"><select id="bancoVenta"><option value="">Sin banco</option><option>BANORTE</option><option>HSBC</option><option>BBVA</option><option>SANTANDER</option><option>BANAMEX</option><option>OXXO PAY</option><option>EFECTIVO</option></select><div class="tip-box">💬 Cuenta bancaria donde el cliente debe depositar. Si no lo sabes aún, déjalo vacío y edítalo después con el botón ✏️.</div></div></div>
+            <div class="field"><label>Vendedor (shopper)</label><div class="tip-wrap"><select id="shopperAsignado"></select><div class="tip-box">💬 Vendedor que compró el artículo en la tienda. Se usa para calcular su comisión del 10% al liberar el pago.</div></div></div>
+            <div class="field"><label>Tienda</label><div class="tip-wrap"><input type="text" id="tienda" value="Ross"><div class="tip-box">💬 Tienda donde se compró. Por defecto Ross. Cámbialo si es otra: Marshalls, TJ Maxx, Burlington, etc.</div></div></div>
+            <div class="field"><label>Nota</label><div class="tip-wrap"><input type="text" id="nota"><div class="tip-box">💬 Observaciones extras: color, estilo, número de referencia, condición. El cliente puede verlo en su pantalla.</div></div></div>
           </div>
           <div class="btn-row">
             <button class="btn btn-primary" onclick="agregarProducto()">➕ Agregar producto</button>
@@ -385,14 +467,16 @@ tr:hover td { background: var(--cream); }
       <div id="tab-clientes" class="tab-content">
         <div class="card">
           <div class="card-title">👤 Productos del cliente</div>
-          <div class="btn-row" style="margin-bottom:14px;">
-            <div class="field" style="max-width:200px;"><label>Código cliente</label><input type="text" id="clienteSeleccionado" maxlength="4" placeholder="1234" inputmode="numeric"></div>
+          <div class="filter-row">
+            <div class="field" style="max-width:180px;"><label>Código cliente</label><input type="text" id="clienteSeleccionado" maxlength="4" placeholder="1234" inputmode="numeric" oninput="autoNombreCliente()"></div>
+            <div class="field" style="max-width:220px;"><label>Buscar por nombre</label><select id="selectClienteNombre" onchange="seleccionarClienteNombre()"><option value="">— Seleccionar —</option></select></div>
+            <div class="field" style="max-width:160px;"><label>Filtrar estado</label><select id="filtroEstado" onchange="cargarProductosClienteAdmin()"><option value="">Todos</option><option value="pendiente">Pendiente</option><option value="aprobado">Aprobado</option><option value="pagado">Pagado</option><option value="cancelado">Cancelado</option></select></div>
             <button class="btn btn-info" onclick="cargarProductosClienteAdmin()">🔍 Cargar</button>
           </div>
           <div id="infoClienteHeader"></div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Producto</th><th>Marca</th><th>Pzas</th><th>USD</th><th>Total MXN</th><th>Talla</th><th>Banco</th><th>Shopper</th><th>Estado</th><th>Comp.</th><th>Acciones</th></tr></thead>
+              <thead><tr><th>Producto</th><th>Marca</th><th>Pzas</th><th>USD</th><th>Total MXN</th><th>Talla</th><th>Tienda</th><th>Banco</th><th>Shopper</th><th>Estado</th><th>Comp.</th><th>Acciones</th></tr></thead>
               <tbody id="tbodyProductosCliente"></tbody>
             </table>
           </div>
@@ -416,7 +500,7 @@ tr:hover td { background: var(--cream); }
         <div class="card">
           <div class="card-title">👥 Usuarios registrados</div>
           <div class="table-wrap">
-            <table><thead><tr><th>Código</th><th>Nombre</th><th>Rol</th><th>Socio</th><th>Acciones</th></tr></thead><tbody id="tbodyUsuarios"></tbody></table>
+                        <table><thead><tr><th>Código</th><th>Nombre</th><th>Rol</th><th>WhatsApp</th><th>Socio</th><th>Acciones</th></tr></thead><tbody id="tbodyUsuarios"></tbody></table>
           </div>
         </div>
       </div>
@@ -442,6 +526,61 @@ tr:hover td { background: var(--cream); }
           <div class="card-title">🔧 Firebase</div>
           <button class="btn btn-ghost" onclick="reconfigurarFirebase()">Reconfigurar Firebase</button>
           <p class="text-small" style="margin-top:8px;">Toca esto solo si cambiaste de proyecto Firebase.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">🛡️ Reglas de seguridad recomendadas</div>
+          <p style="font-size:13px;color:var(--plum-mid);margin-bottom:10px;">
+            Copia estas reglas en <strong>Firebase Console → Firestore → Reglas</strong> y en <strong>Storage → Reglas</strong>. Evitan que extraños escriban datos aunque vean tu config.
+          </p>
+          <div style="background:var(--plum);color:#a8ffcb;border-radius:var(--r-sm);padding:16px;font-family:monospace;font-size:12px;line-height:1.7;overflow-x:auto;">
+            <div style="color:#ffd97d;margin-bottom:6px;">// ── FIRESTORE ──────────────────────────</div>
+            rules_version = '2';<br>
+            service cloud.firestore {<br>
+            &nbsp;&nbsp;match /databases/{database}/documents {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#ffd97d;">// Config: solo lectura pública, escritura bloqueada</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;match /config/{doc} {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow read: if true;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow write: if false;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#ffd97d;">// Usuarios: lectura pública (para login), escritura bloqueada</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;match /usuarios/{uid} {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow read: if true;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow write: if false;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#ffd97d;">// Ventas: lectura pública, escritura bloqueada desde fuera</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;match /ventas/{id} {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow read: if true;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow write: if false;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#ffd97d;">// Comprobantes y notificaciones: igual</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;match /{collection}/{doc} {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow read: if true;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow write: if false;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+            &nbsp;&nbsp;}<br>
+            }<br><br>
+            <span style="color:#ffd97d;">// ── STORAGE ────────────────────────────</span><br>
+            rules_version = '2';<br>
+            service firebase.storage {<br>
+            &nbsp;&nbsp;match /b/{bucket}/o {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;match /comprobantes/{file} {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow read: if true;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow write: if false;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+            &nbsp;&nbsp;}<br>
+            }
+          </div>
+          <p style="font-size:12px;color:var(--plum-light);margin-top:10px;">
+            ⚠️ Con estas reglas la app deja de poder escribir desde el navegador. Para producción real activa
+            <strong>Firebase App Check</strong> en la consola y cambia <code>allow write: if false</code>
+            por <code>allow write: if request.app != null</code> — así solo tu dominio puede escribir.
+          </p>
+          <div style="margin-top:14px;padding:14px;background:var(--info-bg);border-radius:var(--r-sm);font-size:13px;">
+            <strong>🔑 Restricción de API Key (muy recomendada):</strong><br>
+            Ve a <a href="https://console.cloud.google.com/apis/credentials" target="_blank" style="color:var(--info);">Google Cloud Console → Credenciales</a>,
+            selecciona tu API Key de Firebase y en <em>"Restricciones de aplicación"</em> agrega solo tu dominio
+            (ej: <code>tudominio.pages.dev</code>). Así el key no sirve desde otros sitios aunque alguien lo vea.
+          </div>
         </div>
       </div>
     </div>
@@ -491,6 +630,123 @@ tr:hover td { background: var(--cream); }
   </div>
 </div>
 
+<!-- MANUAL MODAL -->
+<div id="manualModal" class="manual-overlay" style="display:none;" onclick="if(event.target===this)cerrarManual()">
+  <div class="manual-box">
+    <div class="manual-header">
+      <h2>📖 Manual de captura</h2>
+      <button class="manual-close" onclick="cerrarManual()">✕</button>
+    </div>
+    <div class="manual-body">
+      <p style="font-size:13px;color:var(--plum-light);margin-bottom:18px;">Guía rápida para capturar artículos correctamente. También puedes pasar el cursor sobre cada campo del formulario para ver una ayuda rápida.</p>
+
+      <div class="manual-section-title">📋 Flujo del pedido</div>
+      <div class="manual-step">
+        <div class="manual-num">1</div>
+        <div>
+          <h3>Captura los artículos del cliente</h3>
+          <p>En la pestaña <strong>➕ Agregar</strong>, escribe el código de 4 dígitos del cliente y agrega cada artículo. Verás la lista en tiempo real en el panel dorado de abajo.</p>
+          <div class="tip">💡 El código son los últimos 4 dígitos del WhatsApp del cliente.</div>
+        </div>
+      </div>
+      <div class="manual-step">
+        <div class="manual-num">2</div>
+        <div>
+          <h3>Presiona "Captura terminada"</h3>
+          <p>Cuando termines de agregar todos los artículos, presiona el botón verde. Se abrirá WhatsApp con un resumen listo para enviarle al cliente.</p>
+        </div>
+      </div>
+      <div class="manual-step">
+        <div class="manual-num">3</div>
+        <div>
+          <h3>El cliente revisa y aprueba</h3>
+          <p>El cliente entra a la app con su código, ve sus artículos y presiona ✅ o ❌ en cada uno según lo que quiera.</p>
+          <div class="tip">💡 Solo los artículos aprobados se cobran.</div>
+        </div>
+      </div>
+      <div class="manual-step">
+        <div class="manual-num">4</div>
+        <div>
+          <h3>El cliente sube su comprobante</h3>
+          <p>Después de aprobar, el cliente sube la foto o PDF de su transferencia desde su pantalla.</p>
+        </div>
+      </div>
+      <div class="manual-step">
+        <div class="manual-num">5</div>
+        <div>
+          <h3>Tú verificas y liberas</h3>
+          <p>Ve a la pestaña <strong>👤 Clientes</strong>, busca su código, revisa el comprobante y presiona <strong>✅ Liberar pago</strong>. Los artículos quedan marcados como Pagados.</p>
+        </div>
+      </div>
+
+      <div class="manual-section-title">📝 Campos del formulario</div>
+      <div class="manual-step">
+        <div class="manual-num" style="background:var(--gold)">?</div>
+        <div>
+          <h3>Código cliente</h3>
+          <p>Los <strong>últimos 4 dígitos</strong> del número de WhatsApp del cliente. Debe estar registrado en 👥 Usuarios. Ejemplo: si su número es 6561234<strong>5678</strong>, el código es <strong>5678</strong>.</p>
+        </div>
+      </div>
+      <div class="manual-step">
+        <div class="manual-num" style="background:var(--gold)">?</div>
+        <div>
+          <h3>Producto y Marca</h3>
+          <p>Escribe el nombre del artículo tal como aparece en la etiqueta o en la tienda. La marca va separada. Ejemplo: Producto: <em>Tenis running</em> / Marca: <em>Nike</em>.</p>
+        </div>
+      </div>
+      <div class="manual-step">
+        <div class="manual-num" style="background:var(--gold)">?</div>
+        <div>
+          <h3>Precio USD</h3>
+          <p>El precio en dólares tal como está en la etiqueta de la tienda, <strong>sin impuesto</strong>. El sistema convierte automáticamente a MXN usando el tipo de cambio configurado y agrega la comisión.</p>
+          <div class="tip">💡 El total en MXN aparece como vista previa abajo del formulario.</div>
+        </div>
+      </div>
+      <div class="manual-step">
+        <div class="manual-num" style="background:var(--gold)">?</div>
+        <div>
+          <h3>Tipo de artículo y Talla</h3>
+          <p><strong>Calzado:</strong> selecciona categoría y talla USA — el sistema muestra el equivalente en México y CM.<br>
+          <strong>Ropa:</strong> selecciona género y talla (XS–4XL) con equivalente en número mexicano.<br>
+          <strong>Ropa interior:</strong> selecciona tipo (brasier, boxer, panty…). Para brasier elige banda + copa (ej: 34B).<br>
+          <strong>Otro:</strong> escribe libremente lo que necesites.</p>
+        </div>
+      </div>
+      <div class="manual-step">
+        <div class="manual-num" style="background:var(--gold)">?</div>
+        <div>
+          <h3>Banco</h3>
+          <p>La cuenta bancaria donde el cliente debe depositar. Si aún no lo sabes, déjalo en blanco y edítalo después.</p>
+        </div>
+      </div>
+      <div class="manual-step">
+        <div class="manual-num" style="background:var(--gold)">?</div>
+        <div>
+          <h3>Vendedor (Shopper)</h3>
+          <p>El vendedor que compró el artículo. Esto se usa para calcular su comisión del 10% cuando el pago sea liberado.</p>
+        </div>
+      </div>
+      <div class="manual-step">
+        <div class="manual-num" style="background:var(--gold)">?</div>
+        <div>
+          <h3>Nota</h3>
+          <p>Cualquier observación extra: color, estilo, número de referencia, condición del artículo, etc.</p>
+          <div class="tip">💡 La nota le aparece visible al cliente en su pantalla.</div>
+        </div>
+      </div>
+
+      <div class="manual-section-title">💡 Consejos rápidos</div>
+      <div style="background:var(--cream);border-radius:var(--r-sm);padding:16px;font-size:13px;color:var(--plum-mid);line-height:2;">
+        ✅ Puedes editar un artículo (✏️) mientras esté en estado <em>Pendiente</em><br>
+        ✅ Hora Feliz aplica descuento automático a todos los precios<br>
+        ✅ El tipo de cambio (TC) se ajusta en ⚙️ Config<br>
+        ✅ El dashboard muestra cuántos comprobantes están pendientes de revisar<br>
+        ✅ El vendedor ve sus ganancias en tiempo real desde su acceso
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 // ─────────────────────────────────────────────
 // FIREBASE CONFIG
@@ -507,7 +763,7 @@ const FIREBASE_CONFIG = {
 
 let db, storage;
 let ventas = [], usuarios = [], comprobantes = {};
-let cfg = { TC: 17.40, comisionGlobal: 10, horaFelizActiva: false, descuentoHH: 10, adminPassword: 'spena748' };
+let cfg = { TC: 17.40, comisionGlobal: 10, horaFelizActiva: false, descuentoHH: 10, adminPasswordHash: '' };
 let usuarioActual = null;
 let unsubs = [];
 
@@ -539,7 +795,15 @@ function setupListeners() {
   unsubs.forEach(u => u());
   unsubs = [];
   unsubs.push(db.collection('config').doc('settings').onSnapshot(snap => {
-    if (snap.exists) Object.assign(cfg, snap.data());
+    if (snap.exists) {
+      const data = snap.data();
+      // Never expose password hash to JS global state display
+      cfg.TC = data.TC || cfg.TC;
+      cfg.comisionGlobal = data.comisionGlobal ?? cfg.comisionGlobal;
+      cfg.horaFelizActiva = data.horaFelizActiva ?? cfg.horaFelizActiva;
+      cfg.descuentoHH = data.descuentoHH ?? cfg.descuentoHH;
+      // Hash only used in loginAdmin, not stored in cfg
+    }
     syncUI();
   }));
   unsubs.push(db.collection('ventas').orderBy('createdAt','desc').onSnapshot(snap => {
@@ -731,6 +995,11 @@ function toast(msg, type = '') {
   setTimeout(() => el.remove(), 3200);
 }
 
+// ─── MANUAL ──────────────────────────────────
+function abrirManual() { document.getElementById('manualModal').style.display = 'flex'; }
+function cerrarManual() { document.getElementById('manualModal').style.display = 'none'; }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarManual(); });
+
 // ─── CAPTURA EN VIVO ─────────────────────────
 let capturaActualCodigo = null;
 
@@ -835,22 +1104,29 @@ function setLoading(pct) {
   if (pct >= 100) setTimeout(() => { document.getElementById('loading-bar').style.width = '0'; }, 400);
 }
 
+// ─── SANITIZE ────────────────────────────────
+function sanitize(str) {
+  if (typeof str !== 'string') return str;
+  return str.replace(/[<>"'`]/g, '').trim().slice(0, 200);
+}
+
 // ─── ADMIN: AGREGAR PRODUCTO ─────────────────
 async function agregarProducto() {
   const codCliente = document.getElementById('codCliente').value.trim();
-  const producto = document.getElementById('producto').value.trim();
-  const marca = document.getElementById('marca').value.trim();
+  const producto = sanitize(document.getElementById('producto').value);
+  const marca = sanitize(document.getElementById('marca').value);
   const precioUSD = parseFloat(document.getElementById('precioUSD').value);
-  const pzas = parseInt(document.getElementById('pzas').value) || 1;
+  const pzas = Math.min(Math.max(parseInt(document.getElementById('pzas').value) || 1, 1), 999);
   const banco = document.getElementById('bancoVenta').value;
-  const nota = document.getElementById('nota').value.trim();
+  const nota = sanitize(document.getElementById('nota').value);
   const shopper = document.getElementById('shopperAsignado').value;
-  const tienda = document.getElementById('tienda').value.trim() || 'Ross';
+  const tienda = sanitize(document.getElementById('tienda').value) || 'Ross';
   const { tallaDisplay, tipo: tipoArt } = getTallaCapturada();
   const usa = tallaDisplay;
 
   if (!codCliente || codCliente.length !== 4 || !/^\d+$/.test(codCliente)) { toast('Código cliente: 4 dígitos', 'error'); return; }
   if (!producto || isNaN(precioUSD) || precioUSD <= 0) { toast('Producto y precio válidos requeridos', 'error'); return; }
+  if (precioUSD > 9999) { toast('Precio fuera de rango (máx $9,999 USD)', 'error'); return; }
 
   const totalMXN = calcTotal(precioUSD, pzas);
   const now = new Date();
@@ -899,7 +1175,9 @@ function actualizarPreviewPrecio() {
 function cargarProductosClienteAdmin() {
   const codigo = (document.getElementById('clienteSeleccionado')?.value || '').trim();
   if (!codigo) return;
-  const productos = ventas.filter(v => v.codCliente === codigo);
+  const filtroEstado = document.getElementById('filtroEstado')?.value || '';
+  let productos = ventas.filter(v => v.codCliente === codigo);
+  if (filtroEstado) productos = productos.filter(v => v.estado === filtroEstado);
   const usuario = usuarios.find(u => u.codigo === codigo);
   const comp = comprobantes[codigo];
 
@@ -907,17 +1185,19 @@ function cargarProductosClienteAdmin() {
   const hdr = document.getElementById('infoClienteHeader');
   if (hdr) {
     hdr.innerHTML = usuario
-      ? `<div style="margin-bottom:10px;"><span class="chip">${usuario.nombre}</span> ${comp ? `<span class="comp-badge-yes">✅ Comprobante recibido</span>` : '<span class="comp-badge-no">⏳ Sin comprobante</span>'}</div>`
+      ? `<div style="margin-bottom:10px;"><span class="chip">${usuario.nombre}</span> ${comp ? `<span class="comp-badge-yes">✅ Comprobante recibido</span>` : '<span class="comp-badge-no">⏳ Sin comprobante</span>'}${ usuario.whatsapp ? ` <a class="wa-link" href="https://wa.me/52${usuario.whatsapp}" target="_blank">📱 ${usuario.whatsapp}</a>` : ''}</div>`
       : `<div class="text-small" style="margin-bottom:10px;">⚠️ Cliente no encontrado en usuarios</div>`;
   }
 
   const tbody = document.getElementById('tbodyProductosCliente');
   tbody.innerHTML = '';
-  if (productos.length === 0) { tbody.innerHTML = '<tr><td colspan="11" class="empty-state">Sin productos para este cliente</td></tr>'; }
+  if (productos.length === 0) { tbody.innerHTML = '<tr><td colspan="12" class="empty-state">Sin productos para este cliente</td></tr>'; }
 
   let totalPendiente = 0;
+  const allProductos = ventas.filter(v => v.codCliente === codigo);
+  allProductos.forEach(p => { if (p.estado === 'pendiente' || p.estado === 'aprobado') totalPendiente += p.totalMXN; });
+
   productos.forEach(p => {
-    if (p.estado === 'pendiente' || p.estado === 'aprobado') totalPendiente += p.totalMXN;
     const shopperUser = usuarios.find(u => u.codigo === p.shopper);
     const row = tbody.insertRow();
     row.innerHTML = `
@@ -927,6 +1207,7 @@ function cargarProductosClienteAdmin() {
       <td>$${p.precioUSD?.toFixed(2)}</td>
       <td><strong>${fmt(p.totalMXN)}</strong></td>
       <td class="text-small">${p.tallaInfo || p.talla}</td>
+      <td class="text-small">${p.tienda || '—'}</td>
       <td>${p.banco || '—'}</td>
       <td>${shopperUser ? shopperUser.nombre : (p.shopper || '—')}</td>
       <td><span class="badge b-${p.estado}">${{pendiente:'Pendiente',aprobado:'Aprobado',cancelado:'Cancelado',pagado:'Pagado'}[p.estado]}</span></td>
@@ -940,8 +1221,8 @@ function cargarProductosClienteAdmin() {
   });
 
   const footer = document.getElementById('footerCliente');
-  if (footer && productos.length > 0) {
-    footer.innerHTML = `<div class="desglose-card"><strong>Total pendiente/aprobado:</strong> <span class="desglose-total">${fmt(totalPendiente)}</span></div>`;
+  if (footer) {
+    footer.innerHTML = `<div class="desglose-card"><strong>Total pendiente/aprobado (todos):</strong> <span class="desglose-total">${fmt(totalPendiente)}</span></div>`;
   }
 }
 
@@ -1056,20 +1337,26 @@ function renderTablaUsuarios() {
   tbody.innerHTML = '';
   usuarios.forEach(u => {
     const row = tbody.insertRow();
+    const waLink = u.whatsapp
+      ? `<a class="wa-link" href="https://wa.me/52${u.whatsapp}" target="_blank">📱 ${u.whatsapp}</a>`
+      : '—';
     row.innerHTML = `
       <td><span class="chip">${u.codigo}</span></td>
       <td>${u.nombre}</td>
       <td>${{admin:'Administrador',shopper:'Vendedor',cliente:'Cliente'}[u.rol] || u.rol}</td>
+      <td>${waLink}</td>
       <td>${u.esSocio ? '✅' : '—'}</td>
       <td>${u.rol !== 'admin' ? `<button class="btn btn-danger btn-sm" onclick="eliminarUsuario('${u.codigo}')">🗑️</button>` : '—'}</td>`;
   });
+  // Populate name search dropdown in Clientes tab
+  cargarSelectClienteNombre();
 }
 function toggleSocioCheck() {
   document.getElementById('socioField').style.display = document.getElementById('nuevoRol').value === 'shopper' ? 'block' : 'none';
 }
 async function agregarUsuario() {
   const codigo = document.getElementById('nuevoCodigo').value.trim();
-  const nombre = document.getElementById('nuevoNombre').value.trim();
+  const nombre = sanitize(document.getElementById('nuevoNombre').value);
   const rol = document.getElementById('nuevoRol').value;
   const esSocio = document.getElementById('nuevoEsSocio').checked;
   if (!codigo || codigo.length !== 4 || !/^\d+$/.test(codigo)) { toast('Código debe ser 4 dígitos', 'error'); return; }
@@ -1093,6 +1380,18 @@ async function eliminarUsuario(codigo) {
   } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
+// ─── BADGE COMPROBANTES ───────────────────
+function actualizarCompBadge() {
+  const pendientes = Object.keys(comprobantes).filter(cod => ventas.some(v => v.codCliente === cod && v.estado === 'aprobado'));
+  const badge = document.getElementById('compBadge');
+  if (badge) {
+    badge.textContent = pendientes.length;
+    badge.style.display = pendientes.length > 0 ? 'flex' : 'none';
+    if (pendientes.length > 0) badge.classList.add('pulse');
+    else badge.classList.remove('pulse');
+  }
+}
+
 // ─── CONFIG ───────────────────────────────────
 function syncUI() {
   if (usuarioActual?.rol !== 'admin') return;
@@ -1112,7 +1411,10 @@ async function guardarConfig() {
     comisionGlobal: parseFloat(document.getElementById('cfgComision').value) || cfg.comisionGlobal,
     descuentoHH: parseFloat(document.getElementById('cfgDescuentoHH').value) || cfg.descuentoHH,
   };
-  if (nuevaPass) updates.adminPassword = nuevaPass;
+  if (nuevaPass) {
+    if (nuevaPass.length < 6) { toast('La clave debe tener al menos 6 caracteres', 'error'); return; }
+    updates.adminPasswordHash = await sha256(nuevaPass);
+  }
   try {
     await db.collection('config').doc('settings').set(updates, { merge: true });
     toast('Configuración guardada ✓', 'success');
@@ -1124,13 +1426,6 @@ async function toggleHH(activar) {
     await db.collection('config').doc('settings').set({ horaFelizActiva: activar }, { merge: true });
     toast(activar ? '🎉 Hora Feliz ACTIVADA' : 'Hora Feliz desactivada', activar ? 'success' : '');
   } catch(e) { toast('Error: ' + e.message, 'error'); }
-}
-
-// ─── BADGE COMPROBANTES ───────────────────────
-function actualizarCompBadge() {
-  const pendientes = Object.keys(comprobantes).filter(cod => ventas.some(v => v.codCliente === cod && v.estado === 'aprobado'));
-  const badge = document.getElementById('compBadge');
-  if (badge) { badge.textContent = pendientes.length; badge.style.display = pendientes.length > 0 ? 'flex' : 'none'; }
 }
 
 // ─── SHOPPER PANEL ────────────────────────────
@@ -1306,18 +1601,73 @@ async function loginUsuario() {
     } catch(e) { document.getElementById('loginError').innerText = 'Error de conexión'; }
   }
 }
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+// Rate limiting: 5 attempts max, 5 min lockout
+const ADMIN_MAX_INTENTOS = 5;
+const ADMIN_LOCKOUT_MS = 5 * 60 * 1000;
+
+function getLoginState() {
+  try {
+    const s = JSON.parse(sessionStorage.getItem('_adm') || '{}');
+    return { intentos: s.i || 0, bloqueadoHasta: s.b || 0 };
+  } catch { return { intentos: 0, bloqueadoHasta: 0 }; }
+}
+function setLoginState(intentos, bloqueadoHasta) {
+  sessionStorage.setItem('_adm', JSON.stringify({ i: intentos, b: bloqueadoHasta }));
+}
+
 async function loginAdmin() {
-  document.getElementById('loginError').innerText = '';
-  const pass = document.getElementById('adminPassword').value.trim();
-  // Check Firestore config first, fall back to default
-  let correctPass = cfg.adminPassword || 'spena748';
+  const errEl = document.getElementById('loginError');
+  errEl.innerText = '';
+
+  // Check lockout
+  const { intentos, bloqueadoHasta } = getLoginState();
+  if (Date.now() < bloqueadoHasta) {
+    const mins = Math.ceil((bloqueadoHasta - Date.now()) / 60000);
+    errEl.innerText = `Demasiados intentos. Espera ${mins} min.`;
+    return;
+  }
+
+  const pass = document.getElementById('adminPassword').value;
+  if (!pass) { errEl.innerText = 'Ingresa la clave'; return; }
+
   try {
     const snap = await db.collection('config').doc('settings').get();
-    if (snap.exists && snap.data().adminPassword) correctPass = snap.data().adminPassword;
-  } catch(e) {}
-  if (pass !== correctPass) { document.getElementById('loginError').innerText = 'Clave incorrecta'; return; }
-  usuarioActual = { codigo: 'admin', nombre: 'Administrador', rol: 'admin', esSocio: false };
-  mostrarApp();
+    const storedHash = snap.exists ? snap.data().adminPasswordHash : '';
+
+    // First-time setup: no hash stored yet → set it now
+    if (!storedHash) {
+      const nuevoHash = await sha256(pass);
+      await db.collection('config').doc('settings').set({ adminPasswordHash: nuevoHash }, { merge: true });
+      setLoginState(0, 0);
+      usuarioActual = { codigo: 'admin', nombre: 'Administrador', rol: 'admin', esSocio: false };
+      mostrarApp();
+      return;
+    }
+
+    const inputHash = await sha256(pass);
+    if (inputHash === storedHash) {
+      setLoginState(0, 0);
+      usuarioActual = { codigo: 'admin', nombre: 'Administrador', rol: 'admin', esSocio: false };
+      mostrarApp();
+    } else {
+      const nuevosIntentos = intentos + 1;
+      if (nuevosIntentos >= ADMIN_MAX_INTENTOS) {
+        setLoginState(nuevosIntentos, Date.now() + ADMIN_LOCKOUT_MS);
+        errEl.innerText = `Clave incorrecta. Cuenta bloqueada 5 minutos.`;
+      } else {
+        setLoginState(nuevosIntentos, 0);
+        errEl.innerText = `Clave incorrecta. ${ADMIN_MAX_INTENTOS - nuevosIntentos} intento(s) restante(s).`;
+      }
+      document.getElementById('adminPassword').value = '';
+    }
+  } catch(e) {
+    errEl.innerText = 'Error de conexión: ' + e.message;
+  }
 }
 function mostrarApp() {
   document.getElementById('loginOverlay').style.display = 'none';
@@ -1331,6 +1681,7 @@ function mostrarApp() {
   else renderCliente();
 }
 function cerrarSesion() {
+  if (!confirm('¿Cerrar sesión?')) return;
   usuarioActual = null;
   document.getElementById('mainApp').style.display = 'none';
   document.getElementById('loginOverlay').style.display = 'flex';
@@ -1339,15 +1690,94 @@ function cerrarSesion() {
   document.getElementById('loginError').innerText = '';
 }
 
-// ─── INIT ─────────────────────────────────────
+// ─── INIT ────────────────────────────────────────────
+// ─── HELPERS NUEVOS ─────────────────────────────
+
+// Fechas en español
+function fmtFecha(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso + (iso.length === 10 ? 'T12:00:00' : ''));
+  return d.toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+// Exportar CSV
+function exportarCSV() {
+  if (ventas.length === 0) { toast('Sin ventas para exportar', 'error'); return; }
+  const headers = ['Fecha','Cliente','Producto','Marca','Pzas','USD','Total MXN','Talla','Tienda','Banco','Shopper','Estado'];
+  const rows = ventas.map(v => {
+    const shopperUser = usuarios.find(u => u.codigo === v.shopper);
+    const clienteUser = usuarios.find(u => u.codigo === v.codCliente);
+    return [
+      fmtFecha(v.fecha),
+      clienteUser ? clienteUser.nombre : v.codCliente,
+      v.producto, v.marca || '', v.pzas,
+      v.precioUSD?.toFixed(2),
+      v.totalMXN?.toFixed(2),
+      v.tallaInfo || v.talla || '',
+      v.tienda || '',
+      v.banco || '',
+      shopperUser ? shopperUser.nombre : (v.shopper || ''),
+      v.estado
+    ].map(x => `"${String(x).replace(/"/g,'""')}"`).join(',');
+  });
+  const csv = [headers.join(','), ...rows].join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `divina_ventas_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('CSV descargado ✓', 'success');
+}
+
+// Cargar dropdown de clientes por nombre
+function cargarSelectClienteNombre() {
+  const sel = document.getElementById('selectClienteNombre');
+  if (!sel) return;
+  const clientes = usuarios.filter(u => u.rol === 'cliente' || u.rol === 'shopper');
+  sel.innerHTML = '<option value="">— Buscar por nombre —</option>' +
+    clientes.map(u => `<option value="${u.codigo}">${u.nombre} (${u.codigo})</option>`).join('');
+}
+
+// Cuando se escribe el código, sincronizar dropdown
+function autoNombreCliente() {
+  const cod = document.getElementById('clienteSeleccionado')?.value.trim();
+  const sel = document.getElementById('selectClienteNombre');
+  if (sel && cod) {
+    const opt = sel.querySelector(`option[value="${cod}"]`);
+    if (opt) sel.value = cod;
+  }
+}
+
+// Cuando se selecciona nombre, poblar código y cargar
+function seleccionarClienteNombre() {
+  const cod = document.getElementById('selectClienteNombre')?.value;
+  if (!cod) return;
+  const el = document.getElementById('clienteSeleccionado');
+  if (el) el.value = cod;
+  cargarProductosClienteAdmin();
+}
+
 window.onload = () => {
   const ok = iniciarFirebase();
   if (!ok) return;
 
   // Bootstrap Firestore config if empty
   db.collection('config').doc('settings').get().then(snap => {
-    if (!snap.exists) db.collection('config').doc('settings').set(cfg);
-    else Object.assign(cfg, snap.data());
+    if (!snap.exists) {
+      db.collection('config').doc('settings').set({
+        TC: cfg.TC, comisionGlobal: cfg.comisionGlobal,
+        horaFelizActiva: cfg.horaFelizActiva, descuentoHH: cfg.descuentoHH
+        // adminPasswordHash set on first admin login
+      });
+    } else {
+      const d = snap.data();
+      if (d.TC) cfg.TC = d.TC;
+      if (d.comisionGlobal != null) cfg.comisionGlobal = d.comisionGlobal;
+      if (d.horaFelizActiva != null) cfg.horaFelizActiva = d.horaFelizActiva;
+      if (d.descuentoHH != null) cfg.descuentoHH = d.descuentoHH;
+    }
   });
 
   // Bootstrap admin user if missing
