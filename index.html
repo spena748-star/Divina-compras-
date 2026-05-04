@@ -263,7 +263,25 @@ tr:hover td { background: var(--cream); }
       <div class="field"><label>Marca</label><input type="text" id="editMarca"></div>
       <div class="field"><label>Precio USD</label><input type="number" id="editPrecioUSD" step="0.01"></div>
       <div class="field"><label>Piezas</label><input type="number" id="editPzas" min="1"></div>
-      <div class="field"><label>Banco</label><select id="editBanco"><option value="">Sin banco</option><option>BANORTE</option><option>HSBC</option><option>EFECTIVO</option></select></div>
+      <div class="field"><label>Banco</label><select id="editBanco" onchange="toggleBancoCustom('editBanco','editBancoCustom')">
+                  <option value="">Sin banco</option>
+                  <optgroup label="💳 Transferencia">
+                    <option>BANORTE</option><option>HSBC</option><option>BBVA</option>
+                    <option>SANTANDER</option><option>BANAMEX (CITIBANAMEX)</option>
+                    <option>BANCO AZTECA</option><option>INBURSA</option><option>SCOTIABANK</option>
+                  </optgroup>
+                  <optgroup label="📱 Digital">
+                    <option>MERCADO PAGO</option><option>NU (NUBANK)</option>
+                    <option>HEY BANCO</option><option>SPIN BY OXXO</option>
+                  </optgroup>
+                  <optgroup label="💵 Físico">
+                    <option>EFECTIVO</option><option>OXXO PAY</option><option>7-ELEVEN</option>
+                  </optgroup>
+                  <optgroup label="➕ Otro">
+                    <option value="__otro__">Otro (escribir)...</option>
+                  </optgroup>
+                </select>
+                <input type="text" id="editBancoCustom" placeholder="Escribe el banco" style="display:none;width:100%;margin-top:6px;padding:10px 14px;font-size:15px;border:1.5px solid var(--border);border-radius:var(--r-sm);background:var(--cream);font-family:var(--font-body);"></div>
       <div class="field"><label>Nota</label><input type="text" id="editNota"></div>
     </div>
     <div class="btn-row">
@@ -428,13 +446,37 @@ tr:hover td { background: var(--cream); }
             <div class="field">
               <label>Banco</label>
               <div class="tip-wrap">
-                <select id="bancoVenta">
+                <select id="bancoVenta" onchange="toggleBancoCustom('bancoVenta','bancoCustom')">
                   <option value="">Sin banco</option>
-                  <option>BANORTE</option>
-                  <option>HSBC</option>
-                  <option>EFECTIVO</option>
+                  <optgroup label="💳 Transferencia">
+                    <option>BANORTE</option>
+                    <option>HSBC</option>
+                    <option>BBVA</option>
+                    <option>SANTANDER</option>
+                    <option>BANAMEX (CITIBANAMEX)</option>
+                    <option>BANCO AZTECA</option>
+                    <option>INBURSA</option>
+                    <option>SCOTIABANK</option>
+                  </optgroup>
+                  <optgroup label="📱 Digital / Wallet">
+                    <option>MERCADO PAGO</option>
+                    <option>NU (NUBANK)</option>
+                    <option>HEY BANCO</option>
+                    <option>SPIN BY OXXO</option>
+                  </optgroup>
+                  <optgroup label="💵 Pago físico">
+                    <option>EFECTIVO</option>
+                    <option>OXXO PAY</option>
+                    <option>7-ELEVEN</option>
+                  </optgroup>
+                  <optgroup label="➕ Otro">
+                    <option value="__otro__">Otro (escribir)...</option>
+                  </optgroup>
                 </select>
                 <div class="tip-box">💬 Cuenta bancaria donde el cliente debe depositar. Puedes dejarlo vacío y editarlo después con ✏️.</div>
+              </div>
+              <div id="bancoCustomWrap" style="display:none;margin-top:6px;">
+                <input type="text" id="bancoCustom" placeholder="Escribe el banco o método de pago" style="width:100%;padding:10px 14px;font-size:15px;border:1.5px solid var(--border);border-radius:var(--r-sm);background:var(--cream);font-family:var(--font-body);">
               </div>
             </div>
             <div class="field">
@@ -545,63 +587,12 @@ tr:hover td { background: var(--cream); }
           <div id="estadoHHBadge" style="margin-top:12px;"></div>
         </div>
         <div class="card">
-          <div class="card-title">🔧 Firebase</div>
-          <button class="btn btn-ghost" onclick="reconfigurarFirebase()">Reconfigurar Firebase</button>
-          <p class="text-small" style="margin-top:8px;">Toca esto solo si cambiaste de proyecto Firebase.</p>
-        </div>
-        <div class="card">
-          <div class="card-title">🛡️ Reglas de seguridad recomendadas</div>
-          <p style="font-size:13px;color:var(--plum-mid);margin-bottom:10px;">
-            Copia estas reglas en <strong>Firebase Console → Firestore → Reglas</strong> y en <strong>Storage → Reglas</strong>. Evitan que extraños escriban datos aunque vean tu config.
-          </p>
-          <div style="background:var(--plum);color:#a8ffcb;border-radius:var(--r-sm);padding:16px;font-family:monospace;font-size:12px;line-height:1.7;overflow-x:auto;">
-            <div style="color:#ffd97d;margin-bottom:6px;">// ── FIRESTORE ──────────────────────────</div>
-            rules_version = '2';<br>
-            service cloud.firestore {<br>
-            &nbsp;&nbsp;match /databases/{database}/documents {<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#ffd97d;">// Config: solo lectura pública, escritura bloqueada</span><br>
-            &nbsp;&nbsp;&nbsp;&nbsp;match /config/{doc} {<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow read: if true;<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow write: if false;<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;}<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#ffd97d;">// Usuarios: lectura pública (para login), escritura bloqueada</span><br>
-            &nbsp;&nbsp;&nbsp;&nbsp;match /usuarios/{uid} {<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow read: if true;<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow write: if false;<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;}<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#ffd97d;">// Ventas: lectura pública, escritura bloqueada desde fuera</span><br>
-            &nbsp;&nbsp;&nbsp;&nbsp;match /ventas/{id} {<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow read: if true;<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow write: if false;<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;}<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#ffd97d;">// Comprobantes y notificaciones: igual</span><br>
-            &nbsp;&nbsp;&nbsp;&nbsp;match /{collection}/{doc} {<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow read: if true;<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow write: if false;<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;}<br>
-            &nbsp;&nbsp;}<br>
-            }<br><br>
-            <span style="color:#ffd97d;">// ── STORAGE ────────────────────────────</span><br>
-            rules_version = '2';<br>
-            service firebase.storage {<br>
-            &nbsp;&nbsp;match /b/{bucket}/o {<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;match /comprobantes/{file} {<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow read: if true;<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow write: if false;<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;}<br>
-            &nbsp;&nbsp;}<br>
-            }
-          </div>
-          <p style="font-size:12px;color:var(--plum-light);margin-top:10px;">
-            ⚠️ Con estas reglas la app deja de poder escribir desde el navegador. Para producción real activa
-            <strong>Firebase App Check</strong> en la consola y cambia <code>allow write: if false</code>
-            por <code>allow write: if request.app != null</code> — así solo tu dominio puede escribir.
-          </p>
-          <div style="margin-top:14px;padding:14px;background:var(--info-bg);border-radius:var(--r-sm);font-size:13px;">
-            <strong>🔑 Restricción de API Key (muy recomendada):</strong><br>
-            Ve a <a href="https://console.cloud.google.com/apis/credentials" target="_blank" style="color:var(--info);">Google Cloud Console → Credenciales</a>,
-            selecciona tu API Key de Firebase y en <em>"Restricciones de aplicación"</em> agrega solo tu dominio
-            (ej: <code>tudominio.pages.dev</code>). Así el key no sirve desde otros sitios aunque alguien lo vea.
+          <div class="card-title">🏦 Bancos personalizados</div>
+          <p style="font-size:13px;color:var(--plum-mid);margin-bottom:12px;">Agrega métodos de pago extra que aparecerán en el selector al capturar.</p>
+          <div id="listaBancosExtra" style="margin-bottom:12px;"></div>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <input type="text" id="nuevoBanco" placeholder="Ej: BANBAJÍO, CODI, ZELLE..." style="flex:1;min-width:180px;padding:10px 14px;font-size:15px;border:1.5px solid var(--border);border-radius:var(--r-sm);background:var(--cream);font-family:var(--font-body);">
+            <button class="btn btn-primary" onclick="agregarBancoExtra()">➕ Agregar</button>
           </div>
         </div>
       </div>
@@ -1017,6 +1008,25 @@ function toast(msg, type = '') {
   setTimeout(() => el.remove(), 3200);
 }
 
+// ─── BANCO HELPERS ───────────────────────────
+function toggleBancoCustom(selectId, inputId) {
+  const sel = document.getElementById(selectId);
+  const inp = document.getElementById(inputId);
+  const wrap = document.getElementById('bancoCustomWrap');
+  if (!sel || !inp) return;
+  const isOtro = sel.value === '__otro__';
+  inp.style.display = isOtro ? 'block' : 'none';
+  if (wrap) wrap.style.display = isOtro ? 'block' : 'none';
+  if (isOtro) inp.focus();
+}
+function getBancoValue(selectId, inputId) {
+  const sel = document.getElementById(selectId);
+  const inp = document.getElementById(inputId);
+  if (!sel) return '';
+  if (sel.value === '__otro__') return inp ? inp.value.trim().toUpperCase() : '';
+  return sel.value;
+}
+
 // ─── MANUAL ──────────────────────────────────
 function abrirManual() { document.getElementById('manualModal').style.display = 'flex'; }
 function cerrarManual() { document.getElementById('manualModal').style.display = 'none'; }
@@ -1139,7 +1149,7 @@ async function agregarProducto() {
   const marca = sanitize(document.getElementById('marca').value);
   const precioUSD = parseFloat(document.getElementById('precioUSD').value);
   const pzas = Math.min(Math.max(parseInt(document.getElementById('pzas').value) || 1, 1), 999);
-  const banco = document.getElementById('bancoVenta').value;
+  const banco = getBancoValue('bancoVenta','bancoCustom');
   const nota = sanitize(document.getElementById('nota').value);
   const shopper = document.getElementById('shopperAsignado').value;
   const tienda = sanitize(document.getElementById('tienda').value) || 'Ross';
@@ -1178,6 +1188,8 @@ function limpiarFormProducto() {
   ['producto','marca','precioUSD','nota','tallaLibre'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = ''; });
   document.getElementById('pzas').value = '1';
   document.getElementById('bancoVenta').value = '';
+  const bcw = document.getElementById('bancoCustomWrap'); if(bcw) bcw.style.display='none';
+  const bci = document.getElementById('bancoCustom'); if(bci) bci.value='';
   document.getElementById('tienda').value = 'Ross';
   document.getElementById('previewPrecio').innerHTML = '';
   if(document.getElementById('tipoArticulo')) document.getElementById('tipoArticulo').value = 'calzado';
@@ -1293,7 +1305,7 @@ async function guardarEdicion() {
       producto: document.getElementById('editProducto').value.trim(),
       marca: document.getElementById('editMarca').value.trim(),
       precioUSD, pzas, totalMXN,
-      banco: document.getElementById('editBanco').value,
+      banco: getBancoValue('editBanco','editBancoCustom'),
       nota: document.getElementById('editNota').value.trim(),
       historial: firebase.firestore.FieldValue.arrayUnion({ estado: 'editado', fecha: new Date().toISOString(), por: 'admin' })
     });
@@ -1403,6 +1415,73 @@ function syncUI() {
     ? `<span class="badge b-aprobado">🎉 Hora Feliz ACTIVA — ${cfg.descuentoHH}% descuento</span>`
     : `<span class="badge b-pendiente">Hora Feliz inactiva</span>`;
 }
+// ─── BANCOS EXTRA ────────────────────────────
+let bancosExtra = [];
+
+async function cargarBancosExtra() {
+  try {
+    const snap = await db.collection('config').doc('bancos').get();
+    bancosExtra = snap.exists ? (snap.data().lista || []) : [];
+    renderBancosExtra();
+    agregarBancosAlSelect();
+  } catch(e) {}
+}
+function renderBancosExtra() {
+  const div = document.getElementById('listaBancosExtra');
+  if (!div) return;
+  if (bancosExtra.length === 0) { div.innerHTML = '<p class="text-small">Sin bancos personalizados aún</p>'; return; }
+  div.innerHTML = bancosExtra.map((b,i) => `
+    <div style="display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--cream);border-radius:var(--r-sm);margin-bottom:6px;">
+      <span style="flex:1;font-size:14px;">🏦 ${b}</span>
+      <button class="btn btn-danger btn-sm" onclick="eliminarBancoExtra(${i})">🗑️</button>
+    </div>`).join('');
+}
+function agregarBancosAlSelect() {
+  // Add custom banks to all banco selects
+  ['bancoVenta','editBanco'].forEach(selId => {
+    const sel = document.getElementById(selId);
+    if (!sel) return;
+    // Remove existing custom group if any
+    const existing = sel.querySelector('optgroup[label="⭐ Personalizados"]');
+    if (existing) existing.remove();
+    if (bancosExtra.length === 0) return;
+    const grp = document.createElement('optgroup');
+    grp.label = '⭐ Personalizados';
+    bancosExtra.forEach(b => {
+      const opt = document.createElement('option');
+      opt.value = b; opt.text = b;
+      grp.appendChild(opt);
+    });
+    // Insert before the "Otro" optgroup
+    const otroGrp = sel.querySelector('optgroup[label="➕ Otro"]');
+    if (otroGrp) sel.insertBefore(grp, otroGrp);
+    else sel.appendChild(grp);
+  });
+}
+async function agregarBancoExtra() {
+  const inp = document.getElementById('nuevoBanco');
+  const val = inp.value.trim().toUpperCase();
+  if (!val) { toast('Escribe el nombre del banco', 'error'); return; }
+  if (bancosExtra.includes(val)) { toast('Ya existe', 'error'); return; }
+  bancosExtra.push(val);
+  try {
+    await db.collection('config').doc('bancos').set({ lista: bancosExtra });
+    inp.value = '';
+    renderBancosExtra();
+    agregarBancosAlSelect();
+    toast('Banco agregado ✓', 'success');
+  } catch(e) { toast('Error: ' + e.message, 'error'); bancosExtra.pop(); }
+}
+async function eliminarBancoExtra(idx) {
+  bancosExtra.splice(idx, 1);
+  try {
+    await db.collection('config').doc('bancos').set({ lista: bancosExtra });
+    renderBancosExtra();
+    agregarBancosAlSelect();
+    toast('Banco eliminado', 'warning');
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
+}
+
 async function guardarConfig() {
   const nuevaPass = document.getElementById('cfgNuevaPass').value.trim();
   const updates = {
@@ -1682,7 +1761,7 @@ function mostrarApp() {
   document.getElementById('adminPanel').style.display = usuarioActual.rol === 'admin' ? 'block' : 'none';
   document.getElementById('shopperPanel').style.display = usuarioActual.rol === 'shopper' ? 'block' : 'none';
   document.getElementById('clientePanel').style.display = usuarioActual.rol === 'cliente' ? 'block' : 'none';
-  if (usuarioActual.rol === 'admin') { renderDashboard(); renderTablaUsuarios(); cargarSelectVendedores(); syncUI(); }
+  if (usuarioActual.rol === 'admin') { renderDashboard(); renderTablaUsuarios(); cargarSelectVendedores(); syncUI(); cargarBancosExtra(); }
   else if (usuarioActual.rol === 'shopper') renderShopper();
   else renderCliente();
 }
