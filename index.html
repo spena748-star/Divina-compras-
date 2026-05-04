@@ -220,6 +220,23 @@ tr:hover td { background: var(--cream); }
   .stats-grid { grid-template-columns: 1fr 1fr; }
   .btn { padding: 9px 16px; font-size: 13px; }
 }
+
+/* COUNT-UP */
+@keyframes countUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+.stat-num { animation: countUp 0.45s ease both; }
+
+/* PULSE BADGE */
+@keyframes pulse { 0%,100% { box-shadow:0 0 0 0 rgba(201,144,58,0.5); } 70% { box-shadow:0 0 0 6px rgba(201,144,58,0); } }
+.tab-badge.pulse { animation: pulse 1.4s ease infinite; }
+
+/* FILTER + EXPORT */
+.filter-row { display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; margin-bottom:12px; }
+.filter-row .field { margin:0; min-width:150px; }
+.export-row { display:flex; justify-content:flex-end; margin-bottom:14px; }
+
+/* WA LINK */
+.wa-link { color:var(--success); font-weight:600; text-decoration:none; font-size:13px; }
+.wa-link:hover { text-decoration:underline; }
 </style>
 </head>
 <body>
@@ -263,25 +280,7 @@ tr:hover td { background: var(--cream); }
       <div class="field"><label>Marca</label><input type="text" id="editMarca"></div>
       <div class="field"><label>Precio USD</label><input type="number" id="editPrecioUSD" step="0.01"></div>
       <div class="field"><label>Piezas</label><input type="number" id="editPzas" min="1"></div>
-      <div class="field"><label>Banco</label><select id="editBanco" onchange="toggleBancoCustom('editBanco','editBancoCustom')">
-                  <option value="">Sin banco</option>
-                  <optgroup label="💳 Transferencia">
-                    <option>BANORTE</option><option>HSBC</option><option>BBVA</option>
-                    <option>SANTANDER</option><option>BANAMEX (CITIBANAMEX)</option>
-                    <option>BANCO AZTECA</option><option>INBURSA</option><option>SCOTIABANK</option>
-                  </optgroup>
-                  <optgroup label="📱 Digital">
-                    <option>MERCADO PAGO</option><option>NU (NUBANK)</option>
-                    <option>HEY BANCO</option><option>SPIN BY OXXO</option>
-                  </optgroup>
-                  <optgroup label="💵 Físico">
-                    <option>EFECTIVO</option><option>OXXO PAY</option><option>7-ELEVEN</option>
-                  </optgroup>
-                  <optgroup label="➕ Otro">
-                    <option value="__otro__">Otro (escribir)...</option>
-                  </optgroup>
-                </select>
-                <input type="text" id="editBancoCustom" placeholder="Escribe el banco" style="display:none;width:100%;margin-top:6px;padding:10px 14px;font-size:15px;border:1.5px solid var(--border);border-radius:var(--r-sm);background:var(--cream);font-family:var(--font-body);"></div>
+      <div class="field"><label>Banco</label><select id="editBanco"><option value="">Sin banco</option><option>BANORTE</option><option>HSBC</option><option>BBVA</option><option>SANTANDER</option><option>BANAMEX</option><option>OXXO PAY</option><option>EFECTIVO</option></select></div>
       <div class="field"><label>Nota</label><input type="text" id="editNota"></div>
     </div>
     <div class="btn-row">
@@ -315,6 +314,9 @@ tr:hover td { background: var(--cream); }
       <!-- TAB: DASHBOARD -->
       <div id="tab-dashboard" class="tab-content active">
         <div class="stats-grid" id="statsGrid"></div>
+        <div class="export-row">
+          <button class="btn btn-ghost btn-sm" onclick="exportarCSV()">📥 Exportar ventas CSV</button>
+        </div>
         <div class="card">
           <div class="card-title">📋 Comprobantes pendientes de revisar</div>
           <div id="comprobantesAdmin"></div>
@@ -347,7 +349,7 @@ tr:hover td { background: var(--cream); }
                   <option value="interior">🩲 Ropa Interior</option>
                   <option value="otro">✏️ Otro / Libre</option>
                 </select>
-                <div class="tip-box">💬 Tipo de artículo. Cambia los campos de talla: calzado, ropa, interior o campo libre.</div>
+                <div class="tip-box">💬 Tipo de artículo que vas a registrar. Cambia los campos de talla según lo que selecciones: calzado, ropa, interior o campo libre.</div>
               </div>
             </div>
             <!-- CALZADO -->
@@ -361,15 +363,12 @@ tr:hover td { background: var(--cream); }
                   <option value="ninos">Niños</option>
                   <option value="bebes">Bebés</option>
                 </select>
-                <div class="tip-box">💬 Categoría del calzado. Cambia las tallas disponibles según el género y edad.</div>
+                <div class="tip-box">💬 Categoría del calzado. Cambia las tallas disponibles: Mujer, Hombre, Juniors, Niños o Bebés.</div>
               </div>
             </div>
             <div id="sec-calzado2" class="field">
               <label>Talla USA (calzado)</label>
-              <div class="tip-wrap">
-                <select id="tallaUSA" onchange="actualizarInfoTalla()"></select>
-                <div class="tip-box">💬 Talla USA tal como aparece en la caja. El equivalente en México y CM aparece abajo.</div>
-              </div>
+              <div class="tip-wrap"><select id="tallaUSA" onchange="actualizarInfoTalla()"></select><div class="tip-box">💬 Talla USA del calzado tal como aparece en la caja. El equivalente en México y CM aparece abajo automáticamente.</div></div>
               <div id="infoTalla" class="talla-hint"></div>
             </div>
             <!-- ROPA -->
@@ -384,15 +383,12 @@ tr:hover td { background: var(--cream); }
                   <option value="nin">Niños</option>
                   <option value="beb">Bebés</option>
                 </select>
-                <div class="tip-box">💬 Para quién es la ropa. Determina las tallas disponibles: XS–4XL para adultos, tallas numeradas para niños.</div>
+                <div class="tip-box">💬 Selecciona para quién es la ropa. Esto determina las tallas disponibles (XS–4XL para adultos, tallas numeradas para niños).</div>
               </div>
             </div>
             <div id="sec-ropa2" class="field" style="display:none;">
               <label>Talla ropa</label>
-              <div class="tip-wrap">
-                <select id="tallaRopa" onchange="actualizarInfoRopa()"></select>
-                <div class="tip-box">💬 Talla tal como aparece en la etiqueta. El equivalente mexicano aparece abajo.</div>
-              </div>
+              <div class="tip-wrap"><select id="tallaRopa" onchange="actualizarInfoRopa()"></select><div class="tip-box">💬 Talla de la ropa tal como aparece en la etiqueta. El equivalente mexicano aparece abajo.</div></div>
               <div id="infoRopa" class="talla-hint"></div>
             </div>
             <!-- ROPA INTERIOR -->
@@ -409,97 +405,35 @@ tr:hover td { background: var(--cream); }
                   <option value="pijama">Pijama / Ropa de dormir</option>
                   <option value="media">Medias / Calcetines</option>
                 </select>
-                <div class="tip-box">💬 Tipo de ropa interior. Para brasier aparece el campo de copa (A, B, C, D…).</div>
+                <div class="tip-box">💬 Tipo de ropa interior. Para brasier aparecerá un campo extra para la copa (A, B, C, D…).</div>
               </div>
             </div>
             <div id="sec-interior2" class="field" style="display:none;">
               <label>Talla interior</label>
-              <div class="tip-wrap">
-                <select id="tallaInterior" onchange="actualizarInfoInterior()"></select>
-                <div class="tip-box">💬 Para brasier: banda (28, 30, 32, 34…). Para lo demás: talla del artículo.</div>
-              </div>
+              <div class="tip-wrap"><select id="tallaInterior" onchange="actualizarInfoInterior()"></select><div class="tip-box">💬 Para brasier: banda (28, 30, 32, 34…). Para lo demás: talla del artículo.</div></div>
               <div id="infoInterior" class="talla-hint"></div>
             </div>
             <div id="sec-interior3" class="field" style="display:none;">
               <label>Copa (brasier)</label>
-              <div class="tip-wrap">
-                <select id="tallaInteriorCopa">
-                  <option value="A">A</option>
-                  <option value="B" selected>B</option>
-                  <option value="C">C</option>
-                  <option value="D">D</option>
-                  <option value="DD">DD</option>
-                  <option value="DDD/F">DDD/F</option>
-                  <option value="G">G</option>
-                </select>
-                <div class="tip-box">💬 Copa del brasier. Se combina con la banda: ej. 34 + B = <strong>34B</strong>.</div>
-              </div>
+              <div class="tip-wrap"><select id="tallaInteriorCopa"><div class="tip-box">💬 Copa del brasier. Combinada con la banda forma la talla completa. Ej: banda 34 + copa B = <strong>34B</strong>.</div></div>
+                <option value="A">A</option>
+                <option value="B" selected>B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+                <option value="DD">DD</option>
+                <option value="DDD/F">DDD/F</option>
+                <option value="G">G</option>
+              </select>
             </div>
             <!-- OTRO -->
             <div id="sec-otro" class="field" style="display:none;">
               <label>Talla / Especificación (libre)</label>
-              <div class="tip-wrap">
-                <input type="text" id="tallaLibre" placeholder="Ej: L / 38 / Unitalla / 34B...">
-                <div class="tip-box">💬 Escribe la talla libremente: L, XL, 38, Unitalla, 2XL, lo que necesites.</div>
-              </div>
+              <div class="tip-wrap"><input type="text" id="tallaLibre" placeholder="Ej: L / 38 / Unitalla / 34B..."><div class="tip-box">💬 Escribe la talla libremente: L, XL, 38, Unitalla, Talla única, 2XL, lo que necesites.</div></div>
             </div>
-            <div class="field">
-              <label>Banco</label>
-              <div class="tip-wrap">
-                <select id="bancoVenta" onchange="toggleBancoCustom('bancoVenta','bancoCustom')">
-                  <option value="">Sin banco</option>
-                  <optgroup label="💳 Transferencia">
-                    <option>BANORTE</option>
-                    <option>HSBC</option>
-                    <option>BBVA</option>
-                    <option>SANTANDER</option>
-                    <option>BANAMEX (CITIBANAMEX)</option>
-                    <option>BANCO AZTECA</option>
-                    <option>INBURSA</option>
-                    <option>SCOTIABANK</option>
-                  </optgroup>
-                  <optgroup label="📱 Digital / Wallet">
-                    <option>MERCADO PAGO</option>
-                    <option>NU (NUBANK)</option>
-                    <option>HEY BANCO</option>
-                    <option>SPIN BY OXXO</option>
-                  </optgroup>
-                  <optgroup label="💵 Pago físico">
-                    <option>EFECTIVO</option>
-                    <option>OXXO PAY</option>
-                    <option>7-ELEVEN</option>
-                  </optgroup>
-                  <optgroup label="➕ Otro">
-                    <option value="__otro__">Otro (escribir)...</option>
-                  </optgroup>
-                </select>
-                <div class="tip-box">💬 Cuenta bancaria donde el cliente debe depositar. Puedes dejarlo vacío y editarlo después con ✏️.</div>
-              </div>
-              <div id="bancoCustomWrap" style="display:none;margin-top:6px;">
-                <input type="text" id="bancoCustom" placeholder="Escribe el banco o método de pago" style="width:100%;padding:10px 14px;font-size:15px;border:1.5px solid var(--border);border-radius:var(--r-sm);background:var(--cream);font-family:var(--font-body);">
-              </div>
-            </div>
-            <div class="field">
-              <label>Vendedor (shopper)</label>
-              <div class="tip-wrap">
-                <select id="shopperAsignado"></select>
-                <div class="tip-box">💬 Vendedor que compró el artículo. Se usa para calcular su comisión del 10% al liberar el pago.</div>
-              </div>
-            </div>
-            <div class="field">
-              <label>Tienda</label>
-              <div class="tip-wrap">
-                <input type="text" id="tienda" value="Ross">
-                <div class="tip-box">💬 Tienda donde se compró. Por defecto Ross. Cámbialo si es otra: Marshalls, TJ Maxx, Burlington…</div>
-              </div>
-            </div>
-            <div class="field">
-              <label>Nota</label>
-              <div class="tip-wrap">
-                <input type="text" id="nota">
-                <div class="tip-box">💬 Observaciones extras: color, estilo, referencia, condición. El cliente puede verlo en su pantalla.</div>
-              </div>
-            </div>
+            <div class="field"><label>Banco</label><div class="tip-wrap"><select id="bancoVenta"><option value="">Sin banco</option><option>BANORTE</option><option>HSBC</option><option>BBVA</option><option>SANTANDER</option><option>BANAMEX</option><option>OXXO PAY</option><option>EFECTIVO</option></select><div class="tip-box">💬 Cuenta bancaria donde el cliente debe depositar. Si no lo sabes aún, déjalo vacío y edítalo después con el botón ✏️.</div></div></div>
+            <div class="field"><label>Vendedor (shopper)</label><div class="tip-wrap"><select id="shopperAsignado"></select><div class="tip-box">💬 Vendedor que compró el artículo en la tienda. Se usa para calcular su comisión del 10% al liberar el pago.</div></div></div>
+            <div class="field"><label>Tienda</label><div class="tip-wrap"><input type="text" id="tienda" value="Ross"><div class="tip-box">💬 Tienda donde se compró. Por defecto Ross. Cámbialo si es otra: Marshalls, TJ Maxx, Burlington, etc.</div></div></div>
+            <div class="field"><label>Nota</label><div class="tip-wrap"><input type="text" id="nota"><div class="tip-box">💬 Observaciones extras: color, estilo, número de referencia, condición. El cliente puede verlo en su pantalla.</div></div></div>
           </div>
           <div class="btn-row">
             <button class="btn btn-primary" onclick="agregarProducto()">➕ Agregar producto</button>
@@ -533,14 +467,16 @@ tr:hover td { background: var(--cream); }
       <div id="tab-clientes" class="tab-content">
         <div class="card">
           <div class="card-title">👤 Productos del cliente</div>
-          <div class="btn-row" style="margin-bottom:14px;">
-            <div class="field" style="max-width:200px;"><label>Código cliente</label><input type="text" id="clienteSeleccionado" maxlength="4" placeholder="1234" inputmode="numeric"></div>
+          <div class="filter-row">
+            <div class="field" style="max-width:180px;"><label>Código cliente</label><input type="text" id="clienteSeleccionado" maxlength="4" placeholder="1234" inputmode="numeric" oninput="autoNombreCliente()"></div>
+            <div class="field" style="max-width:220px;"><label>Buscar por nombre</label><select id="selectClienteNombre" onchange="seleccionarClienteNombre()"><option value="">— Seleccionar —</option></select></div>
+            <div class="field" style="max-width:160px;"><label>Filtrar estado</label><select id="filtroEstado" onchange="cargarProductosClienteAdmin()"><option value="">Todos</option><option value="pendiente">Pendiente</option><option value="aprobado">Aprobado</option><option value="pagado">Pagado</option><option value="cancelado">Cancelado</option></select></div>
             <button class="btn btn-info" onclick="cargarProductosClienteAdmin()">🔍 Cargar</button>
           </div>
           <div id="infoClienteHeader"></div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Producto</th><th>Marca</th><th>Pzas</th><th>USD</th><th>Total MXN</th><th>Talla</th><th>Banco</th><th>Shopper</th><th>Estado</th><th>Comp.</th><th>Acciones</th></tr></thead>
+              <thead><tr><th>Producto</th><th>Marca</th><th>Pzas</th><th>USD</th><th>Total MXN</th><th>Talla</th><th>Tienda</th><th>Banco</th><th>Shopper</th><th>Estado</th><th>Comp.</th><th>Acciones</th></tr></thead>
               <tbody id="tbodyProductosCliente"></tbody>
             </table>
           </div>
@@ -564,7 +500,7 @@ tr:hover td { background: var(--cream); }
         <div class="card">
           <div class="card-title">👥 Usuarios registrados</div>
           <div class="table-wrap">
-            <table><thead><tr><th>Código</th><th>Nombre</th><th>Rol</th><th>Socio</th><th>Acciones</th></tr></thead><tbody id="tbodyUsuarios"></tbody></table>
+                        <table><thead><tr><th>Código</th><th>Nombre</th><th>Rol</th><th>WhatsApp</th><th>Socio</th><th>Acciones</th></tr></thead><tbody id="tbodyUsuarios"></tbody></table>
           </div>
         </div>
       </div>
@@ -587,12 +523,63 @@ tr:hover td { background: var(--cream); }
           <div id="estadoHHBadge" style="margin-top:12px;"></div>
         </div>
         <div class="card">
-          <div class="card-title">🏦 Bancos personalizados</div>
-          <p style="font-size:13px;color:var(--plum-mid);margin-bottom:12px;">Agrega métodos de pago extra que aparecerán en el selector al capturar.</p>
-          <div id="listaBancosExtra" style="margin-bottom:12px;"></div>
-          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-            <input type="text" id="nuevoBanco" placeholder="Ej: BANBAJÍO, CODI, ZELLE..." style="flex:1;min-width:180px;padding:10px 14px;font-size:15px;border:1.5px solid var(--border);border-radius:var(--r-sm);background:var(--cream);font-family:var(--font-body);">
-            <button class="btn btn-primary" onclick="agregarBancoExtra()">➕ Agregar</button>
+          <div class="card-title">🔧 Firebase</div>
+          <button class="btn btn-ghost" onclick="reconfigurarFirebase()">Reconfigurar Firebase</button>
+          <p class="text-small" style="margin-top:8px;">Toca esto solo si cambiaste de proyecto Firebase.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">🛡️ Reglas de seguridad recomendadas</div>
+          <p style="font-size:13px;color:var(--plum-mid);margin-bottom:10px;">
+            Copia estas reglas en <strong>Firebase Console → Firestore → Reglas</strong> y en <strong>Storage → Reglas</strong>. Evitan que extraños escriban datos aunque vean tu config.
+          </p>
+          <div style="background:var(--plum);color:#a8ffcb;border-radius:var(--r-sm);padding:16px;font-family:monospace;font-size:12px;line-height:1.7;overflow-x:auto;">
+            <div style="color:#ffd97d;margin-bottom:6px;">// ── FIRESTORE ──────────────────────────</div>
+            rules_version = '2';<br>
+            service cloud.firestore {<br>
+            &nbsp;&nbsp;match /databases/{database}/documents {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#ffd97d;">// Config: solo lectura pública, escritura bloqueada</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;match /config/{doc} {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow read: if true;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow write: if false;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#ffd97d;">// Usuarios: lectura pública (para login), escritura bloqueada</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;match /usuarios/{uid} {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow read: if true;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow write: if false;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#ffd97d;">// Ventas: lectura pública, escritura bloqueada desde fuera</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;match /ventas/{id} {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow read: if true;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow write: if false;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#ffd97d;">// Comprobantes y notificaciones: igual</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;match /{collection}/{doc} {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow read: if true;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow write: if false;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+            &nbsp;&nbsp;}<br>
+            }<br><br>
+            <span style="color:#ffd97d;">// ── STORAGE ────────────────────────────</span><br>
+            rules_version = '2';<br>
+            service firebase.storage {<br>
+            &nbsp;&nbsp;match /b/{bucket}/o {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;match /comprobantes/{file} {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow read: if true;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow write: if false;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+            &nbsp;&nbsp;}<br>
+            }
+          </div>
+          <p style="font-size:12px;color:var(--plum-light);margin-top:10px;">
+            ⚠️ Con estas reglas la app deja de poder escribir desde el navegador. Para producción real activa
+            <strong>Firebase App Check</strong> en la consola y cambia <code>allow write: if false</code>
+            por <code>allow write: if request.app != null</code> — así solo tu dominio puede escribir.
+          </p>
+          <div style="margin-top:14px;padding:14px;background:var(--info-bg);border-radius:var(--r-sm);font-size:13px;">
+            <strong>🔑 Restricción de API Key (muy recomendada):</strong><br>
+            Ve a <a href="https://console.cloud.google.com/apis/credentials" target="_blank" style="color:var(--info);">Google Cloud Console → Credenciales</a>,
+            selecciona tu API Key de Firebase y en <em>"Restricciones de aplicación"</em> agrega solo tu dominio
+            (ej: <code>tudominio.pages.dev</code>). Así el key no sirve desde otros sitios aunque alguien lo vea.
           </div>
         </div>
       </div>
@@ -761,6 +748,15 @@ tr:hover td { background: var(--cream); }
 </div>
 
 <script>
+// Manejador global de errores (al inicio para capturar todo)
+window.onerror = function(msg, url, lineNo, columnNo, error) {
+  const errorMsg = '🛑 Error detectado: ' + msg + ' (Línea: ' + lineNo + ')';
+  if (typeof toast === 'function') toast(errorMsg, 'error');
+  else alert(errorMsg);
+  console.error('DEBUG ERROR:', msg, url, lineNo, columnNo, error);
+  return false;
+};
+
 // ─────────────────────────────────────────────
 // FIREBASE CONFIG
 // ─────────────────────────────────────────────
@@ -790,14 +786,19 @@ const tallasData = {
 
 // ─── FIREBASE INIT ───────────────────────────
 function iniciarFirebase() {
+  console.log('Iniciando Firebase...');
   try {
+    if (!firebase || !firebase.initializeApp) throw new Error('SDK de Firebase no cargado. Verifica tu conexión a internet.');
     firebase.initializeApp(FIREBASE_CONFIG);
     db = firebase.firestore();
     storage = firebase.storage();
+    console.log('Firebase OK.');
     return true;
   } catch(e) {
     console.error('Firebase init error:', e);
-    document.getElementById('loginError').innerText = 'Error Firebase: ' + e.message;
+    const errEl = document.getElementById('loginError');
+    if (errEl) errEl.innerText = 'Error crítico: ' + e.message;
+    toast('Error al conectar con Firebase: ' + e.message, 'error');
     return false;
   }
 }
@@ -1008,25 +1009,6 @@ function toast(msg, type = '') {
   setTimeout(() => el.remove(), 3200);
 }
 
-// ─── BANCO HELPERS ───────────────────────────
-function toggleBancoCustom(selectId, inputId) {
-  const sel = document.getElementById(selectId);
-  const inp = document.getElementById(inputId);
-  const wrap = document.getElementById('bancoCustomWrap');
-  if (!sel || !inp) return;
-  const isOtro = sel.value === '__otro__';
-  inp.style.display = isOtro ? 'block' : 'none';
-  if (wrap) wrap.style.display = isOtro ? 'block' : 'none';
-  if (isOtro) inp.focus();
-}
-function getBancoValue(selectId, inputId) {
-  const sel = document.getElementById(selectId);
-  const inp = document.getElementById(inputId);
-  if (!sel) return '';
-  if (sel.value === '__otro__') return inp ? inp.value.trim().toUpperCase() : '';
-  return sel.value;
-}
-
 // ─── MANUAL ──────────────────────────────────
 function abrirManual() { document.getElementById('manualModal').style.display = 'flex'; }
 function cerrarManual() { document.getElementById('manualModal').style.display = 'none'; }
@@ -1149,7 +1131,7 @@ async function agregarProducto() {
   const marca = sanitize(document.getElementById('marca').value);
   const precioUSD = parseFloat(document.getElementById('precioUSD').value);
   const pzas = Math.min(Math.max(parseInt(document.getElementById('pzas').value) || 1, 1), 999);
-  const banco = getBancoValue('bancoVenta','bancoCustom');
+  const banco = document.getElementById('bancoVenta').value;
   const nota = sanitize(document.getElementById('nota').value);
   const shopper = document.getElementById('shopperAsignado').value;
   const tienda = sanitize(document.getElementById('tienda').value) || 'Ross';
@@ -1188,8 +1170,6 @@ function limpiarFormProducto() {
   ['producto','marca','precioUSD','nota','tallaLibre'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = ''; });
   document.getElementById('pzas').value = '1';
   document.getElementById('bancoVenta').value = '';
-  const bcw = document.getElementById('bancoCustomWrap'); if(bcw) bcw.style.display='none';
-  const bci = document.getElementById('bancoCustom'); if(bci) bci.value='';
   document.getElementById('tienda').value = 'Ross';
   document.getElementById('previewPrecio').innerHTML = '';
   if(document.getElementById('tipoArticulo')) document.getElementById('tipoArticulo').value = 'calzado';
@@ -1209,7 +1189,9 @@ function actualizarPreviewPrecio() {
 function cargarProductosClienteAdmin() {
   const codigo = (document.getElementById('clienteSeleccionado')?.value || '').trim();
   if (!codigo) return;
-  const productos = ventas.filter(v => v.codCliente === codigo);
+  const filtroEstado = document.getElementById('filtroEstado')?.value || '';
+  let productos = ventas.filter(v => v.codCliente === codigo);
+  if (filtroEstado) productos = productos.filter(v => v.estado === filtroEstado);
   const usuario = usuarios.find(u => u.codigo === codigo);
   const comp = comprobantes[codigo];
 
@@ -1217,17 +1199,19 @@ function cargarProductosClienteAdmin() {
   const hdr = document.getElementById('infoClienteHeader');
   if (hdr) {
     hdr.innerHTML = usuario
-      ? `<div style="margin-bottom:10px;"><span class="chip">${usuario.nombre}</span> ${comp ? `<span class="comp-badge-yes">✅ Comprobante recibido</span>` : '<span class="comp-badge-no">⏳ Sin comprobante</span>'}</div>`
+      ? `<div style="margin-bottom:10px;"><span class="chip">${usuario.nombre}</span> ${comp ? `<span class="comp-badge-yes">✅ Comprobante recibido</span>` : '<span class="comp-badge-no">⏳ Sin comprobante</span>'}${ usuario.whatsapp ? ` <a class="wa-link" href="https://wa.me/52${usuario.whatsapp}" target="_blank">📱 ${usuario.whatsapp}</a>` : ''}</div>`
       : `<div class="text-small" style="margin-bottom:10px;">⚠️ Cliente no encontrado en usuarios</div>`;
   }
 
   const tbody = document.getElementById('tbodyProductosCliente');
   tbody.innerHTML = '';
-  if (productos.length === 0) { tbody.innerHTML = '<tr><td colspan="11" class="empty-state">Sin productos para este cliente</td></tr>'; }
+  if (productos.length === 0) { tbody.innerHTML = '<tr><td colspan="12" class="empty-state">Sin productos para este cliente</td></tr>'; }
 
   let totalPendiente = 0;
+  const allProductos = ventas.filter(v => v.codCliente === codigo);
+  allProductos.forEach(p => { if (p.estado === 'pendiente' || p.estado === 'aprobado') totalPendiente += p.totalMXN; });
+
   productos.forEach(p => {
-    if (p.estado === 'pendiente' || p.estado === 'aprobado') totalPendiente += p.totalMXN;
     const shopperUser = usuarios.find(u => u.codigo === p.shopper);
     const row = tbody.insertRow();
     row.innerHTML = `
@@ -1237,6 +1221,7 @@ function cargarProductosClienteAdmin() {
       <td>$${p.precioUSD?.toFixed(2)}</td>
       <td><strong>${fmt(p.totalMXN)}</strong></td>
       <td class="text-small">${p.tallaInfo || p.talla}</td>
+      <td class="text-small">${p.tienda || '—'}</td>
       <td>${p.banco || '—'}</td>
       <td>${shopperUser ? shopperUser.nombre : (p.shopper || '—')}</td>
       <td><span class="badge b-${p.estado}">${{pendiente:'Pendiente',aprobado:'Aprobado',cancelado:'Cancelado',pagado:'Pagado'}[p.estado]}</span></td>
@@ -1250,8 +1235,8 @@ function cargarProductosClienteAdmin() {
   });
 
   const footer = document.getElementById('footerCliente');
-  if (footer && productos.length > 0) {
-    footer.innerHTML = `<div class="desglose-card"><strong>Total pendiente/aprobado:</strong> <span class="desglose-total">${fmt(totalPendiente)}</span></div>`;
+  if (footer) {
+    footer.innerHTML = `<div class="desglose-card"><strong>Total pendiente/aprobado (todos):</strong> <span class="desglose-total">${fmt(totalPendiente)}</span></div>`;
   }
 }
 
@@ -1305,7 +1290,7 @@ async function guardarEdicion() {
       producto: document.getElementById('editProducto').value.trim(),
       marca: document.getElementById('editMarca').value.trim(),
       precioUSD, pzas, totalMXN,
-      banco: getBancoValue('editBanco','editBancoCustom'),
+      banco: document.getElementById('editBanco').value,
       nota: document.getElementById('editNota').value.trim(),
       historial: firebase.firestore.FieldValue.arrayUnion({ estado: 'editado', fecha: new Date().toISOString(), por: 'admin' })
     });
@@ -1366,13 +1351,19 @@ function renderTablaUsuarios() {
   tbody.innerHTML = '';
   usuarios.forEach(u => {
     const row = tbody.insertRow();
+    const waLink = u.whatsapp
+      ? `<a class="wa-link" href="https://wa.me/52${u.whatsapp}" target="_blank">📱 ${u.whatsapp}</a>`
+      : '—';
     row.innerHTML = `
       <td><span class="chip">${u.codigo}</span></td>
       <td>${u.nombre}</td>
       <td>${{admin:'Administrador',shopper:'Vendedor',cliente:'Cliente'}[u.rol] || u.rol}</td>
+      <td>${waLink}</td>
       <td>${u.esSocio ? '✅' : '—'}</td>
       <td>${u.rol !== 'admin' ? `<button class="btn btn-danger btn-sm" onclick="eliminarUsuario('${u.codigo}')">🗑️</button>` : '—'}</td>`;
   });
+  // Populate name search dropdown in Clientes tab
+  cargarSelectClienteNombre();
 }
 function toggleSocioCheck() {
   document.getElementById('socioField').style.display = document.getElementById('nuevoRol').value === 'shopper' ? 'block' : 'none';
@@ -1403,85 +1394,35 @@ async function eliminarUsuario(codigo) {
   } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
+// ─── BADGE COMPROBANTES ───────────────────
+function actualizarCompBadge() {
+  const pendientes = Object.keys(comprobantes).filter(cod => ventas.some(v => v.codCliente === cod && v.estado === 'aprobado'));
+  const badge = document.getElementById('compBadge');
+  if (badge) {
+    badge.textContent = pendientes.length;
+    badge.style.display = pendientes.length > 0 ? 'flex' : 'none';
+    if (pendientes.length > 0) badge.classList.add('pulse');
+    else badge.classList.remove('pulse');
+  }
+}
+
 // ─── CONFIG ───────────────────────────────────
 function syncUI() {
+  console.log('syncUI started. usuarioActual:', usuarioActual?.rol);
   if (usuarioActual?.rol !== 'admin') return;
   ['cfgTC','cfgComision','cfgDescuentoHH'].forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.value = { cfgTC: cfg.TC, cfgComision: cfg.comisionGlobal, cfgDescuentoHH: cfg.descuentoHH }[id];
+    if (el) {
+      el.value = { cfgTC: cfg.TC, cfgComision: cfg.comisionGlobal, cfgDescuentoHH: cfg.descuentoHH }[id];
+      console.log('Synced', id, 'to', el.value);
+    }
   });
   const badge = document.getElementById('estadoHHBadge');
   if (badge) badge.innerHTML = cfg.horaFelizActiva
     ? `<span class="badge b-aprobado">🎉 Hora Feliz ACTIVA — ${cfg.descuentoHH}% descuento</span>`
     : `<span class="badge b-pendiente">Hora Feliz inactiva</span>`;
+  console.log('syncUI finished');
 }
-// ─── BANCOS EXTRA ────────────────────────────
-let bancosExtra = [];
-
-async function cargarBancosExtra() {
-  try {
-    const snap = await db.collection('config').doc('bancos').get();
-    bancosExtra = snap.exists ? (snap.data().lista || []) : [];
-    renderBancosExtra();
-    agregarBancosAlSelect();
-  } catch(e) {}
-}
-function renderBancosExtra() {
-  const div = document.getElementById('listaBancosExtra');
-  if (!div) return;
-  if (bancosExtra.length === 0) { div.innerHTML = '<p class="text-small">Sin bancos personalizados aún</p>'; return; }
-  div.innerHTML = bancosExtra.map((b,i) => `
-    <div style="display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--cream);border-radius:var(--r-sm);margin-bottom:6px;">
-      <span style="flex:1;font-size:14px;">🏦 ${b}</span>
-      <button class="btn btn-danger btn-sm" onclick="eliminarBancoExtra(${i})">🗑️</button>
-    </div>`).join('');
-}
-function agregarBancosAlSelect() {
-  // Add custom banks to all banco selects
-  ['bancoVenta','editBanco'].forEach(selId => {
-    const sel = document.getElementById(selId);
-    if (!sel) return;
-    // Remove existing custom group if any
-    const existing = sel.querySelector('optgroup[label="⭐ Personalizados"]');
-    if (existing) existing.remove();
-    if (bancosExtra.length === 0) return;
-    const grp = document.createElement('optgroup');
-    grp.label = '⭐ Personalizados';
-    bancosExtra.forEach(b => {
-      const opt = document.createElement('option');
-      opt.value = b; opt.text = b;
-      grp.appendChild(opt);
-    });
-    // Insert before the "Otro" optgroup
-    const otroGrp = sel.querySelector('optgroup[label="➕ Otro"]');
-    if (otroGrp) sel.insertBefore(grp, otroGrp);
-    else sel.appendChild(grp);
-  });
-}
-async function agregarBancoExtra() {
-  const inp = document.getElementById('nuevoBanco');
-  const val = inp.value.trim().toUpperCase();
-  if (!val) { toast('Escribe el nombre del banco', 'error'); return; }
-  if (bancosExtra.includes(val)) { toast('Ya existe', 'error'); return; }
-  bancosExtra.push(val);
-  try {
-    await db.collection('config').doc('bancos').set({ lista: bancosExtra });
-    inp.value = '';
-    renderBancosExtra();
-    agregarBancosAlSelect();
-    toast('Banco agregado ✓', 'success');
-  } catch(e) { toast('Error: ' + e.message, 'error'); bancosExtra.pop(); }
-}
-async function eliminarBancoExtra(idx) {
-  bancosExtra.splice(idx, 1);
-  try {
-    await db.collection('config').doc('bancos').set({ lista: bancosExtra });
-    renderBancosExtra();
-    agregarBancosAlSelect();
-    toast('Banco eliminado', 'warning');
-  } catch(e) { toast('Error: ' + e.message, 'error'); }
-}
-
 async function guardarConfig() {
   const nuevaPass = document.getElementById('cfgNuevaPass').value.trim();
   const updates = {
@@ -1504,13 +1445,6 @@ async function toggleHH(activar) {
     await db.collection('config').doc('settings').set({ horaFelizActiva: activar }, { merge: true });
     toast(activar ? '🎉 Hora Feliz ACTIVADA' : 'Hora Feliz desactivada', activar ? 'success' : '');
   } catch(e) { toast('Error: ' + e.message, 'error'); }
-}
-
-// ─── BADGE COMPROBANTES ───────────────────────
-function actualizarCompBadge() {
-  const pendientes = Object.keys(comprobantes).filter(cod => ventas.some(v => v.codCliente === cod && v.estado === 'aprobado'));
-  const badge = document.getElementById('compBadge');
-  if (badge) { badge.textContent = pendientes.length; badge.style.display = pendientes.length > 0 ? 'flex' : 'none'; }
 }
 
 // ─── SHOPPER PANEL ────────────────────────────
@@ -1656,14 +1590,41 @@ function generarMensajeWA() {
 
 // ─── TABS ─────────────────────────────────────
 function switchTab(name) {
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  const tab = document.getElementById('tab-' + name);
-  if (tab) tab.classList.add('active');
-  const btn = document.querySelector(`[data-tab="${name}"]`);
-  if (btn) btn.classList.add('active');
-  if (name === 'dashboard') renderDashboard();
-  if (name === 'configTab') syncUI();
+  try {
+    console.log('Switching to tab:', name);
+    // toast('Cambiando a: ' + name, 'info'); // Opcional para depuración extrema
+    
+    // 1. Quitar activo de todo
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    
+    // 2. Activar contenido
+    const tabId = 'tab-' + name;
+    const tabEl = document.getElementById(tabId);
+    if (tabEl) {
+      tabEl.classList.add('active');
+    } else {
+      console.error('No se encontró el contenido de la pestaña:', tabId);
+      toast('Error: No se encontró el panel ' + tabId, 'error');
+    }
+    
+    // 3. Activar botón
+    const btn = document.querySelector(`[data-tab="${name}"]`);
+    if (btn) {
+      btn.classList.add('active');
+    }
+    
+    // 4. Ejecutar funciones de carga
+    if (name === 'dashboard') renderDashboard();
+    if (name === 'usuarios') renderTablaUsuarios();
+    if (name === 'configTab') {
+      console.log('Syncing UI for config tab');
+      syncUI();
+    }
+  } catch (err) {
+    console.error('Error en switchTab:', err);
+    toast('Error al cambiar pestaña: ' + err.message, 'error');
+  }
 }
 
 // ─── AUTH ─────────────────────────────────────
@@ -1761,11 +1722,12 @@ function mostrarApp() {
   document.getElementById('adminPanel').style.display = usuarioActual.rol === 'admin' ? 'block' : 'none';
   document.getElementById('shopperPanel').style.display = usuarioActual.rol === 'shopper' ? 'block' : 'none';
   document.getElementById('clientePanel').style.display = usuarioActual.rol === 'cliente' ? 'block' : 'none';
-  if (usuarioActual.rol === 'admin') { renderDashboard(); renderTablaUsuarios(); cargarSelectVendedores(); syncUI(); cargarBancosExtra(); }
+  if (usuarioActual.rol === 'admin') { renderDashboard(); renderTablaUsuarios(); cargarSelectVendedores(); syncUI(); }
   else if (usuarioActual.rol === 'shopper') renderShopper();
   else renderCliente();
 }
 function cerrarSesion() {
+  if (!confirm('¿Cerrar sesión?')) return;
   usuarioActual = null;
   document.getElementById('mainApp').style.display = 'none';
   document.getElementById('loginOverlay').style.display = 'flex';
@@ -1774,7 +1736,75 @@ function cerrarSesion() {
   document.getElementById('loginError').innerText = '';
 }
 
-// ─── INIT ─────────────────────────────────────
+// ─── INIT ────────────────────────────────────────────
+// ─── HELPERS NUEVOS ─────────────────────────────
+
+// Fechas en español
+function fmtFecha(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso + (iso.length === 10 ? 'T12:00:00' : ''));
+  return d.toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+// Exportar CSV
+function exportarCSV() {
+  if (ventas.length === 0) { toast('Sin ventas para exportar', 'error'); return; }
+  const headers = ['Fecha','Cliente','Producto','Marca','Pzas','USD','Total MXN','Talla','Tienda','Banco','Shopper','Estado'];
+  const rows = ventas.map(v => {
+    const shopperUser = usuarios.find(u => u.codigo === v.shopper);
+    const clienteUser = usuarios.find(u => u.codigo === v.codCliente);
+    return [
+      fmtFecha(v.fecha),
+      clienteUser ? clienteUser.nombre : v.codCliente,
+      v.producto, v.marca || '', v.pzas,
+      v.precioUSD?.toFixed(2),
+      v.totalMXN?.toFixed(2),
+      v.tallaInfo || v.talla || '',
+      v.tienda || '',
+      v.banco || '',
+      shopperUser ? shopperUser.nombre : (v.shopper || ''),
+      v.estado
+    ].map(x => `"${String(x).replace(/"/g,'""')}"`).join(',');
+  });
+  const csv = [headers.join(','), ...rows].join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `divina_ventas_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('CSV descargado ✓', 'success');
+}
+
+// Cargar dropdown de clientes por nombre
+function cargarSelectClienteNombre() {
+  const sel = document.getElementById('selectClienteNombre');
+  if (!sel) return;
+  const clientes = usuarios.filter(u => u.rol === 'cliente' || u.rol === 'shopper');
+  sel.innerHTML = '<option value="">— Buscar por nombre —</option>' +
+    clientes.map(u => `<option value="${u.codigo}">${u.nombre} (${u.codigo})</option>`).join('');
+}
+
+// Cuando se escribe el código, sincronizar dropdown
+function autoNombreCliente() {
+  const cod = document.getElementById('clienteSeleccionado')?.value.trim();
+  const sel = document.getElementById('selectClienteNombre');
+  if (sel && cod) {
+    const opt = sel.querySelector(`option[value="${cod}"]`);
+    if (opt) sel.value = cod;
+  }
+}
+
+// Cuando se selecciona nombre, poblar código y cargar
+function seleccionarClienteNombre() {
+  const cod = document.getElementById('selectClienteNombre')?.value;
+  if (!cod) return;
+  const el = document.getElementById('clienteSeleccionado');
+  if (el) el.value = cod;
+  cargarProductosClienteAdmin();
+}
+
 window.onload = () => {
   const ok = iniciarFirebase();
   if (!ok) return;
