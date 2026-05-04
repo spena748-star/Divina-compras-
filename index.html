@@ -135,12 +135,38 @@ tr:hover td { background: var(--cream); }
 /* WA BTN */
 .btn-wa { background: #25D366; color: white; }
 
+
+
 /* TOOLTIP */
 .tip-wrap { position: relative; display: inline-block; width: 100%; }
 .tip-wrap input, .tip-wrap select, .tip-wrap textarea { width: 100%; }
-.tip-box { display: none; position: absolute; bottom: calc(100% + 8px); left: 0; background: var(--plum); color: #fff; font-size: 12px; line-height: 1.5; padding: 9px 13px; border-radius: 10px; width: 240px; z-index: 500; box-shadow: 0 4px 16px rgba(0,0,0,0.25); pointer-events: none; white-space: normal; }
-.tip-box::after { content: ''; position: absolute; top: 100%; left: 18px; border: 6px solid transparent; border-top-color: var(--plum); }
-.tip-wrap:hover .tip-box, .tip-wrap input:focus ~ .tip-box, .tip-wrap select:focus ~ .tip-box { display: block; }
+.tip-box {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  background: var(--plum);
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 9px 13px;
+  border-radius: 10px;
+  width: 240px;
+  z-index: 500;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  pointer-events: none;
+  white-space: normal;
+}
+.tip-box::after {
+  content: '';
+  position: absolute;
+  top: 100%; left: 18px;
+  border: 6px solid transparent;
+  border-top-color: var(--plum);
+}
+.tip-wrap:hover .tip-box,
+.tip-wrap input:focus ~ .tip-box,
+.tip-wrap select:focus ~ .tip-box { display: block; }
 .tip-icon { font-size: 13px; color: var(--plum-light); cursor: help; margin-left: 4px; vertical-align: middle; }
 
 /* MANUAL MODAL */
@@ -194,23 +220,6 @@ tr:hover td { background: var(--cream); }
   .stats-grid { grid-template-columns: 1fr 1fr; }
   .btn { padding: 9px 16px; font-size: 13px; }
 }
-
-/* COUNT-UP */
-@keyframes countUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
-.stat-num { animation: countUp 0.45s ease both; }
-
-/* PULSE BADGE */
-@keyframes pulse { 0%,100% { box-shadow:0 0 0 0 rgba(201,144,58,0.5); } 70% { box-shadow:0 0 0 6px rgba(201,144,58,0); } }
-.tab-badge.pulse { animation: pulse 1.4s ease infinite; }
-
-/* FILTER + EXPORT */
-.filter-row { display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; margin-bottom:12px; }
-.filter-row .field { margin:0; min-width:150px; }
-.export-row { display:flex; justify-content:flex-end; margin-bottom:14px; }
-
-/* WA LINK */
-.wa-link { color:var(--success); font-weight:600; text-decoration:none; font-size:13px; }
-.wa-link:hover { text-decoration:underline; }
 </style>
 </head>
 <body>
@@ -219,7 +228,7 @@ tr:hover td { background: var(--cream); }
 <div id="toast-container"></div>
 
 <!-- LOGIN -->
-<div id="loginOverlay" class="login-overlay">
+<div id="loginOverlay" class="login-overlay" style="display:none;">
   <div class="login-card">
     <div class="login-logo">✨ Divina Compras</div>
     <p class="login-sub">Sistema de personal shopper</p>
@@ -254,7 +263,7 @@ tr:hover td { background: var(--cream); }
       <div class="field"><label>Marca</label><input type="text" id="editMarca"></div>
       <div class="field"><label>Precio USD</label><input type="number" id="editPrecioUSD" step="0.01"></div>
       <div class="field"><label>Piezas</label><input type="number" id="editPzas" min="1"></div>
-      <div class="field"><label>Banco</label><select id="editBanco"><option value="">Sin banco</option><option>BANORTE</option><option>HSBC</option><option>BBVA</option><option>SANTANDER</option><option>BANAMEX</option><option>OXXO PAY</option><option>EFECTIVO</option></select></div>
+      <div class="field"><label>Banco</label><select id="editBanco"><option value="">Sin banco</option><option>BANORTE</option><option>HSBC</option><option>EFECTIVO</option></select></div>
       <div class="field"><label>Nota</label><input type="text" id="editNota"></div>
     </div>
     <div class="btn-row">
@@ -288,9 +297,6 @@ tr:hover td { background: var(--cream); }
       <!-- TAB: DASHBOARD -->
       <div id="tab-dashboard" class="tab-content active">
         <div class="stats-grid" id="statsGrid"></div>
-        <div class="export-row">
-          <button class="btn btn-ghost btn-sm" onclick="exportarCSV()">📥 Exportar ventas CSV</button>
-        </div>
         <div class="card">
           <div class="card-title">📋 Comprobantes pendientes de revisar</div>
           <div id="comprobantesAdmin"></div>
@@ -309,11 +315,11 @@ tr:hover td { background: var(--cream); }
             <button class="btn btn-ghost btn-sm" onclick="abrirManual()" style="font-size:13px;">📖 Ver manual</button>
           </div>
           <div class="form-grid">
-            <div class="field"><label>Código cliente (4 díg.)</label><div class="tip-wrap"><input type="text" id="codCliente" maxlength="4" placeholder="1234" inputmode="numeric"><div class="tip-box">💬 Últimos 4 dígitos del WhatsApp del cliente.</div></div></div>
-            <div class="field"><label>Producto</label><div class="tip-wrap"><input type="text" id="producto" placeholder="Nombre del artículo"><div class="tip-box">💬 Nombre del artículo.</div></div></div>
-            <div class="field"><label>Marca</label><div class="tip-wrap"><input type="text" id="marca" placeholder="Marca"><div class="tip-box">💬 Marca del artículo.</div></div></div>
-            <div class="field"><label>Precio USD</label><div class="tip-wrap"><input type="number" id="precioUSD" step="0.01" min="0"><div class="tip-box">💬 Precio en dólares sin impuesto.</div></div></div>
-            <div class="field"><label>Piezas</label><div class="tip-wrap"><input type="number" id="pzas" value="1" min="1"><div class="tip-box">💬 Cantidad de piezas.</div></div></div>
+            <div class="field"><label>Código cliente (4 díg.)</label><div class="tip-wrap"><input type="text" id="codCliente" maxlength="4" placeholder="1234" inputmode="numeric"><div class="tip-box">💬 Últimos 4 dígitos del WhatsApp del cliente. Ej: si su número termina en <strong>5678</strong>, pon <strong>5678</strong>. Debe estar en 👥 Usuarios.</div></div></div>
+            <div class="field"><label>Producto</label><div class="tip-wrap"><input type="text" id="producto" placeholder="Nombre del artículo"><div class="tip-box">💬 Nombre tal como aparece en la etiqueta. Ej: <em>Tenis running</em>, <em>Blusa floral</em>, <em>Jeans slim fit</em>.</div></div></div>
+            <div class="field"><label>Marca</label><div class="tip-wrap"><input type="text" id="marca"><div class="tip-box">💬 Marca del artículo. Ej: Nike, Levi's, H&M. Puedes dejarlo vacío si no tiene marca visible.</div></div></div>
+            <div class="field"><label>Precio USD</label><div class="tip-wrap"><input type="number" id="precioUSD" step="0.01" min="0"><div class="tip-box">💬 Precio en dólares de la etiqueta de la tienda, <strong>sin impuesto</strong>. El total en MXN con comisión aparece abajo automáticamente.</div></div></div>
+            <div class="field"><label>Piezas</label><div class="tip-wrap"><input type="number" id="pzas" value="1" min="1"><div class="tip-box">💬 Cantidad de piezas del mismo artículo. Si compró 2 iguales pon 2. Generalmente es 1.</div></div></div>
             <div class="field">
               <label>Tipo de artículo</label>
               <div class="tip-wrap">
@@ -321,104 +327,137 @@ tr:hover td { background: var(--cream); }
                   <option value="calzado">👟 Calzado</option>
                   <option value="ropa">👕 Ropa</option>
                   <option value="interior">🩲 Ropa Interior</option>
-                  <option value="accesorio">💄 Accesorio / Electrónico / Belleza</option>
                   <option value="otro">✏️ Otro / Libre</option>
                 </select>
-                <div class="tip-box">💬 Tipo de artículo. Para planchas, maquillaje, bolsas usa "Accesorio/Electrónico".</div>
+                <div class="tip-box">💬 Tipo de artículo. Cambia los campos de talla: calzado, ropa, interior o campo libre.</div>
               </div>
             </div>
             <!-- CALZADO -->
             <div id="sec-calzado" class="field">
               <label>Categoría calzado</label>
-              <select id="categoria" onchange="cargarSelectTalla()">
-                <option value="mujer">Mujer</option><option value="hombre">Hombre</option>
-                <option value="juniors">Juniors</option><option value="ninos">Niños</option><option value="bebes">Bebés</option>
-              </select>
+              <div class="tip-wrap">
+                <select id="categoria" onchange="cargarSelectTalla()">
+                  <option value="mujer">Mujer</option>
+                  <option value="hombre">Hombre</option>
+                  <option value="juniors">Juniors</option>
+                  <option value="ninos">Niños</option>
+                  <option value="bebes">Bebés</option>
+                </select>
+                <div class="tip-box">💬 Categoría del calzado. Cambia las tallas disponibles según el género y edad.</div>
+              </div>
             </div>
             <div id="sec-calzado2" class="field">
               <label>Talla USA (calzado)</label>
-              <select id="tallaUSA" onchange="actualizarInfoTalla()"></select>
+              <div class="tip-wrap">
+                <select id="tallaUSA" onchange="actualizarInfoTalla()"></select>
+                <div class="tip-box">💬 Talla USA tal como aparece en la caja. El equivalente en México y CM aparece abajo.</div>
+              </div>
               <div id="infoTalla" class="talla-hint"></div>
             </div>
             <!-- ROPA -->
             <div id="sec-ropa" class="field" style="display:none;">
               <label>Género / Edad</label>
-              <select id="ropaGenero" onchange="cargarTallaRopa()">
-                <option value="dam">Dama</option><option value="cab">Caballero</option>
-                <option value="jun">Juniors (Mujer)</option><option value="jun_h">Juniors (Hombre)</option>
-                <option value="nin">Niños</option><option value="beb">Bebés</option>
-              </select>
+              <div class="tip-wrap">
+                <select id="ropaGenero" onchange="cargarTallaRopa()">
+                  <option value="dam">Dama</option>
+                  <option value="cab">Caballero</option>
+                  <option value="jun">Juniors (Mujer)</option>
+                  <option value="jun_h">Juniors (Hombre)</option>
+                  <option value="nin">Niños</option>
+                  <option value="beb">Bebés</option>
+                </select>
+                <div class="tip-box">💬 Para quién es la ropa. Determina las tallas disponibles: XS–4XL para adultos, tallas numeradas para niños.</div>
+              </div>
             </div>
             <div id="sec-ropa2" class="field" style="display:none;">
               <label>Talla ropa</label>
-              <select id="tallaRopa" onchange="actualizarInfoRopa()"></select>
+              <div class="tip-wrap">
+                <select id="tallaRopa" onchange="actualizarInfoRopa()"></select>
+                <div class="tip-box">💬 Talla tal como aparece en la etiqueta. El equivalente mexicano aparece abajo.</div>
+              </div>
               <div id="infoRopa" class="talla-hint"></div>
             </div>
             <!-- ROPA INTERIOR -->
             <div id="sec-interior" class="field" style="display:none;">
               <label>Tipo interior</label>
-              <select id="tipoInterior" onchange="cargarTallaInterior()">
-                <option value="brasier">Brasier</option><option value="panty">Panty</option>
-                <option value="boxer">Boxer</option><option value="calzon">Calzón</option>
-              </select>
+              <div class="tip-wrap">
+                <select id="tipoInterior" onchange="cargarTallaInterior()">
+                  <option value="brasier">Brasier / Bra</option>
+                  <option value="panty">Panty / Tanga / Bikini</option>
+                  <option value="boxer">Boxer / Trunk</option>
+                  <option value="calzon">Calzón / Brief</option>
+                  <option value="bañador">Traje de baño mujer</option>
+                  <option value="bañador_h">Traje de baño hombre</option>
+                  <option value="pijama">Pijama / Ropa de dormir</option>
+                  <option value="media">Medias / Calcetines</option>
+                </select>
+                <div class="tip-box">💬 Tipo de ropa interior. Para brasier aparece el campo de copa (A, B, C, D…).</div>
+              </div>
             </div>
             <div id="sec-interior2" class="field" style="display:none;">
               <label>Talla interior</label>
-              <select id="tallaInteriorSel" onchange="actualizarInfoInterior()"></select>
+              <div class="tip-wrap">
+                <select id="tallaInterior" onchange="actualizarInfoInterior()"></select>
+                <div class="tip-box">💬 Para brasier: banda (28, 30, 32, 34…). Para lo demás: talla del artículo.</div>
+              </div>
               <div id="infoInterior" class="talla-hint"></div>
             </div>
             <div id="sec-interior3" class="field" style="display:none;">
-              <label>Copa</label>
-              <select id="tallaInteriorCopa">
-                <option>A</option><option selected>B</option><option>C</option><option>D</option><option>DD</option>
-              </select>
-            </div>
-            <!-- 🆕 ACCESORIO -->
-            <div id="sec-accesorio" class="field" style="display:none;">
-              <label>Tipo de accesorio</label>
-              <select id="tipoAccesorio" onchange="onAccesorioChange()">
-                <option value="plancha">💇‍♀️ Plancha / Rizador / Secadora</option>
-                <option value="maquillaje">💄 Maquillaje / Skincare</option>
-                <option value="bolsa">👜 Bolsa / Cartera / Mochila</option>
-                <option value="joyeria">💍 Joyería / Bisutería</option>
-                <option value="electronico">📱 Electrónico / Gadget</option>
-                <option value="perfume">🌸 Perfume / Fragancia</option>
-                <option value="hogar">🏠 Artículo de hogar</option>
-                <option value="juguete">🎮 Juguete / Juego</option>
-                <option value="otro_acc">📦 Otro accesorio</option>
-              </select>
-            </div>
-            <div id="sec-accesorio2" class="field" style="display:none;">
-              <label>Modelo / Especificación</label>
-              <input type="text" id="modeloAccesorio" placeholder="Ej: BabyLiss Pro Nano Titanium">
-            </div>
-            <div id="sec-accesorio3" class="field" style="display:none;">
-              <label>Voltaje</label>
-              <select id="voltajeAccesorio">
-                <option value="">No aplica</option>
-                <option value="110V">110V (USA/MEX)</option>
-                <option value="220V">220V</option>
-                <option value="dual">Dual 110-220V</option>
-                <option value="usb">USB</option>
-              </select>
-            </div>
-            <div id="sec-accesorio4" class="field" style="display:none;">
-              <label>Tamaño / Presentación</label>
-              <input type="text" id="tamanoAccesorio" placeholder="Ej: 1.5 pulgadas, 30ml">
-            </div>
-            <div id="sec-accesorio5" class="field" style="display:none;">
-              <label>Color / Variante</label>
-              <input type="text" id="colorAccesorio" placeholder="Ej: Negro/Rosa">
+              <label>Copa (brasier)</label>
+              <div class="tip-wrap">
+                <select id="tallaInteriorCopa">
+                  <option value="A">A</option>
+                  <option value="B" selected>B</option>
+                  <option value="C">C</option>
+                  <option value="D">D</option>
+                  <option value="DD">DD</option>
+                  <option value="DDD/F">DDD/F</option>
+                  <option value="G">G</option>
+                </select>
+                <div class="tip-box">💬 Copa del brasier. Se combina con la banda: ej. 34 + B = <strong>34B</strong>.</div>
+              </div>
             </div>
             <!-- OTRO -->
             <div id="sec-otro" class="field" style="display:none;">
               <label>Talla / Especificación (libre)</label>
-              <input type="text" id="tallaLibre" placeholder="Ej: L / 38 / Unitalla">
+              <div class="tip-wrap">
+                <input type="text" id="tallaLibre" placeholder="Ej: L / 38 / Unitalla / 34B...">
+                <div class="tip-box">💬 Escribe la talla libremente: L, XL, 38, Unitalla, 2XL, lo que necesites.</div>
+              </div>
             </div>
-            <div class="field"><label>Banco</label><select id="bancoVenta"><option value="">Sin banco</option><option>BANORTE</option><option>HSBC</option><option>BBVA</option><option>SANTANDER</option><option>BANAMEX</option><option>OXXO PAY</option><option>EFECTIVO</option></select></div>
-            <div class="field"><label>Vendedor (shopper)</label><select id="shopperAsignado"></select></div>
-            <div class="field"><label>Tienda</label><input type="text" id="tienda" value="Ross"></div>
-            <div class="field"><label>Nota</label><input type="text" id="nota" placeholder="Nota adicional"></div>
+            <div class="field">
+              <label>Banco</label>
+              <div class="tip-wrap">
+                <select id="bancoVenta">
+                  <option value="">Sin banco</option>
+                  <option>BANORTE</option>
+                  <option>HSBC</option>
+                  <option>EFECTIVO</option>
+                </select>
+                <div class="tip-box">💬 Cuenta bancaria donde el cliente debe depositar. Puedes dejarlo vacío y editarlo después con ✏️.</div>
+              </div>
+            </div>
+            <div class="field">
+              <label>Vendedor (shopper)</label>
+              <div class="tip-wrap">
+                <select id="shopperAsignado"></select>
+                <div class="tip-box">💬 Vendedor que compró el artículo. Se usa para calcular su comisión del 10% al liberar el pago.</div>
+              </div>
+            </div>
+            <div class="field">
+              <label>Tienda</label>
+              <div class="tip-wrap">
+                <input type="text" id="tienda" value="Ross">
+                <div class="tip-box">💬 Tienda donde se compró. Por defecto Ross. Cámbialo si es otra: Marshalls, TJ Maxx, Burlington…</div>
+              </div>
+            </div>
+            <div class="field">
+              <label>Nota</label>
+              <div class="tip-wrap">
+                <input type="text" id="nota">
+                <div class="tip-box">💬 Observaciones extras: color, estilo, referencia, condición. El cliente puede verlo en su pantalla.</div>
+              </div>
+            </div>
           </div>
           <div class="btn-row">
             <button class="btn btn-primary" onclick="agregarProducto()">➕ Agregar producto</button>
@@ -452,16 +491,14 @@ tr:hover td { background: var(--cream); }
       <div id="tab-clientes" class="tab-content">
         <div class="card">
           <div class="card-title">👤 Productos del cliente</div>
-          <div class="filter-row">
-            <div class="field" style="max-width:180px;"><label>Código cliente</label><input type="text" id="clienteSeleccionado" maxlength="4" placeholder="1234" inputmode="numeric"></div>
-            <div class="field" style="max-width:220px;"><label>Buscar por nombre</label><select id="selectClienteNombre" onchange="seleccionarClienteNombre()"><option value="">— Seleccionar —</option></select></div>
-            <div class="field" style="max-width:160px;"><label>Filtrar estado</label><select id="filtroEstado" onchange="cargarProductosClienteAdmin()"><option value="">Todos</option><option value="pendiente">Pendiente</option><option value="aprobado">Aprobado</option><option value="pagado">Pagado</option><option value="cancelado">Cancelado</option></select></div>
+          <div class="btn-row" style="margin-bottom:14px;">
+            <div class="field" style="max-width:200px;"><label>Código cliente</label><input type="text" id="clienteSeleccionado" maxlength="4" placeholder="1234" inputmode="numeric"></div>
             <button class="btn btn-info" onclick="cargarProductosClienteAdmin()">🔍 Cargar</button>
           </div>
           <div id="infoClienteHeader"></div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Producto</th><th>Marca</th><th>Pzas</th><th>USD</th><th>Total MXN</th><th>Talla</th><th>Tienda</th><th>Banco</th><th>Shopper</th><th>Estado</th><th>Comp.</th><th>Acciones</th></tr></thead>
+              <thead><tr><th>Producto</th><th>Marca</th><th>Pzas</th><th>USD</th><th>Total MXN</th><th>Talla</th><th>Banco</th><th>Shopper</th><th>Estado</th><th>Comp.</th><th>Acciones</th></tr></thead>
               <tbody id="tbodyProductosCliente"></tbody>
             </table>
           </div>
@@ -485,7 +522,7 @@ tr:hover td { background: var(--cream); }
         <div class="card">
           <div class="card-title">👥 Usuarios registrados</div>
           <div class="table-wrap">
-            <table><thead><tr><th>Código</th><th>Nombre</th><th>Rol</th><th>WhatsApp</th><th>Socio</th><th>Acciones</th></tr></thead><tbody id="tbodyUsuarios"></tbody></table>
+            <table><thead><tr><th>Código</th><th>Nombre</th><th>Rol</th><th>Socio</th><th>Acciones</th></tr></thead><tbody id="tbodyUsuarios"></tbody></table>
           </div>
         </div>
       </div>
@@ -498,12 +535,12 @@ tr:hover td { background: var(--cream); }
             <div class="field"><label>Tipo de cambio (TC) USD→MXN</label><input type="number" id="cfgTC" step="0.01" min="1"></div>
             <div class="field"><label>Comisión global (%)</label><input type="number" id="cfgComision" step="1" min="0" max="100"></div>
             <div class="field"><label>Descuento Hora Feliz (%)</label><input type="number" id="cfgDescuentoHH" step="1" min="0" max="100"></div>
-            <div class="field"><label>Cambiar clave admin</label><input type="password" id="cfgNuevaPass" placeholder="Nueva clave (mín. 6 caracteres)"></div>
+            <div class="field"><label>Cambiar clave admin</label><input type="password" id="cfgNuevaPass" placeholder="Nueva clave"></div>
           </div>
           <div class="btn-row">
-            <button class="btn btn-primary" id="btnGuardarConfig" onclick="guardarConfig()">💾 Guardar configuración</button>
-            <button id="btnActivarHH" class="btn btn-warning" onclick="toggleHH(true, event)">🎉 Activar Hora Feliz</button>
-            <button id="btnDesactivarHH" class="btn btn-ghost" onclick="toggleHH(false, event)">⛔ Desactivar HH</button>
+            <button class="btn btn-primary" onclick="guardarConfig()">💾 Guardar configuración</button>
+            <button id="btnActivarHH" class="btn btn-warning" onclick="toggleHH(true)">🎉 Activar Hora Feliz</button>
+            <button id="btnDesactivarHH" class="btn btn-ghost" onclick="toggleHH(false)">⛔ Desactivar HH</button>
           </div>
           <div id="estadoHHBadge" style="margin-top:12px;"></div>
         </div>
@@ -511,6 +548,61 @@ tr:hover td { background: var(--cream); }
           <div class="card-title">🔧 Firebase</div>
           <button class="btn btn-ghost" onclick="reconfigurarFirebase()">Reconfigurar Firebase</button>
           <p class="text-small" style="margin-top:8px;">Toca esto solo si cambiaste de proyecto Firebase.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">🛡️ Reglas de seguridad recomendadas</div>
+          <p style="font-size:13px;color:var(--plum-mid);margin-bottom:10px;">
+            Copia estas reglas en <strong>Firebase Console → Firestore → Reglas</strong> y en <strong>Storage → Reglas</strong>. Evitan que extraños escriban datos aunque vean tu config.
+          </p>
+          <div style="background:var(--plum);color:#a8ffcb;border-radius:var(--r-sm);padding:16px;font-family:monospace;font-size:12px;line-height:1.7;overflow-x:auto;">
+            <div style="color:#ffd97d;margin-bottom:6px;">// ── FIRESTORE ──────────────────────────</div>
+            rules_version = '2';<br>
+            service cloud.firestore {<br>
+            &nbsp;&nbsp;match /databases/{database}/documents {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#ffd97d;">// Config: solo lectura pública, escritura bloqueada</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;match /config/{doc} {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow read: if true;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow write: if false;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#ffd97d;">// Usuarios: lectura pública (para login), escritura bloqueada</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;match /usuarios/{uid} {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow read: if true;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow write: if false;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#ffd97d;">// Ventas: lectura pública, escritura bloqueada desde fuera</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;match /ventas/{id} {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow read: if true;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow write: if false;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#ffd97d;">// Comprobantes y notificaciones: igual</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;match /{collection}/{doc} {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow read: if true;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow write: if false;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+            &nbsp;&nbsp;}<br>
+            }<br><br>
+            <span style="color:#ffd97d;">// ── STORAGE ────────────────────────────</span><br>
+            rules_version = '2';<br>
+            service firebase.storage {<br>
+            &nbsp;&nbsp;match /b/{bucket}/o {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;match /comprobantes/{file} {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow read: if true;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow write: if false;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+            &nbsp;&nbsp;}<br>
+            }
+          </div>
+          <p style="font-size:12px;color:var(--plum-light);margin-top:10px;">
+            ⚠️ Con estas reglas la app deja de poder escribir desde el navegador. Para producción real activa
+            <strong>Firebase App Check</strong> en la consola y cambia <code>allow write: if false</code>
+            por <code>allow write: if request.app != null</code> — así solo tu dominio puede escribir.
+          </p>
+          <div style="margin-top:14px;padding:14px;background:var(--info-bg);border-radius:var(--r-sm);font-size:13px;">
+            <strong>🔑 Restricción de API Key (muy recomendada):</strong><br>
+            Ve a <a href="https://console.cloud.google.com/apis/credentials" target="_blank" style="color:var(--info);">Google Cloud Console → Credenciales</a>,
+            selecciona tu API Key de Firebase y en <em>"Restricciones de aplicación"</em> agrega solo tu dominio
+            (ej: <code>tudominio.pages.dev</code>). Así el key no sirve desde otros sitios aunque alguien lo vea.
+          </div>
         </div>
       </div>
     </div>
@@ -533,7 +625,7 @@ tr:hover td { background: var(--cream); }
     <!-- CLIENTE PANEL -->
     <div id="clientePanel" style="display:none;">
       <div id="bannerCaptura"></div>
-      <div id="desgloseCard" class="card">
+    <div id="desgloseCard" class="card">
         <div class="card-title">💰 Desglose de precios</div>
         <div id="desgloseContent" class="desglose-card">Cargando...</div>
       </div>
@@ -544,7 +636,7 @@ tr:hover td { background: var(--cream); }
         </div>
         <div class="comp-section">
           <h3>📎 Comprobante de depósito</h3>
-          <p class="text-small" style="margin-bottom:10px;">Sube tu comprobante después de aprobar los productos.</p>
+          <p class="text-small" style="margin-bottom:10px;">Sube tu comprobante después de aprobar los productos. El admin liberará tu pedido.</p>
           <div id="estadoCompActual"></div>
           <input type="file" id="fileComp" accept="image/*,application/pdf" style="margin-top:8px;">
           <div class="btn-row" style="margin-top:10px;">
@@ -556,6 +648,7 @@ tr:hover td { background: var(--cream); }
         </div>
       </div>
     </div>
+
   </div>
 </div>
 
@@ -567,21 +660,119 @@ tr:hover td { background: var(--cream); }
       <button class="manual-close" onclick="cerrarManual()">✕</button>
     </div>
     <div class="manual-body">
-      <p style="font-size:13px;color:var(--plum-light);margin-bottom:18px;">Guía rápida para capturar artículos correctamente.</p>
+      <p style="font-size:13px;color:var(--plum-light);margin-bottom:18px;">Guía rápida para capturar artículos correctamente. También puedes pasar el cursor sobre cada campo del formulario para ver una ayuda rápida.</p>
+
       <div class="manual-section-title">📋 Flujo del pedido</div>
-      <div class="manual-step"><div class="manual-num">1</div><div><h3>Captura los artículos</h3><p>En ➕ Agregar, escribe el código del cliente y cada artículo.</p></div></div>
-      <div class="manual-step"><div class="manual-num">2</div><div><h3>Captura terminada</h3><p>Presiona el botón verde para notificar al cliente por WhatsApp.</p></div></div>
-      <div class="manual-step"><div class="manual-num">3</div><div><h3>Cliente revisa</h3><p>El cliente aprueba ✅ o rechaza ❌ cada artículo.</p></div></div>
-      <div class="manual-step"><div class="manual-num">4</div><div><h3>Cliente sube comprobante</h3><p>Sube foto de su transferencia.</p></div></div>
-      <div class="manual-step"><div class="manual-num">5</div><div><h3>Liberar pago</h3><p>En 👤 Clientes, revisa el comprobante y libera el pago.</p></div></div>
+      <div class="manual-step">
+        <div class="manual-num">1</div>
+        <div>
+          <h3>Captura los artículos del cliente</h3>
+          <p>En la pestaña <strong>➕ Agregar</strong>, escribe el código de 4 dígitos del cliente y agrega cada artículo. Verás la lista en tiempo real en el panel dorado de abajo.</p>
+          <div class="tip">💡 El código son los últimos 4 dígitos del WhatsApp del cliente.</div>
+        </div>
+      </div>
+      <div class="manual-step">
+        <div class="manual-num">2</div>
+        <div>
+          <h3>Presiona "Captura terminada"</h3>
+          <p>Cuando termines de agregar todos los artículos, presiona el botón verde. Se abrirá WhatsApp con un resumen listo para enviarle al cliente.</p>
+        </div>
+      </div>
+      <div class="manual-step">
+        <div class="manual-num">3</div>
+        <div>
+          <h3>El cliente revisa y aprueba</h3>
+          <p>El cliente entra a la app con su código, ve sus artículos y presiona ✅ o ❌ en cada uno según lo que quiera.</p>
+          <div class="tip">💡 Solo los artículos aprobados se cobran.</div>
+        </div>
+      </div>
+      <div class="manual-step">
+        <div class="manual-num">4</div>
+        <div>
+          <h3>El cliente sube su comprobante</h3>
+          <p>Después de aprobar, el cliente sube la foto o PDF de su transferencia desde su pantalla.</p>
+        </div>
+      </div>
+      <div class="manual-step">
+        <div class="manual-num">5</div>
+        <div>
+          <h3>Tú verificas y liberas</h3>
+          <p>Ve a la pestaña <strong>👤 Clientes</strong>, busca su código, revisa el comprobante y presiona <strong>✅ Liberar pago</strong>. Los artículos quedan marcados como Pagados.</p>
+        </div>
+      </div>
+
+      <div class="manual-section-title">📝 Campos del formulario</div>
+      <div class="manual-step">
+        <div class="manual-num" style="background:var(--gold)">?</div>
+        <div>
+          <h3>Código cliente</h3>
+          <p>Los <strong>últimos 4 dígitos</strong> del número de WhatsApp del cliente. Debe estar registrado en 👥 Usuarios. Ejemplo: si su número es 6561234<strong>5678</strong>, el código es <strong>5678</strong>.</p>
+        </div>
+      </div>
+      <div class="manual-step">
+        <div class="manual-num" style="background:var(--gold)">?</div>
+        <div>
+          <h3>Producto y Marca</h3>
+          <p>Escribe el nombre del artículo tal como aparece en la etiqueta o en la tienda. La marca va separada. Ejemplo: Producto: <em>Tenis running</em> / Marca: <em>Nike</em>.</p>
+        </div>
+      </div>
+      <div class="manual-step">
+        <div class="manual-num" style="background:var(--gold)">?</div>
+        <div>
+          <h3>Precio USD</h3>
+          <p>El precio en dólares tal como está en la etiqueta de la tienda, <strong>sin impuesto</strong>. El sistema convierte automáticamente a MXN usando el tipo de cambio configurado y agrega la comisión.</p>
+          <div class="tip">💡 El total en MXN aparece como vista previa abajo del formulario.</div>
+        </div>
+      </div>
+      <div class="manual-step">
+        <div class="manual-num" style="background:var(--gold)">?</div>
+        <div>
+          <h3>Tipo de artículo y Talla</h3>
+          <p><strong>Calzado:</strong> selecciona categoría y talla USA — el sistema muestra el equivalente en México y CM.<br>
+          <strong>Ropa:</strong> selecciona género y talla (XS–4XL) con equivalente en número mexicano.<br>
+          <strong>Ropa interior:</strong> selecciona tipo (brasier, boxer, panty…). Para brasier elige banda + copa (ej: 34B).<br>
+          <strong>Otro:</strong> escribe libremente lo que necesites.</p>
+        </div>
+      </div>
+      <div class="manual-step">
+        <div class="manual-num" style="background:var(--gold)">?</div>
+        <div>
+          <h3>Banco</h3>
+          <p>La cuenta bancaria donde el cliente debe depositar. Si aún no lo sabes, déjalo en blanco y edítalo después.</p>
+        </div>
+      </div>
+      <div class="manual-step">
+        <div class="manual-num" style="background:var(--gold)">?</div>
+        <div>
+          <h3>Vendedor (Shopper)</h3>
+          <p>El vendedor que compró el artículo. Esto se usa para calcular su comisión del 10% cuando el pago sea liberado.</p>
+        </div>
+      </div>
+      <div class="manual-step">
+        <div class="manual-num" style="background:var(--gold)">?</div>
+        <div>
+          <h3>Nota</h3>
+          <p>Cualquier observación extra: color, estilo, número de referencia, condición del artículo, etc.</p>
+          <div class="tip">💡 La nota le aparece visible al cliente en su pantalla.</div>
+        </div>
+      </div>
+
+      <div class="manual-section-title">💡 Consejos rápidos</div>
+      <div style="background:var(--cream);border-radius:var(--r-sm);padding:16px;font-size:13px;color:var(--plum-mid);line-height:2;">
+        ✅ Puedes editar un artículo (✏️) mientras esté en estado <em>Pendiente</em><br>
+        ✅ Hora Feliz aplica descuento automático a todos los precios<br>
+        ✅ El tipo de cambio (TC) se ajusta en ⚙️ Config<br>
+        ✅ El dashboard muestra cuántos comprobantes están pendientes de revisar<br>
+        ✅ El vendedor ve sus ganancias en tiempo real desde su acceso
+      </div>
     </div>
   </div>
 </div>
 
 <script>
-// ============================================
-// 🔧 FIREBASE CONFIG
-// ============================================
+// ─────────────────────────────────────────────
+// FIREBASE CONFIG
+// ─────────────────────────────────────────────
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyC7nz2vN0moz-sgGyY_HXo-pSxt9474jSw",
   authDomain: "ventas-eb527.firebaseapp.com",
@@ -594,7 +785,7 @@ const FIREBASE_CONFIG = {
 
 let db, storage;
 let ventas = [], usuarios = [], comprobantes = {};
-let cfg = { TC: 17.40, comisionGlobal: 10, horaFelizActiva: false, descuentoHH: 10 };
+let cfg = { TC: 17.40, comisionGlobal: 10, horaFelizActiva: false, descuentoHH: 10, adminPasswordHash: '' };
 let usuarioActual = null;
 let unsubs = [];
 
@@ -606,201 +797,107 @@ const tallasData = {
   bebes:   { usa: ["1","2","3","4","5","6","7","8","9","10"],                                  mx: ["9","10","11","12","13","14","15","16","17","18"],                                 cm: ["9","10","11","12","13","14","15","16","17","18"] }
 };
 
-const ropaTallas = {
-  dam: { tallas:['XS','S','M','L','XL','XXL','3XL','4XL'], mx:['32','34','36','38','40','42','44','46'] },
-  cab: { tallas:['XS','S','M','L','XL','XXL','3XL','4XL'], mx:['32','34','36','38','40','42','44','46'] },
-  jun: { tallas:['XS','S','M','L','XL','0/2','2/4','4/6','6/8','8/10','10/12'], mx:['28','30','32','34','36','1','3','5','7','9','11'] },
-  jun_h: { tallas:['XS','S','M','L','XL','XXL'], mx:['28','30','32','34','36','38'] },
-  nin: { tallas:['2T','3T','4T','5','6','7','8','10','12','14','16','18'], mx:['2','3','4','5','6','7','8','10','12','14','16','18'] },
-  beb: { tallas:['NB','0-3M','3-6M','6-9M','9-12M','12-18M','18-24M','2T'], mx:['RN','0-3M','3-6M','6-9M','9-12M','12-18M','18-24M','2'] }
-};
-
-const interiorTallas = {
-  brasier:   { bandas:['28','30','32','34','36','38','40','42','44'] },
-  panty:     { tallas:['XS','S','M','L','XL','XXL','3XL','4XL'] },
-  boxer:     { tallas:['S','M','L','XL','XXL','3XL','4XL'] },
-  calzon:    { tallas:['XS','S','M','L','XL','XXL','3XL'] }
-};
-
-// ============================================
-// INICIALIZACIÓN FIREBASE
-// ============================================
+// ─── FIREBASE INIT ───────────────────────────
 function iniciarFirebase() {
   try {
-    if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+    firebase.initializeApp(FIREBASE_CONFIG);
     db = firebase.firestore();
     storage = firebase.storage();
-    console.log('✅ Firebase inicializado');
     return true;
   } catch(e) {
-    console.error('❌ Firebase:', e);
+    console.error('Firebase init error:', e);
     document.getElementById('loginError').innerText = 'Error Firebase: ' + e.message;
     return false;
   }
 }
+function reconfigurarFirebase() { if (confirm('Recargar la app?')) location.reload(); }
 
-function reconfigurarFirebase() { if (confirm('Recargar?')) location.reload(); }
-
-// ============================================
-// LISTENERS
-// ============================================
+// ─── LISTENERS ───────────────────────────────
 function setupListeners() {
   unsubs.forEach(u => u());
   unsubs = [];
-  
   unsubs.push(db.collection('config').doc('settings').onSnapshot(snap => {
     if (snap.exists) {
       const data = snap.data();
+      // Never expose password hash to JS global state display
       cfg.TC = data.TC || cfg.TC;
       cfg.comisionGlobal = data.comisionGlobal ?? cfg.comisionGlobal;
       cfg.horaFelizActiva = data.horaFelizActiva ?? cfg.horaFelizActiva;
       cfg.descuentoHH = data.descuentoHH ?? cfg.descuentoHH;
+      // Hash only used in loginAdmin, not stored in cfg
     }
-    // Solo sincronizar UI si el admin está logueado Y la pestaña config está abierta
-    if (usuarioActual && usuarioActual.rol === 'admin') {
-      const configTab = document.getElementById('tab-configTab');
-      if (configTab && configTab.classList.contains('active')) {
-        syncUI();
-      }
-    }
+    syncUI();
   }));
-  
   unsubs.push(db.collection('ventas').orderBy('createdAt','desc').onSnapshot(snap => {
     ventas = snap.docs.map(d => ({ _id: d.id, ...d.data() }));
     refreshCurrentView();
   }));
-  
   unsubs.push(db.collection('usuarios').onSnapshot(snap => {
     usuarios = snap.docs.map(d => ({ ...d.data() }));
     if (usuarioActual && usuarioActual.rol === 'admin') {
       renderTablaUsuarios();
       cargarSelectVendedores();
-      cargarSelectClienteNombre();
     }
   }));
-  
+  // Notificación de captura lista (solo si es cliente)
   if (usuarioActual && usuarioActual.rol === 'cliente') {
     unsubs.push(db.collection('notificaciones').doc(usuarioActual.codigo).onSnapshot(snap => {
       if (snap.exists && !snap.data().visto) mostrarBannerCaptura(snap.data());
     }));
   }
-  
   unsubs.push(db.collection('comprobantes').onSnapshot(snap => {
     comprobantes = {};
     snap.docs.forEach(d => { comprobantes[d.id] = d.data(); });
-    if (usuarioActual && usuarioActual.rol === 'admin') actualizarCompBadge();
     refreshCurrentView();
   }));
 }
-
 function refreshCurrentView() {
   if (!usuarioActual) return;
-  if (usuarioActual.rol === 'admin') { 
-    renderDashboard(); 
-    cargarProductosClienteAdmin(); 
-    actualizarCompBadge(); 
-    actualizarCapturaPanel(); 
-  }
+  if (usuarioActual.rol === 'admin') { renderDashboard(); cargarProductosClienteAdmin(); actualizarCompBadge(); actualizarCapturaPanel(); }
   else if (usuarioActual.rol === 'shopper') renderShopper();
   else if (usuarioActual.rol === 'cliente') renderCliente();
 }
 
-// ============================================
-// CÁLCULOS
-// ============================================
+// ─── CÁLCULOS ────────────────────────────────
 function calcTotal(precioUSD, pzas) {
   let base = precioUSD * pzas * cfg.TC;
   let total = base * (1 + cfg.comisionGlobal / 100);
   if (cfg.horaFelizActiva) total *= (1 - cfg.descuentoHH / 100);
   return total;
 }
-
 function calcBase(precioUSD, pzas) { return precioUSD * pzas * cfg.TC; }
 function calcComision(precioUSD, pzas) { return calcBase(precioUSD, pzas) * cfg.comisionGlobal / 100; }
 function fmt(n) { return '$' + Number(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
-function fmtFecha(iso) {
-  if (!iso) return '—';
-  const d = new Date(iso + (iso.length === 10 ? 'T12:00:00' : ''));
-  return d.toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' });
-}
-function sanitize(str) {
-  if (typeof str !== 'string') return str;
-  return str.replace(/[<>"'`]/g, '').trim().slice(0, 200);
-}
 
-// ============================================
-// TOAST
-// ============================================
-function toast(msg, type = '') {
-  const el = document.createElement('div');
-  el.className = 'toast ' + type;
-  el.textContent = msg;
-  document.getElementById('toast-container').appendChild(el);
-  setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity 0.3s'; setTimeout(() => el.remove(), 300); }, 3000);
-}
+// ─── DATOS ROPA ──────────────────────────────
+const ropaTallas = {
+  dam: { tallas:['XS','S','M','L','XL','XXL','3XL','4XL'], mx:['32','34','36','38','40','42','44','46'], num:['0','2','4','6','8','10','12','14'] },
+  cab: { tallas:['XS','S','M','L','XL','XXL','3XL','4XL'], mx:['32','34','36','38','40','42','44','46'], num:['28','30','32','34','36','38','40','42'] },
+  jun: { tallas:['XS','S','M','L','XL','0/2','2/4','4/6','6/8','8/10','10/12'], mx:['28','30','32','34','36','1','3','5','7','9','11'], num:[] },
+  jun_h: { tallas:['XS','S','M','L','XL','XXL'], mx:['28','30','32','34','36','38'], num:[] },
+  nin: { tallas:['2T','3T','4T','5','6','7','8','10','12','14','16','18'], mx:['2','3','4','5','6','7','8','10','12','14','16','18'], num:[] },
+  beb: { tallas:['NB','0-3M','3-6M','6-9M','9-12M','12-18M','18-24M','2T'], mx:['RN','0-3M','3-6M','6-9M','9-12M','12-18M','18-24M','2'], num:[] }
+};
 
-// ============================================
-// LOADING BAR
-// ============================================
-function setLoading(pct) {
-  document.getElementById('loading-bar').style.width = pct + '%';
-  if (pct >= 100) setTimeout(() => { document.getElementById('loading-bar').style.width = '0'; }, 400);
-}
+const interiorTallas = {
+  brasier:   { bandas:['28','30','32','34','36','38','40','42','44'], label:'Banda' },
+  panty:     { tallas:['XS (2)','S (4)','M (6)','L (8)','XL (10)','XXL (12)','3XL (14)','4XL (16)'] },
+  boxer:     { tallas:['S','M','L','XL','XXL','3XL','4XL'] },
+  calzon:    { tallas:['XS (2)','S (4)','M (6)','L (8)','XL (10)','XXL (12)','3XL (14)'] },
+  bañador:   { tallas:['XS','S','M','L','XL','XXL','3XL','4','6','8','10','12','14','16'] },
+  bañador_h: { tallas:['XS','S','M','L','XL','XXL','3XL','28','30','32','34','36','38'] },
+  pijama:    { tallas:['XS','S','M','L','XL','XXL','3XL','4XL'] },
+  media:     { tallas:['S (4-6)','M (6-8)','L (8-10)','XL (10-12)','One Size'] }
+};
 
-// ============================================
-// CAMBIO DE TIPO DE ARTÍCULO
-// ============================================
-function onTipoChange() {
-  const tipo = document.getElementById('tipoArticulo').value;
-  const allSecs = ['sec-calzado','sec-calzado2','sec-ropa','sec-ropa2','sec-interior','sec-interior2','sec-interior3','sec-accesorio','sec-accesorio2','sec-accesorio3','sec-accesorio4','sec-accesorio5','sec-otro'];
-  
-  allSecs.forEach(id => { const el = document.getElementById(id); if(el) el.style.display = 'none'; });
-  
-  if (tipo === 'calzado') {
-    document.getElementById('sec-calzado').style.display = '';
-    document.getElementById('sec-calzado2').style.display = '';
-    cargarSelectTalla();
-  } else if (tipo === 'ropa') {
-    document.getElementById('sec-ropa').style.display = '';
-    document.getElementById('sec-ropa2').style.display = '';
-    cargarTallaRopa();
-  } else if (tipo === 'interior') {
-    document.getElementById('sec-interior').style.display = '';
-    document.getElementById('sec-interior2').style.display = '';
-    document.getElementById('sec-interior3').style.display = '';
-    cargarTallaInterior();
-  } else if (tipo === 'accesorio') {
-    document.getElementById('sec-accesorio').style.display = '';
-    document.getElementById('sec-accesorio2').style.display = '';
-    document.getElementById('sec-accesorio3').style.display = '';
-    document.getElementById('sec-accesorio4').style.display = '';
-    document.getElementById('sec-accesorio5').style.display = '';
-  } else if (tipo === 'otro') {
-    document.getElementById('sec-otro').style.display = '';
-  }
-  
-  actualizarPreviewPrecio();
-}
-
-function onAccesorioChange() {
-  const tipo = document.getElementById('tipoAccesorio').value;
-  const voltajeField = document.getElementById('sec-accesorio3');
-  if (voltajeField) {
-    voltajeField.style.display = ['plancha','electronico'].includes(tipo) ? '' : 'none';
-  }
-}
-
-// ============================================
-// TALLAS
-// ============================================
+// ─── TALLAS ──────────────────────────────────
+// Calzado
 function cargarSelectTalla() {
   const cat = document.getElementById('categoria').value;
   const sel = document.getElementById('tallaUSA');
-  if (!sel || !tallasData[cat]) return;
   sel.innerHTML = tallasData[cat].usa.map(t => `<option>${t}</option>`).join('');
   actualizarInfoTalla();
 }
-
 function actualizarInfoTalla() {
   const cat = document.getElementById('categoria').value;
   const usa = document.getElementById('tallaUSA').value;
@@ -808,112 +905,234 @@ function actualizarInfoTalla() {
   document.getElementById('infoTalla').innerHTML = idx >= 0 ? `🇲🇽 ${tallasData[cat].mx[idx]} | 📏 ${tallasData[cat].cm[idx]} cm` : '';
 }
 
+// Tipo articulo
+function onTipoChange() {
+  const tipo = document.getElementById('tipoArticulo').value;
+  const sections = { calzado:['sec-calzado','sec-calzado2'], ropa:['sec-ropa','sec-ropa2'], interior:['sec-interior','sec-interior2'], otro:['sec-otro'] };
+  const allSecs = ['sec-calzado','sec-calzado2','sec-ropa','sec-ropa2','sec-interior','sec-interior2','sec-interior3','sec-otro'];
+  allSecs.forEach(id => { const el=document.getElementById(id); if(el) el.style.display='none'; });
+  (sections[tipo] || []).forEach(id => { const el=document.getElementById(id); if(el) el.style.display=''; });
+  if (tipo === 'calzado') cargarSelectTalla();
+  if (tipo === 'ropa') cargarTallaRopa();
+  if (tipo === 'interior') cargarTallaInterior();
+}
+
+// Ropa
 function cargarTallaRopa() {
   const gen = document.getElementById('ropaGenero').value;
   const data = ropaTallas[gen];
   const sel = document.getElementById('tallaRopa');
-  if (!sel || !data) return;
   sel.innerHTML = data.tallas.map(t => `<option value="${t}">${t}</option>`).join('');
+  actualizarInfoRopa();
+}
+function actualizarInfoRopa() {
+  const gen = document.getElementById('ropaGenero').value;
+  const talla = document.getElementById('tallaRopa').value;
+  const data = ropaTallas[gen];
+  const idx = data.tallas.indexOf(talla);
+  let hint = '';
+  if (idx >= 0 && data.mx[idx]) hint += `🇲🇽 Mex: ${data.mx[idx]}`;
+  if (idx >= 0 && data.num && data.num[idx]) hint += ` | # ${data.num[idx]}`;
+  document.getElementById('infoRopa').innerHTML = hint;
 }
 
+// Ropa Interior
 function cargarTallaInterior() {
   const tipo = document.getElementById('tipoInterior').value;
   const data = interiorTallas[tipo];
-  const sel = document.getElementById('tallaInteriorSel');
+  const sel = document.getElementById('tallaInterior');
   const copa = document.getElementById('sec-interior3');
-  if (!sel || !data) return;
   if (tipo === 'brasier') {
     sel.innerHTML = data.bandas.map(b => `<option value="${b}">${b}</option>`).join('');
-    if(copa) copa.style.display = '';
+    copa.style.display = '';
+    document.getElementById('infoInterior').innerHTML = 'Selecciona banda + copa → Ej: 34B';
   } else {
-    sel.innerHTML = (data.tallas || []).map(t => `<option value="${t}">${t}</option>`).join('');
-    if(copa) copa.style.display = 'none';
+    sel.innerHTML = data.tallas.map(t => `<option value="${t}">${t}</option>`).join('');
+    copa.style.display = 'none';
+    document.getElementById('infoInterior').innerHTML = '';
   }
 }
-
 function actualizarInfoInterior() {
   const tipo = document.getElementById('tipoInterior').value;
-  if (tipo === 'brasier') {
-    const banda = document.getElementById('tallaInteriorSel').value;
-    const copa = document.getElementById('tallaInteriorCopa').value;
-    document.getElementById('infoInterior').innerHTML = `📐 Talla: <strong>${banda}${copa}</strong>`;
-  }
+  if (tipo !== 'brasier') { document.getElementById('infoInterior').innerHTML = ''; return; }
+  const banda = document.getElementById('tallaInterior').value;
+  const copa = document.getElementById('tallaInteriorCopa').value;
+  document.getElementById('infoInterior').innerHTML = `📐 Talla brasier: <strong>${banda}${copa}</strong>`;
 }
 
-// ============================================
-// OBTENER TALLA CAPTURADA
-// ============================================
+// Helper: obtener talla capturada para guardar
 function getTallaCapturada() {
   const tipo = document.getElementById('tipoArticulo').value;
-  
   if (tipo === 'calzado') {
     const cat = document.getElementById('categoria').value;
     const usa = document.getElementById('tallaUSA').value;
-    const idx = tallasData[cat].usa.indexOf(usa);
-    const mx = idx >= 0 ? tallasData[cat].mx[idx] : '';
-    const cm = idx >= 0 ? tallasData[cat].cm[idx] : '';
-    return { tallaDisplay: `USA ${usa} → Mex ${mx} / ${cm} cm`, tipo: 'calzado' };
+    return { tallaDisplay: getTallaInfo(cat, usa), tipo: 'calzado', cat };
   }
-  
   if (tipo === 'ropa') {
     const gen = document.getElementById('ropaGenero').value;
     const talla = document.getElementById('tallaRopa').value;
+    const data = ropaTallas[gen];
+    const idx = data.tallas.indexOf(talla);
+    const mx = (idx >= 0 && data.mx[idx]) ? ` / Mex ${data.mx[idx]}` : '';
     const genLabels = { dam:'Dama', cab:'Caballero', jun:'Juniors Mujer', jun_h:'Juniors Hombre', nin:'Niños', beb:'Bebés' };
-    return { tallaDisplay: `${genLabels[gen]} ${talla}`, tipo: 'ropa' };
+    return { tallaDisplay: `${genLabels[gen]} ${talla}${mx}`, tipo: 'ropa', gen };
   }
-  
   if (tipo === 'interior') {
     const tipoInt = document.getElementById('tipoInterior').value;
-    const tallaInt = document.getElementById('tallaInteriorSel').value;
-    const tipoLabels = { brasier:'Brasier', panty:'Panty', boxer:'Boxer', calzon:'Calzón' };
+    const tallaInt = document.getElementById('tallaInterior').value;
+    const tipoLabels = { brasier:'Brasier', panty:'Panty', boxer:'Boxer', calzon:'Calzón', bañador:'Baño Mujer', bañador_h:'Baño Hombre', pijama:'Pijama', media:'Medias' };
     let display = `${tipoLabels[tipoInt] || tipoInt}: `;
     if (tipoInt === 'brasier') {
       const copa = document.getElementById('tallaInteriorCopa').value;
       display += `${tallaInt}${copa}`;
     } else display += tallaInt;
-    return { tallaDisplay: display, tipo: 'interior' };
+    return { tallaDisplay: display, tipo: 'interior', tipoInt };
   }
-  
-  if (tipo === 'accesorio') {
-    const tipoAcc = document.getElementById('tipoAccesorio').value;
-    const modelo = document.getElementById('modeloAccesorio')?.value?.trim() || '';
-    const voltaje = document.getElementById('voltajeAccesorio')?.value || '';
-    const tamano = document.getElementById('tamanoAccesorio')?.value?.trim() || '';
-    const color = document.getElementById('colorAccesorio')?.value?.trim() || '';
-    
-    const tipoLabels = {
-      plancha: '💇‍♀️ Plancha/Rizador', maquillaje: '💄 Maquillaje', bolsa: '👜 Bolsa',
-      joyeria: '💍 Joyería', electronico: '📱 Electrónico', perfume: '🌸 Perfume',
-      hogar: '🏠 Hogar', juguete: '🎮 Juguete', otro_acc: '📦 Accesorio'
-    };
-    
-    let display = tipoLabels[tipoAcc] || 'Accesorio';
-    if (modelo) display += ` | ${modelo}`;
-    if (voltaje) display += ` | ${voltaje}`;
-    if (tamano) display += ` | ${tamano}`;
-    if (color) display += ` | ${color}`;
-    
-    return { tallaDisplay: display, tipo: 'accesorio' };
-  }
-  
-  const libre = document.getElementById('tallaLibre')?.value?.trim() || '';
+  // otro
+  const libre = document.getElementById('tallaLibre').value.trim();
   return { tallaDisplay: libre || 'N/A', tipo: 'otro' };
 }
 
-// ============================================
-// PREVIEW PRECIO
-// ============================================
-function actualizarPreviewPrecio() {
-  const usd = parseFloat(document.getElementById('precioUSD')?.value);
-  const pzas = parseInt(document.getElementById('pzas')?.value) || 1;
-  if (isNaN(usd) || usd <= 0) { document.getElementById('previewPrecio').innerHTML = ''; return; }
-  const total = calcTotal(usd, pzas);
-  document.getElementById('previewPrecio').innerHTML = `💡 Total estimado: <strong>${fmt(total)} MXN</strong> (TC: ${cfg.TC} | Com: ${cfg.comisionGlobal}%${cfg.horaFelizActiva ? ` | 🎉 HH -${cfg.descuentoHH}%` : ''})`;
+function getTallaInfo(cat, usa) {
+  const idx = tallasData[cat]?.usa.indexOf(usa) ?? -1;
+  return idx >= 0 ? `USA ${usa} → Mex ${tallasData[cat].mx[idx]} / CM ${tallasData[cat].cm[idx]}` : `USA ${usa}`;
 }
 
-// ============================================
-// AGREGAR PRODUCTO
-// ============================================
+// ─── VENDEDORES SELECT ────────────────────────
+function cargarSelectVendedores() {
+  const sel = document.getElementById('shopperAsignado');
+  if (!sel) return;
+  const shoppers = usuarios.filter(u => u.rol === 'shopper');
+  sel.innerHTML = shoppers.length
+    ? shoppers.map(s => `<option value="${s.codigo}">${s.nombre} (${s.codigo})</option>`).join('')
+    : '<option value="">Sin vendedores</option>';
+}
+
+// ─── TOAST ───────────────────────────────────
+function toast(msg, type = '') {
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = msg;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(() => el.remove(), 3200);
+}
+
+// ─── MANUAL ──────────────────────────────────
+function abrirManual() { document.getElementById('manualModal').style.display = 'flex'; }
+function cerrarManual() { document.getElementById('manualModal').style.display = 'none'; }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarManual(); });
+
+// ─── CAPTURA EN VIVO ─────────────────────────
+let capturaActualCodigo = null;
+
+function actualizarCapturaPanel() {
+  const codInput = document.getElementById('codCliente');
+  if (!codInput) return;
+  const cod = codInput.value.trim();
+
+  if (!cod || cod.length < 4) {
+    document.getElementById('capturaPanel').style.display = 'none';
+    capturaActualCodigo = null;
+    return;
+  }
+
+  capturaActualCodigo = cod;
+  const panel = document.getElementById('capturaPanel');
+  panel.style.display = 'block';
+
+  // Nombre del cliente
+  const usuario = usuarios.find(u => u.codigo === cod);
+  const nombre = usuario ? usuario.nombre : cod;
+  document.getElementById('capturaClienteTag').innerHTML = `👤 ${nombre} · ${cod}`;
+
+  // Filtrar ventas del cliente actual (pendientes y aprobadas)
+  const items = ventas.filter(v => v.codCliente === cod && v.estado !== 'cancelado' && v.estado !== 'pagado');
+  document.getElementById('capturaCount').textContent = items.length;
+
+  // Listado
+  const listado = document.getElementById('capturaListado');
+  if (items.length === 0) {
+    listado.innerHTML = '<div class="captura-empty">Aún no hay productos agregados para este cliente</div>';
+    document.getElementById('capturaTotal').textContent = '$0.00';
+    return;
+  }
+
+  listado.innerHTML = items.map(p => `
+    <div class="captura-item">
+      <div class="captura-item-info">
+        <div class="captura-item-name">${p.producto}${p.marca ? ' · ' + p.marca : ''}</div>
+        <div class="captura-item-sub">
+          ${p.tallaInfo || p.talla || ''} ${p.tallaInfo ? '·' : ''} ×${p.pzas} pza${p.pzas > 1 ? 's' : ''} · $${p.precioUSD?.toFixed(2)} USD
+          ${p.nota ? ' · 📝 ' + p.nota : ''}
+          <span class="badge b-${p.estado}" style="margin-left:6px;">${{pendiente:'Pendiente',aprobado:'Aprobado'}[p.estado] || p.estado}</span>
+        </div>
+      </div>
+      <div class="captura-item-price">${fmt(p.totalMXN)}</div>
+      <button onclick="cancelarProducto('${p._id}')" style="background:none;border:none;cursor:pointer;color:var(--danger);font-size:18px;padding:0 4px;" title="Eliminar">✕</button>
+    </div>`).join('');
+
+  const total = items.reduce((s, v) => s + (v.totalMXN || 0), 0);
+  document.getElementById('capturaTotal').textContent = fmt(total);
+}
+
+async function capturaTerminada() {
+  if (!capturaActualCodigo) return;
+  const cod = capturaActualCodigo;
+  const items = ventas.filter(v => v.codCliente === cod && v.estado === 'pendiente');
+  if (items.length === 0) { toast('No hay productos pendientes para este cliente', 'error'); return; }
+
+  const usuario = usuarios.find(u => u.codigo === cod);
+  const nombre = usuario ? usuario.nombre : cod;
+  const total = items.reduce((s, v) => s + (v.totalMXN || 0), 0);
+
+  // Guardar marca de "captura lista" en Firestore para que cliente vea aviso
+  try {
+    await db.collection('notificaciones').doc(cod).set({
+      tipo: 'capturaLista',
+      totalMXN: total,
+      items: items.length,
+      fecha: new Date().toISOString(),
+      visto: false
+    });
+  } catch(e) { /* no-op si falla */ }
+
+  // Generar mensaje WhatsApp
+  const lineas = items.map(p =>
+    `• ${p.producto}${p.marca ? ' ' + p.marca : ''} ×${p.pzas} — ${fmt(p.totalMXN)}`
+  ).join('%0A');
+
+  const msg = `✨ *Divina Compras* ✨%0A` +
+    `Hola ${nombre} 👋 Ya están listos tus artículos:%0A%0A` +
+    lineas + `%0A%0A` +
+    `💰 *Total: ${fmt(total)}*%0A%0A` +
+    `Por favor ingresa a la app con tu código *${cod}* para aprobar o cancelar cada artículo y subir tu comprobante. 🛍️`;
+
+  toast(`Captura terminada — ${items.length} productos para ${nombre}`, 'success');
+
+  // Abrir WhatsApp (con número si lo tienen)
+  if (usuario && usuario.whatsapp) {
+    window.open(`https://wa.me/52${usuario.whatsapp}?text=${msg}`);
+  } else {
+    // Copiar al portapapeles y dar opción de abrir WA sin número
+    const plain = decodeURIComponent(msg.replace(/%0A/g, '\n'));
+    try { await navigator.clipboard.writeText(plain); toast('Mensaje copiado al portapapeles 📋', 'success'); } catch(e) {}
+    if (confirm('¿Abrir WhatsApp para elegir contacto?')) window.open(`https://wa.me/?text=${msg}`);
+  }
+}
+
+// ─── LOADING BAR ─────────────────────────────
+function setLoading(pct) {
+  document.getElementById('loading-bar').style.width = pct + '%';
+  if (pct >= 100) setTimeout(() => { document.getElementById('loading-bar').style.width = '0'; }, 400);
+}
+
+// ─── SANITIZE ────────────────────────────────
+function sanitize(str) {
+  if (typeof str !== 'string') return str;
+  return str.replace(/[<>"'`]/g, '').trim().slice(0, 200);
+}
+
+// ─── ADMIN: AGREGAR PRODUCTO ─────────────────
 async function agregarProducto() {
   const codCliente = document.getElementById('codCliente').value.trim();
   const producto = sanitize(document.getElementById('producto').value);
@@ -924,17 +1143,18 @@ async function agregarProducto() {
   const nota = sanitize(document.getElementById('nota').value);
   const shopper = document.getElementById('shopperAsignado').value;
   const tienda = sanitize(document.getElementById('tienda').value) || 'Ross';
-  const tipoArticulo = document.getElementById('tipoArticulo').value;
-  const { tallaDisplay } = getTallaCapturada();
+  const { tallaDisplay, tipo: tipoArt } = getTallaCapturada();
+  const usa = tallaDisplay;
 
   if (!codCliente || codCliente.length !== 4 || !/^\d+$/.test(codCliente)) { toast('Código cliente: 4 dígitos', 'error'); return; }
   if (!producto || isNaN(precioUSD) || precioUSD <= 0) { toast('Producto y precio válidos requeridos', 'error'); return; }
+  if (precioUSD > 9999) { toast('Precio fuera de rango (máx $9,999 USD)', 'error'); return; }
 
   const totalMXN = calcTotal(precioUSD, pzas);
   const now = new Date();
   const venta = {
     codCliente, producto, marca, pzas, precioUSD, totalMXN,
-    talla: tallaDisplay, tallaInfo: tallaDisplay, categoria: tipoArticulo,
+    talla: usa, tallaInfo: tallaDisplay, categoria: tipoArt,
     banco, nota, shopper, tienda,
     estado: 'pendiente',
     fecha: now.toISOString().slice(0,10),
@@ -946,60 +1166,65 @@ async function agregarProducto() {
     setLoading(50);
     await db.collection('ventas').add(venta);
     setLoading(100);
-    toast('✅ Producto agregado', 'success');
+    toast('Producto agregado ✓', 'success');
     const codigoTemp = document.getElementById('codCliente').value.trim();
     limpiarFormProducto();
+    // Restore codCliente so panel keeps updating
     document.getElementById('codCliente').value = codigoTemp;
     actualizarCapturaPanel();
   } catch(e) { toast('Error: ' + e.message, 'error'); setLoading(0); }
 }
-
 function limpiarFormProducto() {
-  ['producto','marca','precioUSD','nota','tallaLibre','modeloAccesorio','tamanoAccesorio','colorAccesorio'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  ['producto','marca','precioUSD','nota','tallaLibre'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = ''; });
   document.getElementById('pzas').value = '1';
   document.getElementById('bancoVenta').value = '';
   document.getElementById('tienda').value = 'Ross';
   document.getElementById('previewPrecio').innerHTML = '';
-  document.getElementById('tipoArticulo').value = 'calzado';
+  if(document.getElementById('tipoArticulo')) document.getElementById('tipoArticulo').value = 'calzado';
   onTipoChange();
 }
 
-// ============================================
-// ADMIN: VER CLIENTE
-// ============================================
+// ─── PREVIEW PRECIO (agregar form) ───────────
+function actualizarPreviewPrecio() {
+  const usd = parseFloat(document.getElementById('precioUSD')?.value);
+  const pzas = parseInt(document.getElementById('pzas')?.value) || 1;
+  if (isNaN(usd) || usd <= 0) { document.getElementById('previewPrecio').innerHTML = ''; return; }
+  const total = calcTotal(usd, pzas);
+  document.getElementById('previewPrecio').innerHTML = `💡 Total estimado: <strong>${fmt(total)} MXN</strong> (TC: ${cfg.TC} | Com: ${cfg.comisionGlobal}%${cfg.horaFelizActiva ? ` | HH -${cfg.descuentoHH}%` : ''})`;
+}
+
+// ─── ADMIN: VER CLIENTE ───────────────────────
 function cargarProductosClienteAdmin() {
   const codigo = (document.getElementById('clienteSeleccionado')?.value || '').trim();
   if (!codigo) return;
-  const filtroEstado = document.getElementById('filtroEstado')?.value || '';
-  let productos = ventas.filter(v => v.codCliente === codigo);
-  if (filtroEstado) productos = productos.filter(v => v.estado === filtroEstado);
-  
+  const productos = ventas.filter(v => v.codCliente === codigo);
   const usuario = usuarios.find(u => u.codigo === codigo);
   const comp = comprobantes[codigo];
 
+  // Header info
   const hdr = document.getElementById('infoClienteHeader');
   if (hdr) {
     hdr.innerHTML = usuario
-      ? `<div style="margin-bottom:10px;"><span class="chip">👤 ${usuario.nombre}</span> ${comp ? '<span class="comp-badge-yes">✅ Comprobante</span>' : '<span class="comp-badge-no">⏳ Sin comprobante</span>'}</div>`
-      : '<div class="text-small">⚠️ Cliente no encontrado</div>';
+      ? `<div style="margin-bottom:10px;"><span class="chip">${usuario.nombre}</span> ${comp ? `<span class="comp-badge-yes">✅ Comprobante recibido</span>` : '<span class="comp-badge-no">⏳ Sin comprobante</span>'}</div>`
+      : `<div class="text-small" style="margin-bottom:10px;">⚠️ Cliente no encontrado en usuarios</div>`;
   }
 
   const tbody = document.getElementById('tbodyProductosCliente');
   tbody.innerHTML = '';
-  if (productos.length === 0) { tbody.innerHTML = '<tr><td colspan="12" class="empty-state">Sin productos</td></tr>'; return; }
+  if (productos.length === 0) { tbody.innerHTML = '<tr><td colspan="11" class="empty-state">Sin productos para este cliente</td></tr>'; }
 
+  let totalPendiente = 0;
   productos.forEach(p => {
+    if (p.estado === 'pendiente' || p.estado === 'aprobado') totalPendiente += p.totalMXN;
     const shopperUser = usuarios.find(u => u.codigo === p.shopper);
     const row = tbody.insertRow();
-    const icono = { calzado: '👟', ropa: '👕', interior: '🩲', accesorio: '💄', otro: '📦' }[p.categoria] || '🛍️';
     row.innerHTML = `
-      <td><strong>${icono} ${p.producto}</strong></td>
+      <td><strong>${p.producto}</strong></td>
       <td>${p.marca || '—'}</td>
       <td>${p.pzas}</td>
       <td>$${p.precioUSD?.toFixed(2)}</td>
       <td><strong>${fmt(p.totalMXN)}</strong></td>
       <td class="text-small">${p.tallaInfo || p.talla}</td>
-      <td class="text-small">${p.tienda || '—'}</td>
       <td>${p.banco || '—'}</td>
       <td>${shopperUser ? shopperUser.nombre : (p.shopper || '—')}</td>
       <td><span class="badge b-${p.estado}">${{pendiente:'Pendiente',aprobado:'Aprobado',cancelado:'Cancelado',pagado:'Pagado'}[p.estado]}</span></td>
@@ -1007,8 +1232,15 @@ function cargarProductosClienteAdmin() {
       <td>
         ${p.estado === 'pendiente' ? `<button class="btn btn-ghost btn-sm" onclick="abrirEditar('${p._id}')">✏️</button> <button class="btn btn-danger btn-sm" onclick="cancelarProducto('${p._id}')">❌</button>` : ''}
         ${p.estado === 'aprobado' && comp ? `<button class="btn btn-success btn-sm" onclick="liberarPago('${codigo}')">✅ Liberar</button>` : ''}
+        ${p.estado === 'aprobado' && !comp ? '<span class="text-small">Esperando comp.</span>' : ''}
+        ${p.estado === 'pagado' || p.estado === 'cancelado' ? '—' : ''}
       </td>`;
   });
+
+  const footer = document.getElementById('footerCliente');
+  if (footer && productos.length > 0) {
+    footer.innerHTML = `<div class="desglose-card"><strong>Total pendiente/aprobado:</strong> <span class="desglose-total">${fmt(totalPendiente)}</span></div>`;
+  }
 }
 
 async function cancelarProducto(id) {
@@ -1016,23 +1248,28 @@ async function cancelarProducto(id) {
   try {
     await db.collection('ventas').doc(id).update({ estado: 'cancelado', historial: firebase.firestore.FieldValue.arrayUnion({ estado: 'cancelado', fecha: new Date().toISOString(), por: 'admin' }) });
     toast('Producto cancelado', 'warning');
+    cargarProductosClienteAdmin();
   } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
 async function liberarPago(codCliente) {
+  if (!confirm(`¿Liberar pago para cliente ${codCliente}?`)) return;
   const aprobados = ventas.filter(v => v.codCliente === codCliente && v.estado === 'aprobado');
   if (aprobados.length === 0) { toast('No hay productos aprobados', 'error'); return; }
   try {
+    setLoading(30);
     const batch = db.batch();
-    aprobados.forEach(v => batch.update(db.collection('ventas').doc(v._id), { estado: 'pagado', historial: firebase.firestore.FieldValue.arrayUnion({ estado: 'pagado', fecha: new Date().toISOString(), por: 'admin' }) }));
+    aprobados.forEach(v => {
+      batch.update(db.collection('ventas').doc(v._id), { estado: 'pagado', historial: firebase.firestore.FieldValue.arrayUnion({ estado: 'pagado', fecha: new Date().toISOString(), por: 'admin' }) });
+    });
     await batch.commit();
-    toast('✅ Pago liberado', 'success');
-  } catch(e) { toast('Error: ' + e.message, 'error'); }
+    setLoading(100);
+    toast('Pago liberado ✓', 'success');
+    cargarProductosClienteAdmin();
+  } catch(e) { toast('Error: ' + e.message, 'error'); setLoading(0); }
 }
 
-// ============================================
-// EDITAR PRODUCTO
-// ============================================
+// ─── EDITAR PRODUCTO ──────────────────────────
 function abrirEditar(id) {
   const v = ventas.find(x => x._id === id);
   if (!v) return;
@@ -1045,9 +1282,7 @@ function abrirEditar(id) {
   document.getElementById('editNota').value = v.nota || '';
   document.getElementById('editModal').style.display = 'flex';
 }
-
 function cerrarModal() { document.getElementById('editModal').style.display = 'none'; }
-
 async function guardarEdicion() {
   const id = document.getElementById('editId').value;
   const precioUSD = parseFloat(document.getElementById('editPrecioUSD').value);
@@ -1059,16 +1294,16 @@ async function guardarEdicion() {
       marca: document.getElementById('editMarca').value.trim(),
       precioUSD, pzas, totalMXN,
       banco: document.getElementById('editBanco').value,
-      nota: document.getElementById('editNota').value.trim()
+      nota: document.getElementById('editNota').value.trim(),
+      historial: firebase.firestore.FieldValue.arrayUnion({ estado: 'editado', fecha: new Date().toISOString(), por: 'admin' })
     });
     cerrarModal();
-    toast('✅ Producto actualizado', 'success');
+    toast('Producto actualizado ✓', 'success');
+    cargarProductosClienteAdmin();
   } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
-// ============================================
-// DASHBOARD
-// ============================================
+// ─── DASHBOARD ────────────────────────────────
 function renderDashboard() {
   const total = ventas.length;
   const pendientes = ventas.filter(v => v.estado === 'pendiente').length;
@@ -1081,373 +1316,266 @@ function renderDashboard() {
     <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-label">Total productos</div></div>
     <div class="stat-card"><div class="stat-num" style="color:var(--warning)">${pendientes}</div><div class="stat-label">Pendientes</div></div>
     <div class="stat-card green"><div class="stat-num">${pagados.length}</div><div class="stat-label">Pagados</div></div>
-    <div class="stat-card gold"><div class="stat-num">${fmt(totalPagadoMXN)}</div><div class="stat-label">Total vendido</div></div>
-    <div class="stat-card blue"><div class="stat-num">${fmt(gananciaTotal)}</div><div class="stat-label">Ganancia</div></div>
-    <div class="stat-card"><div class="stat-num" style="font-size:22px;">1 USD = $${cfg.TC}</div><div class="stat-label">${cfg.horaFelizActiva ? '🎉 Hora Feliz' : 'Sin Hora Feliz'}</div></div>
-  `;
+    <div class="stat-card gold"><div class="stat-num">${fmt(totalPagadoMXN)}</div><div class="stat-label">Total vendido MXN</div></div>
+    <div class="stat-card blue"><div class="stat-num">${fmt(gananciaTotal)}</div><div class="stat-label">Ganancia negocio</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--rose)">TC ${cfg.TC}</div><div class="stat-label">${cfg.horaFelizActiva ? '🎉 Hora Feliz' : 'Sin Hora Feliz'}</div></div>`;
 
+  // Comprobantes pendientes de revisar
   const compDiv = document.getElementById('comprobantesAdmin');
-  if (compDiv) {
-    compDiv.innerHTML = compPendientes.length === 0 ? '<p class="text-small">✅ Sin pendientes</p>' :
-      compPendientes.map(cod => `<div style="padding:10px;background:var(--warning-bg);border-radius:var(--r-sm);margin-bottom:8px;">⏳ ${cod} <button class="btn btn-info btn-sm" onclick="document.getElementById('clienteSeleccionado').value='${cod}';switchTab('clientes')">Ir</button></div>`).join('');
+  if (compPendientes.length === 0) { compDiv.innerHTML = '<p class="text-small">Sin comprobantes pendientes por revisar ✓</p>'; }
+  else {
+    compDiv.innerHTML = compPendientes.map(cod => {
+      const u = usuarios.find(x => x.codigo === cod);
+      const comp = comprobantes[cod];
+      return `<div style="display:flex;align-items:center;gap:12px;padding:10px;background:var(--warning-bg);border-radius:var(--r-sm);margin-bottom:8px;">
+        <span>⏳ <strong>${u ? u.nombre : cod}</strong> (${cod})</span>
+        <a href="${comp.url}" target="_blank" class="btn btn-info btn-sm">📄 Ver</a>
+        <button class="btn btn-success btn-sm" onclick="document.getElementById('clienteSeleccionado').value='${cod}';switchTab('clientes');cargarProductosClienteAdmin()">Ir a cliente</button>
+      </div>`;
+    }).join('');
   }
+
+  // Ganancias por shopper
+  const shoppers = usuarios.filter(u => u.rol === 'shopper');
+  const gDiv = document.getElementById('gananciasPorShopper');
+  if (shoppers.length === 0) { gDiv.innerHTML = '<p class="text-small">Sin vendedores registrados</p>'; return; }
+  const rows = shoppers.map(s => {
+    const misVentas = pagados.filter(v => v.shopper === s.codigo);
+    const ganancia = misVentas.reduce((sum, v) => sum + v.totalMXN * 0.10, 0);
+    return `<tr><td>${s.nombre} (${s.codigo})</td><td>${misVentas.length}</td><td>${fmt(misVentas.reduce((a,v)=>a+v.totalMXN,0))}</td><td><strong>${fmt(ganancia)}</strong></td></tr>`;
+  }).join('');
+  gDiv.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Vendedor</th><th>Ventas pagadas</th><th>Total vendido</th><th>Su ganancia (10%)</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
-// ============================================
-// USUARIOS
-// ============================================
+// ─── ADMIN: USUARIOS ─────────────────────────
 function renderTablaUsuarios() {
   const tbody = document.getElementById('tbodyUsuarios');
   if (!tbody) return;
-  tbody.innerHTML = usuarios.map(u => `
-    <tr>
+  tbody.innerHTML = '';
+  usuarios.forEach(u => {
+    const row = tbody.insertRow();
+    row.innerHTML = `
       <td><span class="chip">${u.codigo}</span></td>
       <td>${u.nombre}</td>
-      <td>${{admin:'Admin',shopper:'Vendedor',cliente:'Cliente'}[u.rol]}</td>
-      <td>${u.whatsapp || '—'}</td>
+      <td>${{admin:'Administrador',shopper:'Vendedor',cliente:'Cliente'}[u.rol] || u.rol}</td>
       <td>${u.esSocio ? '✅' : '—'}</td>
-      <td>${u.rol !== 'admin' ? `<button class="btn btn-danger btn-sm" onclick="eliminarUsuario('${u.codigo}')">🗑️</button>` : '—'}</td>
-    </tr>`).join('');
+      <td>${u.rol !== 'admin' ? `<button class="btn btn-danger btn-sm" onclick="eliminarUsuario('${u.codigo}')">🗑️</button>` : '—'}</td>`;
+  });
 }
-
 function toggleSocioCheck() {
   document.getElementById('socioField').style.display = document.getElementById('nuevoRol').value === 'shopper' ? 'block' : 'none';
 }
-
 async function agregarUsuario() {
   const codigo = document.getElementById('nuevoCodigo').value.trim();
   const nombre = sanitize(document.getElementById('nuevoNombre').value);
   const rol = document.getElementById('nuevoRol').value;
-  if (!codigo || !nombre || usuarios.find(u => u.codigo === codigo)) { toast('Datos inválidos', 'error'); return; }
+  const esSocio = document.getElementById('nuevoEsSocio').checked;
+  if (!codigo || codigo.length !== 4 || !/^\d+$/.test(codigo)) { toast('Código debe ser 4 dígitos', 'error'); return; }
+  if (!nombre) { toast('Nombre requerido', 'error'); return; }
+  if (usuarios.find(u => u.codigo === codigo)) { toast('Código ya existe', 'error'); return; }
   try {
-    await db.collection('usuarios').doc(codigo).set({ codigo, nombre, rol, esSocio: false, creadoEn: new Date().toISOString() });
-    toast('✅ Usuario agregado', 'success');
+    const nuevoWa = document.getElementById('nuevoWhatsapp')?.value.trim() || '';
+    await db.collection('usuarios').doc(codigo).set({ codigo, nombre, rol, esSocio: rol === 'shopper' ? esSocio : false, whatsapp: nuevoWa, creadoEn: new Date().toISOString() });
+    toast('Usuario agregado ✓', 'success');
+    document.getElementById('nuevoCodigo').value = '';
+    document.getElementById('nuevoNombre').value = '';
+    document.getElementById('nuevoEsSocio').checked = false;
+    if(document.getElementById('nuevoWhatsapp')) document.getElementById('nuevoWhatsapp').value = '';
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
+}
+async function eliminarUsuario(codigo) {
+  if (!confirm(`¿Eliminar usuario ${codigo}?`)) return;
+  try {
+    await db.collection('usuarios').doc(codigo).delete();
+    toast('Usuario eliminado', 'warning');
   } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
-async function eliminarUsuario(codigo) {
-  if (!confirm('¿Eliminar?')) return;
-  try { await db.collection('usuarios').doc(codigo).delete(); toast('Eliminado', 'warning'); } catch(e) { toast('Error: ' + e.message, 'error'); }
-}
-
-// ============================================
-// CONFIGURACIÓN (ARREGLADO)
-// ============================================
+// ─── CONFIG ───────────────────────────────────
 function syncUI() {
-  console.log('🔄 syncUI() - Actualizando campos de configuración');
-  
-  if (!usuarioActual || usuarioActual.rol !== 'admin') {
-    console.log('  ⚠️ No es admin, omitiendo');
-    return;
-  }
-  
-  // Usar setTimeout para asegurar que el DOM está listo
-  setTimeout(() => {
-    const elTC = document.getElementById('cfgTC');
-    const elCom = document.getElementById('cfgComision');
-    const elDesc = document.getElementById('cfgDescuentoHH');
-    
-    if (elTC) elTC.value = cfg.TC;
-    if (elCom) elCom.value = cfg.comisionGlobal;
-    if (elDesc) elDesc.value = cfg.descuentoHH;
-    
-    console.log('  ✅ Valores actualizados:', { TC: cfg.TC, Comision: cfg.comisionGlobal, DescuentoHH: cfg.descuentoHH });
-    
-    const badge = document.getElementById('estadoHHBadge');
-    if (badge) {
-      badge.innerHTML = cfg.horaFelizActiva 
-        ? '<span class="badge b-aprobado">🎉 Hora Feliz ACTIVA — ' + cfg.descuentoHH + '% descuento</span>'
-        : '<span class="badge b-pendiente">⏸️ Hora Feliz inactiva</span>';
-    }
-  }, 50);
+  if (usuarioActual?.rol !== 'admin') return;
+  ['cfgTC','cfgComision','cfgDescuentoHH'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = { cfgTC: cfg.TC, cfgComision: cfg.comisionGlobal, cfgDescuentoHH: cfg.descuentoHH }[id];
+  });
+  const badge = document.getElementById('estadoHHBadge');
+  if (badge) badge.innerHTML = cfg.horaFelizActiva
+    ? `<span class="badge b-aprobado">🎉 Hora Feliz ACTIVA — ${cfg.descuentoHH}% descuento</span>`
+    : `<span class="badge b-pendiente">Hora Feliz inactiva</span>`;
 }
-
 async function guardarConfig() {
-  console.log('💾 guardarConfig() - Iniciando...');
-  
-  const btn = document.getElementById('btnGuardarConfig');
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ Guardando...'; }
-  
-  try {
-    const elTC = document.getElementById('cfgTC');
-    const elCom = document.getElementById('cfgComision');
-    const elDesc = document.getElementById('cfgDescuentoHH');
-    const elPass = document.getElementById('cfgNuevaPass');
-    
-    if (!elTC || !elCom || !elDesc) {
-      toast('❌ Error: Campos no encontrados', 'error');
-      console.error('Elementos no encontrados:', { elTC, elCom, elDesc });
-      return;
-    }
-    
-    const TC = parseFloat(elTC.value);
-    const comisionGlobal = parseFloat(elCom.value);
-    const descuentoHH = parseFloat(elDesc.value);
-    const pass = elPass ? elPass.value.trim() : '';
-    
-    if (isNaN(TC) || TC <= 0) { toast('❌ TC inválido', 'error'); return; }
-    if (isNaN(comisionGlobal) || comisionGlobal < 0 || comisionGlobal > 100) { toast('❌ Comisión inválida (0-100)', 'error'); return; }
-    if (isNaN(descuentoHH) || descuentoHH < 0 || descuentoHH > 100) { toast('❌ Descuento HH inválido (0-100)', 'error'); return; }
-    
-    const updates = { TC, comisionGlobal, descuentoHH };
-    
-    if (pass && pass.length >= 6) {
-      updates.adminPasswordHash = await sha256(pass);
-    }
-    
-    console.log('📤 Guardando:', updates);
-    
-    await db.collection('config').doc('settings').set(updates, { merge: true });
-    
-    // Actualizar variables locales
-    cfg.TC = TC;
-    cfg.comisionGlobal = comisionGlobal;
-    cfg.descuentoHH = descuentoHH;
-    
-    toast('✅ Configuración guardada correctamente', 'success');
-    syncUI();
-    
-    if (elPass) elPass.value = '';
-    
-  } catch(e) {
-    console.error('❌ Error guardando config:', e);
-    toast('Error: ' + e.message, 'error');
-  } finally {
-    if (btn) { btn.disabled = false; btn.textContent = '💾 Guardar configuración'; }
+  const nuevaPass = document.getElementById('cfgNuevaPass').value.trim();
+  const updates = {
+    TC: parseFloat(document.getElementById('cfgTC').value) || cfg.TC,
+    comisionGlobal: parseFloat(document.getElementById('cfgComision').value) || cfg.comisionGlobal,
+    descuentoHH: parseFloat(document.getElementById('cfgDescuentoHH').value) || cfg.descuentoHH,
+  };
+  if (nuevaPass) {
+    if (nuevaPass.length < 6) { toast('La clave debe tener al menos 6 caracteres', 'error'); return; }
+    updates.adminPasswordHash = await sha256(nuevaPass);
   }
+  try {
+    await db.collection('config').doc('settings').set(updates, { merge: true });
+    toast('Configuración guardada ✓', 'success');
+    document.getElementById('cfgNuevaPass').value = '';
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
-
-async function toggleHH(activar, event) {
-  if (event) event.preventDefault();
-  console.log('🎉 toggleHH(' + activar + ')');
-  
-  const btnActivar = document.getElementById('btnActivarHH');
-  const btnDesactivar = document.getElementById('btnDesactivarHH');
-  
-  if (btnActivar) btnActivar.disabled = true;
-  if (btnDesactivar) btnDesactivar.disabled = true;
-  
+async function toggleHH(activar) {
   try {
     await db.collection('config').doc('settings').set({ horaFelizActiva: activar }, { merge: true });
-    cfg.horaFelizActiva = activar;
-    syncUI();
-    toast(activar ? '🎉 Hora Feliz ACTIVADA' : '⛔ Hora Feliz desactivada', activar ? 'success' : 'warning');
-  } catch(e) {
-    toast('Error: ' + e.message, 'error');
-  } finally {
-    setTimeout(() => {
-      if (btnActivar) btnActivar.disabled = false;
-      if (btnDesactivar) btnDesactivar.disabled = false;
-    }, 500);
-  }
+    toast(activar ? '🎉 Hora Feliz ACTIVADA' : 'Hora Feliz desactivada', activar ? 'success' : '');
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
-// ============================================
-// LOGIN
-// ============================================
-async function loginUsuario() {
-  const codigo = document.getElementById('codigoAcceso').value.trim();
-  const errEl = document.getElementById('loginError');
-  errEl.innerText = '';
-  if (!codigo || codigo.length !== 4) { errEl.innerText = 'Código inválido'; return; }
-  
-  let usuario = usuarios.find(u => u.codigo === codigo && u.rol !== 'admin');
-  if (!usuario) {
-    const snap = await db.collection('usuarios').doc(codigo).get();
-    if (snap.exists && snap.data().rol !== 'admin') usuario = snap.data();
-  }
-  
-  if (usuario) {
-    usuarioActual = usuario;
-    setupListeners();
-    mostrarApp();
-  } else {
-    errEl.innerText = 'Código no registrado';
-  }
+// ─── BADGE COMPROBANTES ───────────────────────
+function actualizarCompBadge() {
+  const pendientes = Object.keys(comprobantes).filter(cod => ventas.some(v => v.codCliente === cod && v.estado === 'aprobado'));
+  const badge = document.getElementById('compBadge');
+  if (badge) { badge.textContent = pendientes.length; badge.style.display = pendientes.length > 0 ? 'flex' : 'none'; }
 }
 
-async function sha256(str) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+// ─── SHOPPER PANEL ────────────────────────────
+function renderShopper() {
+  if (!usuarioActual) return;
+  const misVentas = ventas.filter(v => v.shopper === usuarioActual.codigo && v.estado === 'pagado');
+  const comisionPersonal = misVentas.reduce((s, v) => s + v.totalMXN * 0.10, 0);
+
+  // Stats
+  document.getElementById('statsShopperGrid').innerHTML = `
+    <div class="stat-card"><div class="stat-num">${misVentas.length}</div><div class="stat-label">Ventas pagadas</div></div>
+    <div class="stat-card gold"><div class="stat-num">${fmt(comisionPersonal)}</div><div class="stat-label">Tu comisión (10%)</div></div>
+    <div class="stat-card green"><div class="stat-num">${fmt(misVentas.reduce((s,v)=>s+v.totalMXN,0))}</div><div class="stat-label">Total vendido</div></div>`;
+
+  // Tabla
+  const tbody = document.getElementById('tbodyProductosShopper');
+  tbody.innerHTML = '';
+  if (misVentas.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Sin ventas pagadas todavía</td></tr>'; }
+  misVentas.forEach(v => {
+    const u = usuarios.find(x => x.codigo === v.codCliente);
+    const row = tbody.insertRow();
+    row.innerHTML = `<td>${v.fecha}</td><td>${u ? u.nombre : v.codCliente}</td><td>${v.producto}</td><td>${v.marca||'—'}</td><td>${v.pzas}</td><td>${fmt(v.totalMXN)}</td><td><strong>${fmt(v.totalMXN*0.10)}</strong></td>`;
+  });
+
+  // Socio
+  const card = document.getElementById('socioCard');
+  if (usuarioActual.esSocio) {
+    card.style.display = 'block';
+    const socios = usuarios.filter(u => u.rol === 'shopper' && u.esSocio);
+    const gananciaTotal = ventas.filter(v => v.estado === 'pagado').reduce((s,v) => s + calcComision(v.precioUSD, v.pzas), 0);
+    const parte = socios.length > 0 ? gananciaTotal / socios.length : 0;
+    document.getElementById('socioInfo').innerHTML = `<strong>Ganancia total del negocio:</strong> ${fmt(gananciaTotal)}<br><strong>Socios:</strong> ${socios.length}<br><strong>Tu parte:</strong> <span class="desglose-total">${fmt(parte)}</span>`;
+  } else card.style.display = 'none';
 }
 
-async function loginAdmin() {
-  const pass = document.getElementById('adminPassword').value;
-  const errEl = document.getElementById('loginError');
-  errEl.innerText = '';
-  if (!pass) { errEl.innerText = 'Ingresa clave'; return; }
-  
-  try {
-    const snap = await db.collection('config').doc('settings').get();
-    const storedHash = snap.exists ? snap.data().adminPasswordHash : '';
-    
-    if (!storedHash) {
-      const newHash = await sha256(pass);
-      await db.collection('config').doc('settings').set({ adminPasswordHash: newHash }, { merge: true });
-      usuarioActual = { codigo: 'admin', nombre: 'Administrador', rol: 'admin', esSocio: false };
-      setupListeners();
-      mostrarApp();
-      toast('🔐 Contraseña configurada', 'success');
-      return;
-    }
-    
-    const inputHash = await sha256(pass);
-    if (inputHash === storedHash) {
-      usuarioActual = { codigo: 'admin', nombre: 'Administrador', rol: 'admin', esSocio: false };
-      setupListeners();
-      mostrarApp();
-    } else {
-      errEl.innerText = 'Clave incorrecta';
-    }
-  } catch(e) {
-    errEl.innerText = 'Error: ' + e.message;
-  }
-}
-
-function mostrarApp() {
-  document.getElementById('loginOverlay').style.display = 'none';
-  document.getElementById('mainApp').style.display = 'block';
-  document.getElementById('bienvenidaUsuario').innerText = `Bienvenida/o, ${usuarioActual.nombre || usuarioActual.codigo}`;
-  document.getElementById('adminPanel').style.display = usuarioActual.rol === 'admin' ? 'block' : 'none';
-  document.getElementById('shopperPanel').style.display = usuarioActual.rol === 'shopper' ? 'block' : 'none';
-  document.getElementById('clientePanel').style.display = usuarioActual.rol === 'cliente' ? 'block' : 'none';
-  
-  if (usuarioActual.rol === 'admin') { 
-    renderDashboard(); 
-    renderTablaUsuarios(); 
-    cargarSelectVendedores(); 
-    syncUI(); 
-  }
-  else if (usuarioActual.rol === 'shopper') renderShopper();
-  else if (usuarioActual.rol === 'cliente') renderCliente();
-}
-
-function cerrarSesion() {
-  usuarioActual = null;
-  unsubs.forEach(u => u());
-  unsubs = [];
-  document.getElementById('mainApp').style.display = 'none';
-  document.getElementById('loginOverlay').style.display = 'flex';
-  document.getElementById('codigoAcceso').value = '';
-  document.getElementById('adminPassword').value = '';
-}
-
-// ============================================
-// VENDEDORES
-// ============================================
-function cargarSelectVendedores() {
-  const sel = document.getElementById('shopperAsignado');
-  if (!sel) return;
-  const shoppers = usuarios.filter(u => u.rol === 'shopper');
-  sel.innerHTML = shoppers.length ? shoppers.map(s => `<option value="${s.codigo}">${s.nombre} (${s.codigo})</option>`).join('') : '<option value="">Sin vendedores</option>';
-}
-
-// ============================================
-// CLIENTE PANEL
-// ============================================
+// ─── CLIENTE PANEL ────────────────────────────
 function mostrarBannerCaptura(data) {
   const banner = document.getElementById('bannerCaptura');
   if (!banner) return;
-  banner.innerHTML = `<div style="background:var(--success-bg);padding:16px;border-radius:var(--r);margin-bottom:16px;">🛍️ ¡Tus artículos están listos! ${data.items} producto(s) · Total: <strong>${fmt(data.totalMXN)}</strong></div>`;
+  banner.innerHTML = `
+    <div style="background:linear-gradient(135deg,var(--success-bg),#e0f5ea);border:1.5px solid var(--success);border-radius:var(--r);padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:12px;animation:fadeIn .4s ease;">
+      <span style="font-size:28px;">🛍️</span>
+      <div>
+        <div style="font-weight:700;color:var(--success);font-size:15px;">¡Tus artículos están listos!</div>
+        <div style="font-size:13px;color:var(--plum-mid);">${data.items} producto${data.items>1?'s':''} registrados · Total: <strong>${fmt(data.totalMXN)}</strong></div>
+        <div style="font-size:12px;color:var(--plum-light);margin-top:2px;">Revisa la lista abajo, aprueba o cancela cada artículo.</div>
+      </div>
+    </div>`;
+  // Mark as seen after 5s
+  setTimeout(() => {
+    if (db && usuarioActual) db.collection('notificaciones').doc(usuarioActual.codigo).update({ visto: true }).catch(()=>{});
+  }, 5000);
 }
 
 function renderCliente() {
   if (!usuarioActual) return;
   const misProductos = ventas.filter(v => v.codCliente === usuarioActual.codigo);
-  document.getElementById('desgloseContent').innerHTML = `💱 TC: $${cfg.TC} | Comisión: ${cfg.comisionGlobal}%${cfg.horaFelizActiva ? ` | 🎉 HH -${cfg.descuentoHH}%` : ''}`;
-  
+  const activos = misProductos.filter(v => v.estado !== 'cancelado');
+
+  // Desglose
+  const ejemplo = activos.find(v => v.estado !== 'pagado');
+  if (ejemplo) {
+    const base = calcBase(ejemplo.precioUSD, ejemplo.pzas);
+    const com = calcComision(ejemplo.precioUSD, ejemplo.pzas);
+    const sub = base + com;
+    const desc = cfg.horaFelizActiva ? sub * cfg.descuentoHH / 100 : 0;
+    document.getElementById('desgloseContent').innerHTML = `
+      <strong>💱 TC actual:</strong> $${cfg.TC} MXN/USD<br>
+      <strong>Comisión:</strong> ${cfg.comisionGlobal}%${cfg.horaFelizActiva ? ` | 🎉 Hora Feliz -${cfg.descuentoHH}%` : ''}<br>
+      <hr style="border:none;border-top:1px solid rgba(181,86,110,0.2);margin:10px 0;">
+      Ej: ${ejemplo.producto} × ${ejemplo.pzas} → Base: ${fmt(base)} + Comisión: ${fmt(com)}${cfg.horaFelizActiva ? ` - Descuento: ${fmt(desc)}` : ''}<br>
+      = <span class="desglose-total">${fmt(ejemplo.totalMXN)}</span>`;
+  } else {
+    document.getElementById('desgloseContent').innerHTML = 'Sin productos activos.';
+  }
+
+  // Tabla
   const tbody = document.getElementById('tbodyClienteFinal');
-  tbody.innerHTML = misProductos.length === 0 ? '<tr><td colspan="8">Sin productos</td></tr>' :
-    misProductos.map(p => {
-      const icono = { calzado: '👟', ropa: '👕', interior: '🩲', accesorio: '💄', otro: '📦' }[p.categoria] || '🛍️';
-      return `<tr>
-        <td>${icono} ${p.producto}</td>
-        <td>${p.marca || '—'}</td>
-        <td>${p.pzas}</td>
-        <td>$${p.precioUSD?.toFixed(2)}</td>
-        <td>${fmt(p.totalMXN)}</td>
-        <td>${p.tallaInfo || p.talla}</td>
-        <td><span class="badge b-${p.estado}">${p.estado}</span></td>
-        <td>${p.estado === 'pendiente' ? `<button class="btn btn-success btn-sm" onclick="decidirProducto('${p._id}','aprobado')">✅</button><button class="btn btn-danger btn-sm" onclick="decidirProducto('${p._id}','cancelado')">❌</button>` : '—'}</td>
-      </tr>`;
-    }).join('');
+  tbody.innerHTML = '';
+  if (misProductos.length === 0) { tbody.innerHTML = '<tr><td colspan="8" class="empty-state">El administrador aún no ha registrado productos para ti</td></tr>'; }
+  misProductos.forEach(p => {
+    const row = tbody.insertRow();
+    let decision = '';
+    if (p.estado === 'pendiente') {
+      decision = `<div style="display:flex;gap:6px;"><button class="btn btn-success btn-sm" onclick="decidirProducto('${p._id}','aprobado')">✅</button><button class="btn btn-danger btn-sm" onclick="decidirProducto('${p._id}','cancelado')">❌</button></div>`;
+    } else if (p.estado === 'aprobado') decision = '<span class="text-small">Sube comprobante</span>';
+    else if (p.estado === 'pagado') decision = '✓ Pagado';
+    else decision = '—';
+    row.innerHTML = `<td><strong>${p.producto}</strong></td><td>${p.marca||'—'}</td><td>${p.pzas}</td><td>$${p.precioUSD?.toFixed(2)}</td><td><strong>${fmt(p.totalMXN)}</strong></td><td class="text-small">${p.tallaInfo||p.talla}</td><td><span class="badge b-${p.estado}">${{pendiente:'Pendiente',aprobado:'Aprobado',cancelado:'Cancelado',pagado:'Pagado'}[p.estado]}</span></td><td>${decision}</td>`;
+  });
+
+  // Estado comprobante
+  const comp = comprobantes[usuarioActual.codigo];
+  document.getElementById('estadoCompActual').innerHTML = comp
+    ? `<div class="comp-badge-yes">✅ Comprobante enviado — <a href="${comp.url}" target="_blank">Ver</a></div>`
+    : '<div class="comp-badge-no">⏳ Sin comprobante subido</div>';
 }
 
 async function decidirProducto(id, estado) {
   try {
     await db.collection('ventas').doc(id).update({ estado, historial: firebase.firestore.FieldValue.arrayUnion({ estado, fecha: new Date().toISOString(), por: 'cliente' }) });
-    toast(estado === 'aprobado' ? '✅ Aprobado' : '❌ Cancelado', 'success');
+    toast(estado === 'aprobado' ? '✅ Aprobado' : '❌ Cancelado', estado === 'aprobado' ? 'success' : '');
   } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
+// ─── SUBIR COMPROBANTE ────────────────────────
 async function subirComprobante() {
-  const file = document.getElementById('fileComp').files[0];
-  if (!file) { toast('Selecciona archivo', 'error'); return; }
-  const ref = storage.ref(`comprobantes/${usuarioActual.codigo}_${Date.now()}`);
-  try {
-    const snap = await ref.put(file);
-    const url = await snap.ref.getDownloadURL();
-    await db.collection('comprobantes').doc(usuarioActual.codigo).set({ url, subidoEn: new Date().toISOString() });
-    toast('✅ Comprobante subido', 'success');
-  } catch(e) { toast('Error: ' + e.message, 'error'); }
-}
-
-function refrescarCliente() { renderCliente(); }
-
-function generarMensajeWA() {
-  const misProductos = ventas.filter(v => v.codCliente === usuarioActual.codigo && v.estado !== 'cancelado');
-  const total = misProductos.reduce((s,v) => s + v.totalMXN, 0);
-  const lineas = misProductos.map(p => `• ${p.producto} ×${p.pzas} — ${fmt(p.totalMXN)}`).join('%0A');
-  window.open(`https://wa.me/?text=✨ Divina Compras %0A${lineas}%0A💰 Total: ${fmt(total)}`);
-}
-
-// ============================================
-// SHOPPER PANEL
-// ============================================
-function renderShopper() {
   if (!usuarioActual) return;
-  const misVentas = ventas.filter(v => v.shopper === usuarioActual.codigo && v.estado === 'pagado');
-  const comision = misVentas.reduce((s,v) => s + v.totalMXN * 0.10, 0);
-  document.getElementById('statsShopperGrid').innerHTML = `
-    <div class="stat-card"><div class="stat-num">${misVentas.length}</div><div class="stat-label">Ventas</div></div>
-    <div class="stat-card gold"><div class="stat-num">${fmt(comision)}</div><div class="stat-label">Comisión</div></div>
-  `;
-  const tbody = document.getElementById('tbodyProductosShopper');
-  if (tbody) tbody.innerHTML = misVentas.map(v => `<tr><td>${v.fecha}</td><td>${v.producto}</td><td>${fmt(v.totalMXN)}</td><td>${fmt(v.totalMXN * 0.10)}</td></tr>`).join('');
+  const file = document.getElementById('fileComp').files[0];
+  if (!file) { toast('Selecciona un archivo', 'error'); return; }
+  if (file.size > 10 * 1024 * 1024) { toast('Archivo muy grande (máx 10MB)', 'error'); return; }
+
+  const aprobados = ventas.filter(v => v.codCliente === usuarioActual.codigo && v.estado === 'aprobado');
+  if (aprobados.length === 0) { toast('Primero aprueba al menos un producto', 'error'); return; }
+
+  const ext = file.name.split('.').pop();
+  const ref = storage.ref(`comprobantes/${usuarioActual.codigo}_${Date.now()}.${ext}`);
+  document.getElementById('uploadProgress').innerHTML = '📤 Subiendo...';
+  try {
+    setLoading(30);
+    const snap = await ref.put(file);
+    setLoading(70);
+    const url = await snap.ref.getDownloadURL();
+    await db.collection('comprobantes').doc(usuarioActual.codigo).set({ url, subidoEn: new Date().toISOString(), tipo: file.type });
+    setLoading(100);
+    document.getElementById('uploadProgress').innerHTML = '';
+    document.getElementById('fileComp').value = '';
+    toast('Comprobante subido ✓ El admin lo revisará', 'success');
+  } catch(e) { toast('Error al subir: ' + e.message, 'error'); setLoading(0); document.getElementById('uploadProgress').innerHTML = ''; }
+}
+function refrescarCliente() { renderCliente(); toast('Actualizado'); }
+
+// ─── WHATSAPP SUMMARY ─────────────────────────
+function generarMensajeWA() {
+  if (!usuarioActual) return;
+  const misProductos = ventas.filter(v => v.codCliente === usuarioActual.codigo && v.estado !== 'cancelado');
+  if (misProductos.length === 0) { toast('Sin productos activos', 'error'); return; }
+  let total = misProductos.reduce((s,v) => s + v.totalMXN, 0);
+  let lineas = misProductos.map(p => `👟 ${p.producto}${p.marca ? ' '+p.marca : ''} ×${p.pzas} → *${fmt(p.totalMXN)} MXN*`).join('\n');
+  const msg = `✨ *Divina Compras — Tu resumen* ✨\n━━━━━━━━━━━━━━━━━━\n${lineas}\n━━━━━━━━━━━━━━━━━━\n💰 *Total a pagar: ${fmt(total)}*\nTC: $${cfg.TC} | Comisión: ${cfg.comisionGlobal}%${cfg.horaFelizActiva ? ` | 🎉 HH -${cfg.descuentoHH}%` : ''}`;
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg));
 }
 
-// ============================================
-// CAPTURA EN VIVO
-// ============================================
-let capturaActualCodigo = null;
-
-function actualizarCapturaPanel() {
-  if (!usuarioActual || usuarioActual.rol !== 'admin') return;
-  const codInput = document.getElementById('codCliente');
-  if (!codInput) return;
-  const cod = codInput.value.trim();
-  if (!cod || cod.length < 4) { document.getElementById('capturaPanel').style.display = 'none'; return; }
-  
-  capturaActualCodigo = cod;
-  document.getElementById('capturaPanel').style.display = 'block';
-  const items = ventas.filter(v => v.codCliente === cod && v.estado !== 'cancelado' && v.estado !== 'pagado');
-  document.getElementById('capturaCount').textContent = items.length;
-  document.getElementById('capturaListado').innerHTML = items.length === 0 ? '<div class="captura-empty">Sin productos</div>' :
-    items.map(p => `<div class="captura-item"><div class="captura-item-info"><div class="captura-item-name">${p.producto}</div></div><div class="captura-item-price">${fmt(p.totalMXN)}</div></div>`).join('');
-  document.getElementById('capturaTotal').textContent = fmt(items.reduce((s,v) => s + v.totalMXN, 0));
-}
-
-async function capturaTerminada() {
-  if (!capturaActualCodigo) return;
-  const items = ventas.filter(v => v.codCliente === capturaActualCodigo && v.estado === 'pendiente');
-  if (items.length === 0) { toast('Sin productos pendientes', 'error'); return; }
-  const total = items.reduce((s,v) => s + v.totalMXN, 0);
-  toast(`✅ ${items.length} productos listos para ${capturaActualCodigo}`, 'success');
-}
-
-// ============================================
-// TABS
-// ============================================
+// ─── TABS ─────────────────────────────────────
 function switchTab(name) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -1455,94 +1583,168 @@ function switchTab(name) {
   if (tab) tab.classList.add('active');
   const btn = document.querySelector(`[data-tab="${name}"]`);
   if (btn) btn.classList.add('active');
-  
   if (name === 'dashboard') renderDashboard();
-  if (name === 'usuarios') renderTablaUsuarios();
   if (name === 'configTab') syncUI();
-  if (name === 'clientes') cargarSelectClienteNombre();
 }
 
-// ============================================
-// EXPORTAR CSV
-// ============================================
-function exportarCSV() {
-  if (ventas.length === 0) { toast('Sin datos', 'error'); return; }
-  const csv = 'Fecha,Cliente,Producto,Marca,Pzas,USD,Total MXN,Estado\n' + ventas.map(v => `${v.fecha},${v.codCliente},${v.producto},${v.marca},${v.pzas},${v.precioUSD},${v.totalMXN},${v.estado}`).join('\n');
-  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `ventas_${new Date().toISOString().slice(0,10)}.csv`;
-  a.click();
-  toast('📥 CSV descargado', 'success');
-}
-
-// ============================================
-// SELECT CLIENTE
-// ============================================
-function cargarSelectClienteNombre() {
-  const sel = document.getElementById('selectClienteNombre');
-  if (!sel) return;
-  const clientes = usuarios.filter(u => u.rol === 'cliente' || u.rol === 'shopper');
-  sel.innerHTML = '<option value="">— Buscar —</option>' + clientes.map(u => `<option value="${u.codigo}">${u.nombre} (${u.codigo})</option>`).join('');
-}
-
-function seleccionarClienteNombre() {
-  const cod = document.getElementById('selectClienteNombre').value;
-  if (!cod) return;
-  document.getElementById('clienteSeleccionado').value = cod;
-  cargarProductosClienteAdmin();
-}
-
-function actualizarCompBadge() {
-  const pendientes = Object.keys(comprobantes).filter(cod => ventas.some(v => v.codCliente === cod && v.estado === 'aprobado'));
-  const badge = document.getElementById('compBadge');
-  if (badge) {
-    badge.textContent = pendientes.length;
-    badge.style.display = pendientes.length > 0 ? 'flex' : 'none';
-  }
-}
-
-// ============================================
-// MANUAL
-// ============================================
-function abrirManual() { document.getElementById('manualModal').style.display = 'flex'; }
-function cerrarManual() { document.getElementById('manualModal').style.display = 'none'; }
-
-// ============================================
-// ARRANQUE
-// ============================================
-window.onload = async () => {
-  console.log('🚀 Iniciando Divina Compras...');
-  if (!iniciarFirebase()) return;
-  
-  const snap = await db.collection('config').doc('settings').get();
-  if (snap.exists) {
-    const d = snap.data();
-    cfg.TC = d.TC || cfg.TC;
-    cfg.comisionGlobal = d.comisionGlobal ?? cfg.comisionGlobal;
-    cfg.horaFelizActiva = d.horaFelizActiva ?? false;
-    cfg.descuentoHH = d.descuentoHH ?? cfg.descuentoHH;
+// ─── AUTH ─────────────────────────────────────
+async function loginUsuario() {
+  const codigo = document.getElementById('codigoAcceso').value.trim();
+  document.getElementById('loginError').innerText = '';
+  if (!codigo) { document.getElementById('loginError').innerText = 'Ingresa tu código'; return; }
+  const usuario = usuarios.find(u => u.codigo === codigo && (u.rol === 'cliente' || u.rol === 'shopper'));
+  if (usuario) {
+    usuarioActual = usuario;
+    mostrarApp();
   } else {
-    await db.collection('config').doc('settings').set({ TC: cfg.TC, comisionGlobal: cfg.comisionGlobal, horaFelizActiva: false, descuentoHH: cfg.descuentoHH });
+    // Try fetching from Firestore in case listeners haven't loaded yet
+    try {
+      const snap = await db.collection('usuarios').doc(codigo).get();
+      if (snap.exists && snap.data().rol !== 'admin') {
+        usuarioActual = snap.data();
+        mostrarApp();
+      } else document.getElementById('loginError').innerText = 'Código no registrado.';
+    } catch(e) { document.getElementById('loginError').innerText = 'Error de conexión'; }
   }
-  
+}
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+// Rate limiting: 5 attempts max, 5 min lockout
+const ADMIN_MAX_INTENTOS = 5;
+const ADMIN_LOCKOUT_MS = 5 * 60 * 1000;
+
+function getLoginState() {
+  try {
+    const s = JSON.parse(sessionStorage.getItem('_adm') || '{}');
+    return { intentos: s.i || 0, bloqueadoHasta: s.b || 0 };
+  } catch { return { intentos: 0, bloqueadoHasta: 0 }; }
+}
+function setLoginState(intentos, bloqueadoHasta) {
+  sessionStorage.setItem('_adm', JSON.stringify({ i: intentos, b: bloqueadoHasta }));
+}
+
+async function loginAdmin() {
+  const errEl = document.getElementById('loginError');
+  errEl.innerText = '';
+
+  // Check lockout
+  const { intentos, bloqueadoHasta } = getLoginState();
+  if (Date.now() < bloqueadoHasta) {
+    const mins = Math.ceil((bloqueadoHasta - Date.now()) / 60000);
+    errEl.innerText = `Demasiados intentos. Espera ${mins} min.`;
+    return;
+  }
+
+  const pass = document.getElementById('adminPassword').value;
+  if (!pass) { errEl.innerText = 'Ingresa la clave'; return; }
+
+  try {
+    const snap = await db.collection('config').doc('settings').get();
+    const storedHash = snap.exists ? snap.data().adminPasswordHash : '';
+
+    // First-time setup: no hash stored yet → set it now
+    if (!storedHash) {
+      const nuevoHash = await sha256(pass);
+      await db.collection('config').doc('settings').set({ adminPasswordHash: nuevoHash }, { merge: true });
+      setLoginState(0, 0);
+      usuarioActual = { codigo: 'admin', nombre: 'Administrador', rol: 'admin', esSocio: false };
+      mostrarApp();
+      return;
+    }
+
+    const inputHash = await sha256(pass);
+    if (inputHash === storedHash) {
+      setLoginState(0, 0);
+      usuarioActual = { codigo: 'admin', nombre: 'Administrador', rol: 'admin', esSocio: false };
+      mostrarApp();
+    } else {
+      const nuevosIntentos = intentos + 1;
+      if (nuevosIntentos >= ADMIN_MAX_INTENTOS) {
+        setLoginState(nuevosIntentos, Date.now() + ADMIN_LOCKOUT_MS);
+        errEl.innerText = `Clave incorrecta. Cuenta bloqueada 5 minutos.`;
+      } else {
+        setLoginState(nuevosIntentos, 0);
+        errEl.innerText = `Clave incorrecta. ${ADMIN_MAX_INTENTOS - nuevosIntentos} intento(s) restante(s).`;
+      }
+      document.getElementById('adminPassword').value = '';
+    }
+  } catch(e) {
+    errEl.innerText = 'Error de conexión: ' + e.message;
+  }
+}
+function mostrarApp() {
+  document.getElementById('loginOverlay').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'block';
+  document.getElementById('bienvenidaUsuario').innerText = `Bienvenida/o, ${usuarioActual.nombre || usuarioActual.codigo}`;
+  document.getElementById('adminPanel').style.display = usuarioActual.rol === 'admin' ? 'block' : 'none';
+  document.getElementById('shopperPanel').style.display = usuarioActual.rol === 'shopper' ? 'block' : 'none';
+  document.getElementById('clientePanel').style.display = usuarioActual.rol === 'cliente' ? 'block' : 'none';
+  if (usuarioActual.rol === 'admin') { renderDashboard(); renderTablaUsuarios(); cargarSelectVendedores(); syncUI(); }
+  else if (usuarioActual.rol === 'shopper') renderShopper();
+  else renderCliente();
+}
+function cerrarSesion() {
+  usuarioActual = null;
+  document.getElementById('mainApp').style.display = 'none';
+  document.getElementById('loginOverlay').style.display = 'flex';
+  document.getElementById('codigoAcceso').value = '';
+  document.getElementById('adminPassword').value = '';
+  document.getElementById('loginError').innerText = '';
+}
+
+// ─── INIT ─────────────────────────────────────
+window.onload = () => {
+  const ok = iniciarFirebase();
+  if (!ok) return;
+
+  // Bootstrap Firestore config if empty
+  db.collection('config').doc('settings').get().then(snap => {
+    if (!snap.exists) {
+      db.collection('config').doc('settings').set({
+        TC: cfg.TC, comisionGlobal: cfg.comisionGlobal,
+        horaFelizActiva: cfg.horaFelizActiva, descuentoHH: cfg.descuentoHH
+        // adminPasswordHash set on first admin login
+      });
+    } else {
+      const d = snap.data();
+      if (d.TC) cfg.TC = d.TC;
+      if (d.comisionGlobal != null) cfg.comisionGlobal = d.comisionGlobal;
+      if (d.horaFelizActiva != null) cfg.horaFelizActiva = d.horaFelizActiva;
+      if (d.descuentoHH != null) cfg.descuentoHH = d.descuentoHH;
+    }
+  });
+
+  // Bootstrap admin user if missing
   db.collection('usuarios').doc('admin').get().then(snap => {
     if (!snap.exists) db.collection('usuarios').doc('admin').set({ codigo: 'admin', nombre: 'Administrador', rol: 'admin', esSocio: false });
   });
-  
+
+  setupListeners();
+
+  // Init tallas
   cargarSelectTalla();
   onTipoChange();
   toggleSocioCheck();
-  
-  ['precioUSD','pzas'].forEach(id => { const el = document.getElementById(id); if(el) el.addEventListener('input', actualizarPreviewPrecio); });
-  document.getElementById('codCliente').addEventListener('input', actualizarCapturaPanel);
+
+  // Preview precio en tiempo real
+  ['precioUSD','pzas','categoria'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', actualizarPreviewPrecio);
+  });
+
+  // codCliente live panel
+  const codClienteEl = document.getElementById('codCliente');
+  if (codClienteEl) codClienteEl.addEventListener('input', actualizarCapturaPanel);
+
+  // Enter key login
   document.getElementById('codigoAcceso').addEventListener('keydown', e => { if(e.key==='Enter') loginUsuario(); });
   document.getElementById('adminPassword').addEventListener('keydown', e => { if(e.key==='Enter') loginAdmin(); });
-  
+
   document.getElementById('mainApp').style.display = 'none';
   document.getElementById('loginOverlay').style.display = 'flex';
-  
-  console.log('✅ Listo');
 };
 </script>
 </body>
